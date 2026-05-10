@@ -1,0 +1,960 @@
+[
+  {
+    "id": 1,
+    "name": "Atelier Montpellier 1",
+    "city": "Montpellier",
+    "address": "144 impasse des Écoles, 92591 Montpellier",
+    "location": {
+      "lat": 43.584225,
+      "lon": 3.865466
+    },
+    "type": "click-and-collect",
+    "opening_hours": "08:00-18:00",
+    "categories": [
+      "Jouets",
+      "Vêtements",
+      "Électronique",
+      "Livres"
+    ],
+    "employee_count": 19
+  },
+  {
+    "id": 2,
+    "name": "Point de vente Lille 2",
+    "city": "Lille",
+    "address": "116 boulevard des Écoles, 33473 Lille",
+    "location": {
+      "lat": 50.629589,
+      "lon": 3.077562
+    },
+    "type": "flagship",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Jouets",
+      "Livres"
+    ],
+    "employee_count": 202
+  },
+  {
+    "id": 3,
+    "name": "Atelier Lille 3",
+    "city": "Lille",
+    "address": "35 avenue du Commerce, 29053 Lille",
+    "location": {
+      "lat": 50.634578,
+      "lon": 3.077252
+    },
+    "type": "standard",
+    "opening_hours": "09:00-19:00",
+    "categories": [
+      "Sports",
+      "Électronique",
+      "Jouets",
+      "Vêtements",
+      "Alimentation"
+    ],
+    "employee_count": 238
+  },
+  {
+    "id": 4,
+    "name": "Boutique Rennes 4",
+    "city": "Rennes",
+    "address": "149 boulevard des Écoles, 69109 Rennes",
+    "location": {
+      "lat": 48.122082,
+      "lon": -1.709694
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Jouets",
+      "Maison & Jardin",
+      "Livres",
+      "Sports",
+      "Alimentation",
+      "Électronique",
+      "Vêtements"
+    ],
+    "employee_count": 84
+  },
+  {
+    "id": 5,
+    "name": "Atelier Nice 5",
+    "city": "Nice",
+    "address": "40 rue des Écoles, 70555 Nice",
+    "location": {
+      "lat": 43.707075,
+      "lon": 7.276294
+    },
+    "type": "outlet",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Livres",
+      "Jouets",
+      "Maison & Jardin",
+      "Vêtements",
+      "Sports",
+      "Électronique"
+    ],
+    "employee_count": 52
+  },
+  {
+    "id": 6,
+    "name": "Marché Montpellier 6",
+    "city": "Montpellier",
+    "address": "54 avenue Lafayette, 91306 Montpellier",
+    "location": {
+      "lat": 43.630666,
+      "lon": 3.85364
+    },
+    "type": "click-and-collect",
+    "opening_hours": "08:00-18:00",
+    "categories": [
+      "Sports",
+      "Alimentation",
+      "Vêtements",
+      "Électronique",
+      "Maison & Jardin",
+      "Jouets"
+    ],
+    "employee_count": 148
+  },
+  {
+    "id": 7,
+    "name": "Boutique Montpellier 7",
+    "city": "Montpellier",
+    "address": "17 avenue des Écoles, 69029 Montpellier",
+    "location": {
+      "lat": 43.613038,
+      "lon": 3.838001
+    },
+    "type": "click-and-collect",
+    "opening_hours": "08:00-20:00",
+    "categories": [
+      "Maison & Jardin",
+      "Électronique",
+      "Sports",
+      "Jouets",
+      "Alimentation"
+    ],
+    "employee_count": 18
+  },
+  {
+    "id": 8,
+    "name": "Espace Bordeaux 8",
+    "city": "Bordeaux",
+    "address": "113 place Foch, 54537 Bordeaux",
+    "location": {
+      "lat": 44.879406,
+      "lon": -0.608951
+    },
+    "type": "standard",
+    "opening_hours": "08:00-21:00",
+    "categories": [
+      "Alimentation",
+      "Vêtements",
+      "Sports",
+      "Livres",
+      "Maison & Jardin",
+      "Jouets"
+    ],
+    "employee_count": 230
+  },
+  {
+    "id": 9,
+    "name": "Marché Lille 9",
+    "city": "Lille",
+    "address": "133 rue Zola, 90107 Lille",
+    "location": {
+      "lat": 50.604034,
+      "lon": 3.025043
+    },
+    "type": "outlet",
+    "opening_hours": "09:00-20:00",
+    "categories": [
+      "Maison & Jardin",
+      "Jouets"
+    ],
+    "employee_count": 43
+  },
+  {
+    "id": 10,
+    "name": "Galerie Grenoble 10",
+    "city": "Grenoble",
+    "address": "15 avenue Jean Jaurès, 26273 Grenoble",
+    "location": {
+      "lat": 45.164995,
+      "lon": 5.768348
+    },
+    "type": "click-and-collect",
+    "opening_hours": "10:00-19:00",
+    "categories": [
+      "Électronique",
+      "Jouets",
+      "Vêtements",
+      "Sports",
+      "Maison & Jardin",
+      "Livres"
+    ],
+    "employee_count": 185
+  },
+  {
+    "id": 11,
+    "name": "Point de vente Toulouse 11",
+    "city": "Toulouse",
+    "address": "147 allée du Moulin, 17611 Toulouse",
+    "location": {
+      "lat": 43.567304,
+      "lon": 1.486439
+    },
+    "type": "flagship",
+    "opening_hours": "10:00-20:00",
+    "categories": [
+      "Jouets",
+      "Vêtements",
+      "Livres",
+      "Alimentation",
+      "Maison & Jardin",
+      "Électronique"
+    ],
+    "employee_count": 67
+  },
+  {
+    "id": 12,
+    "name": "Galerie Grenoble 12",
+    "city": "Grenoble",
+    "address": "98 allée du Commerce, 20675 Grenoble",
+    "location": {
+      "lat": 45.226984,
+      "lon": 5.711171
+    },
+    "type": "outlet",
+    "opening_hours": "09:00-21:00",
+    "categories": [
+      "Jouets",
+      "Électronique",
+      "Vêtements",
+      "Sports",
+      "Maison & Jardin"
+    ],
+    "employee_count": 193
+  },
+  {
+    "id": 13,
+    "name": "Grand Magasin Grenoble 13",
+    "city": "Grenoble",
+    "address": "145 impasse Zola, 45979 Grenoble",
+    "location": {
+      "lat": 45.235835,
+      "lon": 5.678323
+    },
+    "type": "click-and-collect",
+    "opening_hours": "08:00-21:00",
+    "categories": [
+      "Sports",
+      "Maison & Jardin",
+      "Alimentation",
+      "Électronique",
+      "Jouets",
+      "Livres"
+    ],
+    "employee_count": 10
+  },
+  {
+    "id": 14,
+    "name": "Grand Magasin Nantes 14",
+    "city": "Nantes",
+    "address": "41 impasse de la Liberté, 66288 Nantes",
+    "location": {
+      "lat": 47.232126,
+      "lon": -1.585866
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-21:00",
+    "categories": [
+      "Maison & Jardin",
+      "Livres",
+      "Électronique"
+    ],
+    "employee_count": 33
+  },
+  {
+    "id": 15,
+    "name": "Marché Strasbourg 15",
+    "city": "Strasbourg",
+    "address": "21 place Jean Jaurès, 86351 Strasbourg",
+    "location": {
+      "lat": 48.558313,
+      "lon": 7.718245
+    },
+    "type": "click-and-collect",
+    "opening_hours": "10:00-20:00",
+    "categories": [
+      "Alimentation",
+      "Livres",
+      "Sports",
+      "Électronique",
+      "Vêtements",
+      "Jouets"
+    ],
+    "employee_count": 130
+  },
+  {
+    "id": 16,
+    "name": "Galerie Marseille 16",
+    "city": "Marseille",
+    "address": "135 boulevard du Moulin, 71639 Marseille",
+    "location": {
+      "lat": 43.297012,
+      "lon": 5.367078
+    },
+    "type": "flagship",
+    "opening_hours": "08:00-19:00",
+    "categories": [
+      "Vêtements"
+    ],
+    "employee_count": 237
+  },
+  {
+    "id": 17,
+    "name": "Espace Lyon 17",
+    "city": "Lyon",
+    "address": "100 allée du Marché, 43195 Lyon",
+    "location": {
+      "lat": 45.7938,
+      "lon": 4.818726
+    },
+    "type": "outlet",
+    "opening_hours": "09:00-21:00",
+    "categories": [
+      "Alimentation"
+    ],
+    "employee_count": 40
+  },
+  {
+    "id": 18,
+    "name": "Galerie Bordeaux 18",
+    "city": "Bordeaux",
+    "address": "127 avenue de la Paix, 26171 Bordeaux",
+    "location": {
+      "lat": 44.880006,
+      "lon": -0.561027
+    },
+    "type": "standard",
+    "opening_hours": "09:00-21:00",
+    "categories": [
+      "Vêtements"
+    ],
+    "employee_count": 205
+  },
+  {
+    "id": 19,
+    "name": "Galerie Strasbourg 19",
+    "city": "Strasbourg",
+    "address": "107 rue des Fleurs, 45079 Strasbourg",
+    "location": {
+      "lat": 48.58006,
+      "lon": 7.708333
+    },
+    "type": "outlet",
+    "opening_hours": "10:00-20:00",
+    "categories": [
+      "Maison & Jardin",
+      "Vêtements",
+      "Alimentation",
+      "Jouets"
+    ],
+    "employee_count": 138
+  },
+  {
+    "id": 20,
+    "name": "Marché Toulouse 20",
+    "city": "Toulouse",
+    "address": "87 boulevard du Marché, 33727 Toulouse",
+    "location": {
+      "lat": 43.633116,
+      "lon": 1.441159
+    },
+    "type": "flagship",
+    "opening_hours": "10:00-18:00",
+    "categories": [
+      "Sports",
+      "Maison & Jardin",
+      "Vêtements",
+      "Alimentation",
+      "Électronique",
+      "Jouets"
+    ],
+    "employee_count": 210
+  },
+  {
+    "id": 21,
+    "name": "Point de vente Paris 21",
+    "city": "Paris",
+    "address": "19 boulevard de la Liberté, 25113 Paris",
+    "location": {
+      "lat": 48.890377,
+      "lon": 2.33441
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Alimentation"
+    ],
+    "employee_count": 93
+  },
+  {
+    "id": 22,
+    "name": "Point de vente Toulouse 22",
+    "city": "Toulouse",
+    "address": "27 impasse des Écoles, 49256 Toulouse",
+    "location": {
+      "lat": 43.593615,
+      "lon": 1.437765
+    },
+    "type": "flagship",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Maison & Jardin",
+      "Sports",
+      "Alimentation",
+      "Jouets",
+      "Vêtements"
+    ],
+    "employee_count": 210
+  },
+  {
+    "id": 23,
+    "name": "Espace Rennes 23",
+    "city": "Rennes",
+    "address": "48 impasse de la Liberté, 84194 Rennes",
+    "location": {
+      "lat": 48.147423,
+      "lon": -1.684883
+    },
+    "type": "flagship",
+    "opening_hours": "08:00-20:00",
+    "categories": [
+      "Vêtements",
+      "Électronique"
+    ],
+    "employee_count": 77
+  },
+  {
+    "id": 24,
+    "name": "Maison Montpellier 24",
+    "city": "Montpellier",
+    "address": "3 impasse du Commerce, 82216 Montpellier",
+    "location": {
+      "lat": 43.561323,
+      "lon": 3.91251
+    },
+    "type": "click-and-collect",
+    "opening_hours": "10:00-18:00",
+    "categories": [
+      "Livres",
+      "Électronique",
+      "Sports",
+      "Vêtements",
+      "Jouets",
+      "Alimentation",
+      "Maison & Jardin"
+    ],
+    "employee_count": 111
+  },
+  {
+    "id": 25,
+    "name": "Espace Nice 25",
+    "city": "Nice",
+    "address": "125 impasse de Gaulle, 72891 Nice",
+    "location": {
+      "lat": 43.714461,
+      "lon": 7.273255
+    },
+    "type": "click-and-collect",
+    "opening_hours": "10:00-18:00",
+    "categories": [
+      "Vêtements",
+      "Jouets",
+      "Électronique",
+      "Sports"
+    ],
+    "employee_count": 239
+  },
+  {
+    "id": 26,
+    "name": "Maison Bordeaux 26",
+    "city": "Bordeaux",
+    "address": "134 place des Lilas, 15278 Bordeaux",
+    "location": {
+      "lat": 44.880797,
+      "lon": -0.563527
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Électronique"
+    ],
+    "employee_count": 103
+  },
+  {
+    "id": 27,
+    "name": "Atelier Strasbourg 27",
+    "city": "Strasbourg",
+    "address": "66 allée de Gaulle, 15916 Strasbourg",
+    "location": {
+      "lat": 48.606959,
+      "lon": 7.769481
+    },
+    "type": "flagship",
+    "opening_hours": "09:00-20:00",
+    "categories": [
+      "Livres",
+      "Sports",
+      "Électronique",
+      "Jouets",
+      "Maison & Jardin",
+      "Vêtements"
+    ],
+    "employee_count": 247
+  },
+  {
+    "id": 28,
+    "name": "Marché Strasbourg 28",
+    "city": "Strasbourg",
+    "address": "120 allée Zola, 19605 Strasbourg",
+    "location": {
+      "lat": 48.529237,
+      "lon": 7.73097
+    },
+    "type": "outlet",
+    "opening_hours": "08:00-20:00",
+    "categories": [
+      "Livres",
+      "Électronique"
+    ],
+    "employee_count": 197
+  },
+  {
+    "id": 29,
+    "name": "Centre Marseille 29",
+    "city": "Marseille",
+    "address": "78 allée Zola, 71384 Marseille",
+    "location": {
+      "lat": 43.251502,
+      "lon": 5.386394
+    },
+    "type": "outlet",
+    "opening_hours": "08:00-20:00",
+    "categories": [
+      "Livres",
+      "Vêtements",
+      "Maison & Jardin",
+      "Sports",
+      "Jouets",
+      "Électronique",
+      "Alimentation"
+    ],
+    "employee_count": 168
+  },
+  {
+    "id": 30,
+    "name": "Marché Montpellier 30",
+    "city": "Montpellier",
+    "address": "26 avenue de la République, 25911 Montpellier",
+    "location": {
+      "lat": 43.579112,
+      "lon": 3.830789
+    },
+    "type": "flagship",
+    "opening_hours": "10:00-18:00",
+    "categories": [
+      "Sports",
+      "Vêtements"
+    ],
+    "employee_count": 145
+  },
+  {
+    "id": 31,
+    "name": "Maison Grenoble 31",
+    "city": "Grenoble",
+    "address": "33 allée Voltaire, 66219 Grenoble",
+    "location": {
+      "lat": 45.164683,
+      "lon": 5.687392
+    },
+    "type": "outlet",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Jouets",
+      "Alimentation"
+    ],
+    "employee_count": 7
+  },
+  {
+    "id": 32,
+    "name": "Marché Paris 32",
+    "city": "Paris",
+    "address": "54 boulevard Zola, 37903 Paris",
+    "location": {
+      "lat": 48.829739,
+      "lon": 2.344801
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-20:00",
+    "categories": [
+      "Électronique",
+      "Maison & Jardin",
+      "Livres",
+      "Vêtements",
+      "Jouets",
+      "Alimentation",
+      "Sports"
+    ],
+    "employee_count": 237
+  },
+  {
+    "id": 33,
+    "name": "Centre Marseille 33",
+    "city": "Marseille",
+    "address": "29 place de la République, 46270 Marseille",
+    "location": {
+      "lat": 43.335889,
+      "lon": 5.349443
+    },
+    "type": "outlet",
+    "opening_hours": "10:00-20:00",
+    "categories": [
+      "Maison & Jardin",
+      "Livres",
+      "Vêtements"
+    ],
+    "employee_count": 185
+  },
+  {
+    "id": 34,
+    "name": "Maison Lyon 34",
+    "city": "Lyon",
+    "address": "118 allée Voltaire, 17834 Lyon",
+    "location": {
+      "lat": 45.722392,
+      "lon": 4.82172
+    },
+    "type": "standard",
+    "opening_hours": "09:00-20:00",
+    "categories": [
+      "Électronique",
+      "Alimentation",
+      "Livres",
+      "Sports"
+    ],
+    "employee_count": 73
+  },
+  {
+    "id": 35,
+    "name": "Centre Paris 35",
+    "city": "Paris",
+    "address": "21 boulevard Voltaire, 77578 Paris",
+    "location": {
+      "lat": 48.808618,
+      "lon": 2.360993
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Alimentation",
+      "Électronique",
+      "Jouets",
+      "Vêtements"
+    ],
+    "employee_count": 184
+  },
+  {
+    "id": 36,
+    "name": "Centre Lille 36",
+    "city": "Lille",
+    "address": "5 rue des Lilas, 80255 Lille",
+    "location": {
+      "lat": 50.623727,
+      "lon": 3.040801
+    },
+    "type": "standard",
+    "opening_hours": "09:00-20:00",
+    "categories": [
+      "Vêtements",
+      "Alimentation",
+      "Électronique",
+      "Livres",
+      "Maison & Jardin",
+      "Sports",
+      "Jouets"
+    ],
+    "employee_count": 100
+  },
+  {
+    "id": 37,
+    "name": "Centre Bordeaux 37",
+    "city": "Bordeaux",
+    "address": "113 impasse Victor Hugo, 61359 Bordeaux",
+    "location": {
+      "lat": 44.88388,
+      "lon": -0.576749
+    },
+    "type": "standard",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Maison & Jardin",
+      "Électronique",
+      "Jouets",
+      "Sports",
+      "Vêtements",
+      "Alimentation",
+      "Livres"
+    ],
+    "employee_count": 187
+  },
+  {
+    "id": 38,
+    "name": "Point de vente Marseille 38",
+    "city": "Marseille",
+    "address": "84 avenue Foch, 69099 Marseille",
+    "location": {
+      "lat": 43.337922,
+      "lon": 5.367534
+    },
+    "type": "outlet",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Vêtements"
+    ],
+    "employee_count": 249
+  },
+  {
+    "id": 39,
+    "name": "Maison Lille 39",
+    "city": "Lille",
+    "address": "81 boulevard des Écoles, 44428 Lille",
+    "location": {
+      "lat": 50.668485,
+      "lon": 3.08599
+    },
+    "type": "standard",
+    "opening_hours": "09:00-19:00",
+    "categories": [
+      "Jouets",
+      "Sports",
+      "Vêtements",
+      "Maison & Jardin",
+      "Alimentation",
+      "Livres",
+      "Électronique"
+    ],
+    "employee_count": 7
+  },
+  {
+    "id": 40,
+    "name": "Comptoir Lille 40",
+    "city": "Lille",
+    "address": "53 boulevard Jean Jaurès, 35847 Lille",
+    "location": {
+      "lat": 50.610782,
+      "lon": 3.024043
+    },
+    "type": "outlet",
+    "opening_hours": "10:00-19:00",
+    "categories": [
+      "Sports",
+      "Maison & Jardin",
+      "Jouets",
+      "Électronique",
+      "Alimentation"
+    ],
+    "employee_count": 248
+  },
+  {
+    "id": 41,
+    "name": "Atelier Rennes 41",
+    "city": "Rennes",
+    "address": "127 avenue des Lilas, 76542 Rennes",
+    "location": {
+      "lat": 48.078365,
+      "lon": -1.67767
+    },
+    "type": "click-and-collect",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Vêtements",
+      "Électronique",
+      "Livres",
+      "Alimentation",
+      "Maison & Jardin"
+    ],
+    "employee_count": 103
+  },
+  {
+    "id": 42,
+    "name": "Espace Montpellier 42",
+    "city": "Montpellier",
+    "address": "10 boulevard de la Liberté, 51264 Montpellier",
+    "location": {
+      "lat": 43.63834,
+      "lon": 3.899859
+    },
+    "type": "flagship",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Maison & Jardin",
+      "Vêtements",
+      "Jouets",
+      "Livres",
+      "Sports",
+      "Alimentation"
+    ],
+    "employee_count": 72
+  },
+  {
+    "id": 43,
+    "name": "Boutique Lille 43",
+    "city": "Lille",
+    "address": "52 boulevard de la Paix, 34847 Lille",
+    "location": {
+      "lat": 50.678446,
+      "lon": 3.104575
+    },
+    "type": "standard",
+    "opening_hours": "08:00-19:00",
+    "categories": [
+      "Sports"
+    ],
+    "employee_count": 149
+  },
+  {
+    "id": 44,
+    "name": "Boutique Nice 44",
+    "city": "Nice",
+    "address": "18 avenue des Fleurs, 59908 Nice",
+    "location": {
+      "lat": 43.695904,
+      "lon": 7.255287
+    },
+    "type": "outlet",
+    "opening_hours": "08:00-18:00",
+    "categories": [
+      "Électronique",
+      "Sports",
+      "Vêtements",
+      "Jouets",
+      "Alimentation",
+      "Livres"
+    ],
+    "employee_count": 220
+  },
+  {
+    "id": 45,
+    "name": "Atelier Lille 45",
+    "city": "Lille",
+    "address": "32 avenue Jean Jaurès, 59216 Lille",
+    "location": {
+      "lat": 50.640902,
+      "lon": 3.060445
+    },
+    "type": "outlet",
+    "opening_hours": "09:00-21:00",
+    "categories": [
+      "Alimentation",
+      "Vêtements",
+      "Jouets",
+      "Maison & Jardin",
+      "Sports"
+    ],
+    "employee_count": 71
+  },
+  {
+    "id": 46,
+    "name": "Grand Magasin Lyon 46",
+    "city": "Lyon",
+    "address": "89 impasse Gambetta, 77543 Lyon",
+    "location": {
+      "lat": 45.770043,
+      "lon": 4.804859
+    },
+    "type": "standard",
+    "opening_hours": "10:00-20:00",
+    "categories": [
+      "Sports",
+      "Livres"
+    ],
+    "employee_count": 112
+  },
+  {
+    "id": 47,
+    "name": "Espace Lyon 47",
+    "city": "Lyon",
+    "address": "57 avenue de la République, 63362 Lyon",
+    "location": {
+      "lat": 45.75375,
+      "lon": 4.849368
+    },
+    "type": "standard",
+    "opening_hours": "08:00-19:00",
+    "categories": [
+      "Alimentation",
+      "Vêtements"
+    ],
+    "employee_count": 141
+  },
+  {
+    "id": 48,
+    "name": "Comptoir Toulouse 48",
+    "city": "Toulouse",
+    "address": "81 impasse du Moulin, 49651 Toulouse",
+    "location": {
+      "lat": 43.556603,
+      "lon": 1.390439
+    },
+    "type": "outlet",
+    "opening_hours": "08:00-20:00",
+    "categories": [
+      "Sports",
+      "Maison & Jardin",
+      "Jouets"
+    ],
+    "employee_count": 108
+  },
+  {
+    "id": 49,
+    "name": "Grand Magasin Lyon 49",
+    "city": "Lyon",
+    "address": "101 boulevard Victor Hugo, 53657 Lyon",
+    "location": {
+      "lat": 45.725525,
+      "lon": 4.890454
+    },
+    "type": "click-and-collect",
+    "opening_hours": "09:00-18:00",
+    "categories": [
+      "Maison & Jardin",
+      "Sports",
+      "Vêtements"
+    ],
+    "employee_count": 147
+  },
+  {
+    "id": 50,
+    "name": "Boutique Montpellier 50",
+    "city": "Montpellier",
+    "address": "16 rue du Marché, 48534 Montpellier",
+    "location": {
+      "lat": 43.562422,
+      "lon": 3.897238
+    },
+    "type": "click-and-collect",
+    "opening_hours": "10:00-21:00",
+    "categories": [
+      "Maison & Jardin",
+      "Alimentation",
+      "Électronique"
+    ],
+    "employee_count": 51
+  }
+]

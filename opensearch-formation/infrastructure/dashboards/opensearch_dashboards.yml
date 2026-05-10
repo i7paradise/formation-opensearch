@@ -1,0 +1,160 @@
+# =============================================================================
+# Configuration OpenSearch Dashboards — Kit de formation
+# Ce fichier est monté dans le conteneur via un volume Docker
+# Pour l'utiliser : décommenter la ligne volumes dans docker-compose.yml
+#   volumes:
+#     - ./dashboards/opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Serveur Dashboards
+# -----------------------------------------------------------------------------
+
+# Adresse d'écoute du serveur (0.0.0.0 = toutes les interfaces — nécessaire pour Docker)
+server.host: "0.0.0.0"
+
+# Port d'écoute de l'interface web
+server.port: 5601
+
+# Nom du serveur Dashboards (affiché dans les logs)
+server.name: "opensearch-dashboards"
+
+# Basepath si Dashboards est derrière un reverse proxy
+# server.basePath: ""
+# server.rewriteBasePath: false
+
+# Taille maximale des payloads HTTP (augmenter si import de données volumineux)
+server.maxPayloadBytes: 1048576
+
+# -----------------------------------------------------------------------------
+# Connexion à OpenSearch
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+# MODE NOEUD UNIQUE (Jours 1 & 2) — Sécurité DÉSACTIVÉE
+# =============================================================================
+opensearch.hosts: ["http://opensearch:9200"]
+
+# Délai de connexion et de requête (en millisecondes)
+opensearch.requestTimeout: 30000
+opensearch.shardTimeout: 30000
+
+# Nombre de tentatives en cas d'échec de connexion
+# opensearch.requestHeadersAllowlist: ["authorization"]
+
+# =============================================================================
+# MODE CLUSTER (Jour 3) — Sécurité ACTIVÉE
+# Commenter le bloc "NOEUD UNIQUE" ci-dessus et décommenter le bloc ci-dessous
+# =============================================================================
+
+# Connexion aux 3 noeuds du cluster avec HTTPS
+# opensearch.hosts:
+#   - "https://opensearch-node1:9200"
+#   - "https://opensearch-node2:9200"
+#   - "https://opensearch-node3:9200"
+
+# Credentials administrateur (à changer en production !)
+# opensearch.username: "admin"
+# opensearch.password: "Formation@OpenSearch2024!"
+
+# Vérification SSL — désactivé pour les certificats de démonstration
+# opensearch.ssl.verificationMode: "none"
+# opensearch.ssl.alwaysPresentCertificate: false
+
+# Certificats SSL si vérification activée
+# opensearch.ssl.certificateAuthorities: ["/usr/share/opensearch-dashboards/certs/root-ca.pem"]
+
+# -----------------------------------------------------------------------------
+# Sécurité OpenSearch Dashboards
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+# SÉCURITÉ DÉSACTIVÉE (Jours 1 & 2)
+# =============================================================================
+opensearch_security.disabled: true
+
+# =============================================================================
+# SÉCURITÉ ACTIVÉE (Jour 3)
+# Commenter la ligne ci-dessus et décommenter les lignes ci-dessous
+# =============================================================================
+
+# opensearch_security.disabled: false
+
+# Mode d'authentification (basic, openid, saml, etc.)
+# opensearch_security.auth.type: "basicauth"
+
+# Redirection vers la page de login
+# opensearch_security.ui.features.navLinks: []
+
+# Cookie de session — changer la clé en production !
+# opensearch_security.session.ttl: 3600000
+# opensearch_security.session.keepalive: true
+
+# Cookie sécurisé (mettre à true si HTTPS est activé)
+# opensearch_security.cookie.secure: false
+
+# Clé de chiffrement du cookie (32 caractères minimum)
+# opensearch_security.cookie.password: "FormationOpenSearchCookiePassword123!"
+
+# -----------------------------------------------------------------------------
+# Index système Dashboards
+# -----------------------------------------------------------------------------
+
+# Index utilisé pour stocker la configuration de Dashboards
+opensearch_dashboards.index: ".opensearch_dashboards"
+
+# Utilisateur par défaut pour les opérations système
+# opensearch.serviceAccountToken: ""
+
+# -----------------------------------------------------------------------------
+# Journalisation
+# -----------------------------------------------------------------------------
+
+# Niveau de journalisation (silent, error, warning, info, debug)
+logging.root.level: "warn"
+
+# Journalisation vers stdout (adapté pour Docker)
+logging.appenders.default:
+  type: console
+  layout:
+    type: pattern
+    pattern: "[%date][%-5level][%logger] %message"
+
+# Désactivation de certains loggers verbeux
+logging.loggers:
+  - name: plugins.securityDashboards
+    level: warn
+  - name: optimize
+    level: warn
+
+# -----------------------------------------------------------------------------
+# Télémétrie et fonctionnalités
+# -----------------------------------------------------------------------------
+
+# Désactivation de la télémétrie (envoi de données à OpenSearch.org)
+telemetry.optIn: false
+telemetry.enabled: false
+
+# Désactivation des notifications de mise à jour
+newsfeed.enabled: false
+
+# -----------------------------------------------------------------------------
+# Internationalisation
+# -----------------------------------------------------------------------------
+
+# Langue de l'interface (fr-FR disponible selon la version)
+# i18n.locale: "fr-FR"
+
+# -----------------------------------------------------------------------------
+# Paramètres de carte (Maps)
+# -----------------------------------------------------------------------------
+
+# URL du serveur de tuiles cartographiques (laisser vide pour le défaut)
+# map.tilemap.url: ""
+
+# -----------------------------------------------------------------------------
+# Sauvegarde automatique des objets
+# -----------------------------------------------------------------------------
+
+# Intervalle de vérification des migrations (en millisecondes)
+# savedObjects.maxImportPayloadBytes: 26214400

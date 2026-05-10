@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# BMad internal
+_bmad/
+
+# Claude Code internals
+.claude/
+
+# CLAUDE.md prompt files
+CLAUDE-CODE-PROMPT-*.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Editor
+.vscode/
+.idea/
+
+# Env
+.env
+.env.*
