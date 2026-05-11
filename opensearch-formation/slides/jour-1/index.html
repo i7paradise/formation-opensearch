@@ -526,24 +526,72 @@ curl http://localhost:9200/</code></pre>
 <!-- ===================== SLIDE 19 : INDEX INVERSÉ ===================== -->
 <section>
   <h2>L'index inversé — le secret de la rapidité</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.8em;">
-    <div>
-      <p><strong>Base SQL (scan séquentiel)</strong></p>
-      <pre style="font-size:0.8em;"><code>Doc 1: "ordinateur portable léger"
-Doc 2: "ordinateur de bureau puissant"
-Doc 3: "tablette tactile légère"
-→ LIKE '%ordinateur%' = scan complet</code></pre>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5em;font-size:0.72em;align-items:start;">
+
+    <!-- SQL SIDE -->
+    <div style="background:#fef2f2;border:2px solid #fca5a5;border-radius:8px;padding:0.8em;">
+      <p style="margin:0 0 0.5em;font-weight:700;color:#dc2626;text-align:center;">🐢 SQL — LIKE '%ordinateur%'</p>
+      <div style="font-family:monospace;font-size:0.85em;line-height:1.8;">
+        <div style="display:flex;align-items:center;gap:0.5em;">
+          <span style="color:#dc2626;">▶</span>
+          <span style="background:#fff;border:1px solid #fca5a5;border-radius:4px;padding:2px 6px;">ligne 1 : "ordinateur portable léger"</span>
+          <span style="color:#dc2626;font-size:0.8em;">compute ✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5em;margin-top:4px;">
+          <span style="color:#dc2626;">▶</span>
+          <span style="background:#fff;border:1px solid #fca5a5;border-radius:4px;padding:2px 6px;">ligne 2 : "ordinateur de bureau"</span>
+          <span style="color:#dc2626;font-size:0.8em;">compute ✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5em;margin-top:4px;">
+          <span style="color:#94a3b8;">▶</span>
+          <span style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:2px 6px;color:#94a3b8;">ligne 3 : "tablette tactile légère"</span>
+          <span style="color:#94a3b8;font-size:0.8em;">compute ✗</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5em;margin-top:4px;">
+          <span style="color:#94a3b8;">▶</span>
+          <span style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:2px 6px;color:#94a3b8;">ligne 4 : "souris sans fil"</span>
+          <span style="color:#94a3b8;font-size:0.8em;">compute ✗</span>
+        </div>
+        <div style="text-align:center;margin-top:6px;color:#94a3b8;font-size:0.8em;">… 1 000 000 lignes …</div>
+      </div>
+      <p style="margin:0.6em 0 0;font-size:0.85em;color:#dc2626;text-align:center;">
+        <strong>O(n)</strong> — chaque ligne est lue &amp; évaluée
+      </p>
     </div>
-    <div>
-      <p><strong>Index inversé (lookup direct)</strong></p>
-      <pre style="font-size:0.8em;"><code>"ordinateur" → [Doc1, Doc2]
-"portable"   → [Doc1]
-"léger"      → [Doc1, Doc3]
-→ Chercher "ordinateur" = 1 lookup</code></pre>
+
+    <!-- OPENSEARCH SIDE -->
+    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:8px;padding:0.8em;">
+      <p style="margin:0 0 0.5em;font-weight:700;color:#16a34a;text-align:center;">⚡ OpenSearch — index inversé</p>
+      <div style="font-family:monospace;font-size:0.85em;line-height:1.8;">
+        <div style="background:#fff;border:1px solid #86efac;border-radius:4px;padding:4px 8px;">
+          <span style="color:#16a34a;font-weight:700;">"ordinateur"</span>
+          <span style="color:#475569;"> → </span>
+          <span style="background:#dcfce7;border-radius:3px;padding:1px 5px;">Doc1</span>
+          <span style="background:#dcfce7;border-radius:3px;padding:1px 5px;margin-left:4px;">Doc2</span>
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;margin-top:4px;color:#94a3b8;">
+          "portable" → Doc1
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;margin-top:4px;color:#94a3b8;">
+          "léger" → Doc1, Doc3
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;margin-top:4px;color:#94a3b8;">
+          "tablette" → Doc3
+        </div>
+      </div>
+      <div style="margin-top:0.6em;display:flex;align-items:center;justify-content:center;gap:0.4em;font-size:0.9em;">
+        <span style="background:#2563eb;color:#fff;border-radius:4px;padding:2px 8px;">query: "ordinateur"</span>
+        <span style="color:#16a34a;font-weight:700;">→</span>
+        <span style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:2px 8px;color:#16a34a;font-weight:700;">Doc1, Doc2 ✓</span>
+      </div>
+      <p style="margin:0.5em 0 0;font-size:0.85em;color:#16a34a;text-align:center;">
+        <strong>O(1)</strong> — lookup direct, aucun calcul sur les données
+      </p>
     </div>
+
   </div>
   <aside class="notes">
-    C'est la slide la plus importante du jour 1. Prenez le temps de bien l'expliquer. "Imaginez un annuaire téléphonique : chercher un nom par ordre alphabétique est instantané, chercher un numéro pour trouver le nom serait lent. L'index inversé, c'est l'annuaire optimisé pour la recherche textuelle." Lucene crée et gère ces index inversés. OpenSearch distribue les shards (chaque shard = un index Lucene). Timing : 8 min.
+    C'est la slide la plus importante du jour 1. Prenez le temps de bien l'expliquer. "Imaginez un annuaire téléphonique : chercher un nom par ordre alphabétique est instantané, chercher un numéro pour trouver le nom serait lent. L'index inversé, c'est l'annuaire optimisé pour la recherche textuelle." Lucene crée et gère ces index inversés. OpenSearch distribue les shards (chaque shard = un index Lucene). Insister sur le point clé : SQL *calcule* l'expression LIKE sur chaque ligne — OpenSearch *consulte* un dictionnaire pré-construit. Timing : 8 min.
   </aside>
 </section>
 
