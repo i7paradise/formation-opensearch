@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jour 1 — Formation OpenSearch 3.6</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+
+    nav {
+      background: #2563eb;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      flex-wrap: wrap;
+    }
+    nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; transition: color 0.15s; }
+    nav a:hover, nav a.active { color: white; font-weight: 600; }
+    nav .home { font-weight: 700; font-size: 1rem; color: white; }
+    nav .sep { color: rgba(255,255,255,0.3); }
+    nav .slides-btn {
+      margin-left: auto;
+      background: rgba(255,255,255,0.15);
+      padding: 0.35rem 1rem;
+      border-radius: 6px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    nav .slides-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .layout { display: flex; min-height: calc(100vh - 46px); }
+
+    aside {
+      width: 250px;
+      flex-shrink: 0;
+      background: white;
+      border-right: 1px solid #e2e8f0;
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 46px;
+      height: calc(100vh - 46px);
+      overflow-y: auto;
+    }
+
+    aside ul { list-style: none; padding: 0; }
+    aside li a {
+      display: block;
+      padding: 0.45rem 1.2rem;
+      color: #475569;
+      text-decoration: none;
+      font-size: 0.88rem;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    aside li a:hover { color: #2563eb; background: #eff6ff; border-left-color: #2563eb; }
+    aside li a.active { color: #2563eb; background: #eff6ff; border-left-color: #2563eb; font-weight: 600; }
+    aside .section-head {
+      padding: 0.8rem 1.2rem 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+
+    main { flex: 1; padding: 2.5rem 3rem; max-width: 860px; }
+
+    h1 { font-size: 1.8rem; color: #2563eb; margin-bottom: 0.3rem; }
+    .subtitle { color: #64748b; margin-bottom: 2.5rem; font-size: 1rem; }
+
+    .time-block {
+      border-left: 4px solid #e2e8f0;
+      padding-left: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .time-block.cours { border-color: #2563eb; }
+    .time-block.tp { border-color: #16a34a; }
+    .time-block.pause { border-color: #f59e0b; }
+    .time-block.dejeuner { border-color: #f59e0b; }
+    .time-block.qa { border-color: #8b5cf6; }
+
+    .time-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.2rem;
+    }
+    .cours .time-label { color: #2563eb; }
+    .tp .time-label { color: #16a34a; }
+    .pause .time-label, .dejeuner .time-label { color: #f59e0b; }
+    .qa .time-label { color: #8b5cf6; }
+
+    .time-block h2 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .time-block p { color: #64748b; font-size: 0.93rem; }
+    .time-block a { color: #2563eb; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .badge-cours { background: #dbeafe; color: #1e40af; }
+    .badge-tp { background: #dcfce7; color: #166534; }
+    .badge-pause { background: #fef3c7; color: #92400e; }
+
+    section { margin-bottom: 3rem; }
+    section h2 { font-size: 1.3rem; color: #334155; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #2563eb;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .back-to-top.visible { opacity: 1; }
+
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="home">← Accueil</a>
+  <span class="sep">|</span>
+  <a href="../jour-1/index.html" class="active">Jour 1</a>
+  <a href="../jour-2/index.html">Jour 2</a>
+  <a href="../jour-3/index.html">Jour 3</a>
+  <a href="../slides/jour-1/index.html" class="slides-btn">▶ Ouvrir les slides</a>
+</nav>
+
+<div class="layout">
+  <aside>
+    <div class="section-head">Matin</div>
+    <ul>
+      <li><a href="#accueil">09:00 — Accueil</a></li>
+      <li><a href="#demoicebreaker">09:30 — Démo ice breaker</a></li>
+      <li><a href="#ch1">09:45 — Ch1 Introduction</a></li>
+      <li><a href="#ch2">10:20 — Ch2 Installation</a></li>
+      <li><a href="#tp1">10:30 — TP1 Installation</a></li>
+      <li><a href="#pause1">11:15 — Pause</a></li>
+      <li><a href="#ch3a">11:30 — Ch3a Mappings</a></li>
+      <li><a href="#tp2">12:00 — TP2 Index complet</a></li>
+      <li><a href="#dejeuner">12:30 — Déjeuner</a></li>
+    </ul>
+    <div class="section-head">Après-midi</div>
+    <ul>
+      <li><a href="#ch3b">13:30 — Ch3b CRUD & Bulk</a></li>
+      <li><a href="#tp3">14:15 — TP3 CRUD & API</a></li>
+      <li><a href="#pause2">15:00 — Pause</a></li>
+      <li><a href="#ch3c">15:15 — Ch3c Query DSL</a></li>
+      <li><a href="#tp4">15:45 — TP4 Requêtes</a></li>
+      <li><a href="#recap">16:30 — Récap Jour 1</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <h1>Jour 1 — Fondamentaux & Premières requêtes</h1>
+    <p class="subtitle">Introduction, installation, mappings, CRUD, Bulk API et Query DSL — 4 TPs</p>
+
+    <section id="matin">
+      <h2>Matin</h2>
+
+      <div class="time-block qa" id="accueil">
+        <div class="time-label">09:00 — 30 min <span class="badge badge-pause">Q/A</span></div>
+        <h2>Accueil + tour de table</h2>
+        <p>Présentation des participants, tour de table, attentes et niveaux. Vérification des environnements Docker.</p>
+      </div>
+
+      <div class="time-block cours" id="demoicebreaker">
+        <div class="time-label">09:30 — 15 min <span class="badge badge-cours">Démo live</span></div>
+        <h2>Démo live ice breaker</h2>
+        <p>Requête OpenSearch en direct pour montrer immédiatement la puissance du moteur. Indexation et recherche en 5 commandes curl.</p>
+      </div>
+
+      <div class="time-block cours" id="ch1">
+        <div class="time-label">09:45 — 35 min <span class="badge badge-cours">Cours</span></div>
+        <h2>Chapitre 1 — Introduction à OpenSearch</h2>
+        <p>Histoire (fork Elasticsearch), cas d'usage (e-commerce, logs, analytics), architecture de base, comparaison SQL vs NoSQL. Terminologie : cluster, nœud, index, shard, document.</p>
+      </div>
+
+      <div class="time-block cours" id="ch2">
+        <div class="time-label">10:20 — 10 min <span class="badge badge-cours">Cours</span></div>
+        <h2>Chapitre 2 — Installation</h2>
+        <p>Docker Compose uniquement. <code>vm.max_map_count</code>, <code>docker-compose up</code>, vérification avec <code>_cluster/health</code>.</p>
+      </div>
+
+      <div class="time-block tp" id="tp1">
+        <div class="time-label">10:30 — 45 min <span class="badge badge-tp">TP1</span></div>
+        <h2>TP1 — Installation en local</h2>
+        <p>Démarrer le cluster OpenSearch en local avec Docker Compose, vérifier la santé, indexer un premier document.</p>
+        <p><a href="../labs/tp1-installation/README.md">→ Ouvrir le TP1</a></p>
+      </div>
+
+      <div class="time-block pause" id="pause1">
+        <div class="time-label">11:15 — 15 min <span class="badge badge-pause">Pause</span></div>
+        <h2>Pause</h2>
+      </div>
+
+      <div class="time-block cours" id="ch3a">
+        <div class="time-label">11:30 — 30 min <span class="badge badge-cours">Cours</span></div>
+        <h2>Chapitre 3a — Mappings & types de champs</h2>
+        <p>Types de champs : <code>text</code>, <code>keyword</code>, <code>float</code>, <code>integer</code>, <code>boolean</code>, <code>date</code>, <code>geo_point</code>, <code>nested</code>. Dynamic mapping vs mapping explicite. <code>dynamic: strict</code>. Multi-fields.</p>
+      </div>
+
+      <div class="time-block tp" id="tp2">
+        <div class="time-label">12:00 — 30 min <span class="badge badge-tp">TP2 (nouveau)</span></div>
+        <h2>TP2 — Créer un index complet avec tous les types de champs</h2>
+        <p>Créer un mapping explicite couvrant tous les types OpenSearch. Observer text vs keyword avec <code>_analyze</code>. Tester <code>dynamic: strict</code>.</p>
+        <p><a href="../labs/tp2-index-complet/README.md">→ Ouvrir le TP2</a></p>
+      </div>
+
+      <div class="time-block pause dejeuner" id="dejeuner">
+        <div class="time-label">12:30 — 60 min <span class="badge badge-pause">Déjeuner</span></div>
+        <h2>Déjeuner</h2>
+      </div>
+    </section>
+
+    <section id="apresmidi">
+      <h2>Après-midi</h2>
+
+      <div class="time-block cours" id="ch3b">
+        <div class="time-label">13:30 — 45 min <span class="badge badge-cours">Cours</span></div>
+        <h2>Chapitre 3b — API REST, CRUD, Bulk API & bonnes pratiques</h2>
+        <p>Opérations CRUD (GET, PUT, POST, DELETE). Bulk API et format NDJSON. Antipatterns : wildcard en début de terme, suppression individuelle. Bonnes pratiques : <code>_source</code> filtering, <code>refresh_interval</code>.</p>
+      </div>
+
+      <div class="time-block tp" id="tp3">
+        <div class="time-label">14:15 — 45 min <span class="badge badge-tp">TP3</span></div>
+        <h2>TP3 — CRUD, Bulk API & bonnes pratiques</h2>
+        <p>Créer l'index products, indexer manuellement 5 produits, charger 1000+ produits via Bulk API, tester les bonnes pratiques et antipatterns.</p>
+        <p><a href="../labs/tp3-crud-api/README.md">→ Ouvrir le TP3</a></p>
+      </div>
+
+      <div class="time-block pause" id="pause2">
+        <div class="time-label">15:00 — 15 min <span class="badge badge-pause">Pause</span></div>
+        <h2>Pause</h2>
+      </div>
+
+      <div class="time-block cours" id="ch3c">
+        <div class="time-label">15:15 — 30 min <span class="badge badge-cours">Cours</span></div>
+        <h2>Chapitre 3c — Query DSL</h2>
+        <p>Contextes query vs filter. Requêtes : <code>match</code>, <code>term</code>, <code>range</code>, <code>bool</code> (must/filter/should/must_not). BM25 et <code>_explain</code>. Sans agrégations (déplacées au Jour 3).</p>
+      </div>
+
+      <div class="time-block tp" id="tp4">
+        <div class="time-label">15:45 — 45 min <span class="badge badge-tp">TP4</span></div>
+        <h2>TP4 — Requêtes & Recherche</h2>
+        <p>Implémenter la barre de recherche, les filtres par catégorie/prix/stock, les bool queries combinées et déboguer le scoring avec <code>_explain</code>.</p>
+        <p><a href="../labs/tp4-requetes/README.md">→ Ouvrir le TP4</a></p>
+      </div>
+
+      <div class="time-block qa" id="recap">
+        <div class="time-label">16:30 — 30 min <span class="badge badge-pause">Q/A</span></div>
+        <h2>Récap Jour 1 + Q&A + preview Jour 2</h2>
+        <p>Synthèse des concepts clés du jour. Questions ouvertes. Présentation de ce qui arrive demain : sécurité RBAC, pipelines, cluster multi-nœuds.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<a href="#" class="back-to-top" id="backToTop">⬆</a>
+
+<script>
+  // Back to top visibility
+  const btn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 300);
+  });
+
+  // Active sidebar link with IntersectionObserver
+  const sections = document.querySelectorAll('[id]');
+  const links = document.querySelectorAll('aside a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`aside a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

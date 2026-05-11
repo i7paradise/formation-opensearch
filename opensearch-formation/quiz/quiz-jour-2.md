@@ -1,4 +1,4 @@
-# Quiz Jour 2 — Fonctionnalités Avancées & Dashboards
+# Quiz Jour 2 — Sécurité, Fonctionnalités Avancées & Cluster
 
 > **Instructions** : 10 questions, 1 seule réponse correcte par question. Les réponses sont dans les blocs `<details>`.
 
@@ -171,40 +171,46 @@ Le contexte `filter` n'affecte pas le score `_score` et les résultats sont mis 
 
 ---
 
-## Question 9 : Dashboards — Prérequis visualisation
+## Question 9 : Sécurité — Field Level Security (FLS)
 
-Quel objet doit obligatoirement être créé avant de pouvoir construire une visualisation dans OpenSearch Dashboards ?
+Vous configurez un rôle OpenSearch avec la directive suivante : `"fls": ["~price", "~original_price"]`. Quel est l'effet de ce paramètre ?
 
-A) Dashboard  
-B) Saved Object  
-C) Index Pattern  
-D) Data Source  
+A) Seuls les champs `price` et `original_price` sont retournés dans les résultats
+
+B) Les champs `price` et `original_price` sont exclus des résultats pour les utilisateurs ayant ce rôle
+
+C) L'accès à l'index est interdit si le document contient les champs `price` ou `original_price`
+
+D) Les champs `price` et `original_price` sont chiffrés dans les réponses
 
 <details>
 <summary>Réponse</summary>
 
-**Réponse : C**
+**Réponse : B**
 
-L'Index Pattern (aussi appelé "Data View" dans les versions récentes) indique à Dashboards quel(s) index(s) utiliser et quel champ représente la date. Sans Index Pattern, aucune visualisation n'est possible. Il se crée dans **Management → Index Patterns**.
+Le préfixe `~` dans la liste FLS signifie **exclusion**. `"fls": ["~price", "~original_price"]` retire ces deux champs de toutes les réponses pour les utilisateurs ayant ce rôle. Les données sont toujours présentes dans l'index — elles sont simplement masquées à la restitution. Sans le préfixe `~`, la liste serait une liste blanche (seuls les champs listés seraient visibles). Le FLS est utile pour masquer des données sensibles (prix d'achat, marges) selon le profil de l'utilisateur.
 </details>
 
 ---
 
-## Question 10 : Dashboards — Choix de visualisation
+## Question 10 : Cluster — Algorithme de routage
 
-Quelle visualisation Dashboards est la plus adaptée pour afficher les 10 catégories avec le plus de produits ?
+OpenSearch utilise la formule `hash(_id) % number_of_shards` pour router un document vers un shard. Pourquoi cela rend-il impossible la modification du nombre de primary shards sans reindex ?
 
-A) Line Chart  
-B) Pie Chart  
-C) Bar Chart  
-D) Metric  
+A) Parce que `_id` est immutable une fois le document indexé
+
+B) Parce que si N change, `hash(_id) % N` donnera un résultat différent — les documents existants ne seraient plus trouvables dans leur shard actuel
+
+C) Parce que les shards ne peuvent pas recevoir de nouveaux documents une fois créés
+
+D) Parce que le hash est calculé une seule fois et stocké dans le mapping de l'index
 
 <details>
 <summary>Réponse</summary>
 
-**Réponse : C**
+**Réponse : B**
 
-Le **Bar Chart** (diagramme en barres) est idéal pour comparer des catégories distinctes (agrégation `terms`). Le Pie Chart (B) est adapté pour les parts d'un tout (≤ 7 catégories). La Line Chart (A) est pour les séries temporelles. La Metric (D) n'affiche qu'une valeur unique.
+La formule de routage est déterministe et dépend du nombre total de shards N. Si un document avec `_id = "abc"` a été indexé quand N=5 et que `hash("abc") % 5 = 2` (shard 2), changer N à 6 donnerait `hash("abc") % 6 = 1` (shard 1) — OpenSearch chercherait dans le shard 1 et ne trouverait rien. C'est pourquoi il faut créer un nouvel index avec le bon nombre de shards et reindexer tous les documents. Le routing personnalisé (`?routing=valeur`) permet de forcer le shard cible, utile pour regrouper les documents d'une même catégorie.
 </details>
 
 ---

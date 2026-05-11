@@ -1,347 +1,256 @@
-# Jour 3 — Guide formateur : Cluster, Administration & Sécurité
+# Jour 3 — Guide formateur : Agrégations, Dashboards & Cycle de vie
 
 ## Timing global
 
 | Heure | Durée | Activité | Type |
 |-------|-------|----------|------|
-| 09:00 | 15 min | Récap Jour 2 — 6 questions orales | Q/A |
-| 09:15 | 60 min | Chapitre 6 : Configuration du Cluster | Cours |
-| 10:15 | 15 min | Pause | Pause |
-| 10:30 | 60 min | Chapitre 7 : Administration du Cluster | Cours |
-| 11:30 | 60 min | TP6 : Cluster multi-nœuds | TP |
+| 09:00 | 60 min | Chapitre 5 : Agrégations complètes | Cours |
+| 10:00 | 15 min | Pause | Pause |
+| 10:15 | 75 min | TP9 : Agrégations avancées (nouveau) | TP |
+| 11:30 | 45 min | Chapitre 5b : Scoring BM25, _explain, search_after, optimisation | Cours |
+| 12:15 | 15 min | Démo live Agrégations | Démo live |
 | 12:30 | 60 min | Déjeuner | Déjeuner |
-| 13:30 | 60 min | Chapitre 8 : Sécurité dans OpenSearch | Cours |
-| 14:30 | 45 min | TP7 : Sécurisation du cluster | TP |
-| 15:15 | 15 min | Pause | Pause |
-| 15:30 | 30 min | Récap global 3 jours + fil rouge | Cours |
-| 16:00 | 30 min | QCM + Questionnaire satisfaction | QCM |
-| 16:30 | 30 min | Q&A final, clôture | Q/A |
+| 13:30 | 45 min | Chapitre 9 : OpenSearch Dashboards | Cours |
+| 14:15 | 45 min | TP10 : Dashboard e-commerce | TP |
+| 15:00 | 15 min | Pause | Pause |
+| 15:15 | 45 min | Chapitre 10 : Reindex & Cycle de vie | Cours |
+| 16:00 | 30 min | TP11 : Reindex + ISM | TP |
+| 16:30 | 30 min | Récap global 3 jours + QCM + Satisfaction + Q&A | Q/A + QCM |
 
 ---
 
-## Récap Jour 2 (09:00 — 15 min)
+## Chapitre 5 — Agrégations complètes (09:00 — 60 min)
 
-**Timing** : 15 min
+**Timing** : 60 min — chapitre dense et fondamental pour le TP9 et le TP10
 
 **Ce que tu dis** :
-> "Dernière journée ! Avant de commencer, récap rapide de hier."
+> "Jusqu'ici, on a cherché des documents. Maintenant on va analyser des données. Les agrégations sont le 'GROUP BY + fonctions d'agrégation' d'OpenSearch — mais en beaucoup plus puissant, parce qu'on peut imbriquer les agrégations."
 
-**Questions** :
-1. "Quelle est la différence entre un ingest pipeline et un analyseur ?"
-   → Pipeline : transformation du document entier à l'indexation, une seule fois. Analyseur : sur un champ text, à l'indexation ET à la recherche.
-2. "Quel est l'ordre de la chaîne d'analyse ?"
-   → Char Filter → Tokenizer → Token Filters
-3. "À quoi sert l'asciifolding ?"
-   → Convertit les accents en ASCII : é→e, ç→c. Permet de trouver "vélo" en cherchant "velo".
-4. "Comment tester un pipeline sans indexer de documents ?"
-   → API `_simulate`
-5. "Quel type de champ pour le completion suggester ?"
-   → `"type": "completion"`
-6. "Quelle visualisation Dashboards pour des données géographiques ?"
-   → Coordinate Map (avec geohash aggregation)
+**Fil rouge** : "Ces résultats que vous calculez ici sont exactement ce que vous allez visualiser dans Dashboards cet après-midi."
 
-**Alerte** : Si des participants n'ont pas terminé TP5, proposez-leur de le finir en autonomie pendant TP6.
+### Agrégations métriques (15 min)
+
+**Points clés** :
+- `stats` : min, max, avg, sum, count en une seule passe
+- `extended_stats` : ajoute variance, écart-type, bornes de déviation
+- `percentiles` : médiane (P50), P95, P99 — utiles pour les SLAs
+- `cardinality` : HyperLogLog, approximatif mais rapide — bon pour "combien de catégories distinctes ?"
+
+### Agrégations bucket (20 min)
+
+**Points clés** :
+- `terms` : un bucket par valeur unique. Sur `keyword` uniquement. `size: 10` par défaut.
+- `range` : plages personnalisées. Pas d'overlap possible.
+- `histogram` : intervalles réguliers. `interval: 100` pour des tranches de 100€.
+- `date_histogram` : même chose mais sur les dates. `calendar_interval: month`.
+- `filters` : plusieurs filtres nommés → "en stock vs rupture"
+
+### Agrégations imbriquées (15 min)
+
+**Points clés** :
+- On peut imbriquer n'importe quelle agrégation dans un bucket
+- `terms` sur `category` → `avg` sur `price` → prix moyen par catégorie
+- `top_hits` : retourne les documents réels dans un bucket — très utile
+- Pas de limite d'imbrication (mais performance dégradée au-delà de 3 niveaux)
+
+### Agrégations pipeline (10 min)
+
+**Points clés** :
+- S'appliquent sur les résultats d'autres agrégations (pas sur les documents)
+- `max_bucket` : quelle catégorie a le prix moyen le plus élevé ?
+- `avg_bucket`, `sum_bucket`, `min_bucket`
+- `derivative` : taux de variation entre buckets
+
+**Questions fréquentes** :
+- Q: "Les agrégations ralentissent les requêtes ?" → R: "Oui, surtout sur les gros datasets. `size: 0` évite de retourner des hits. Les champs `keyword` sont optimisés pour les aggs."
+- Q: "Peut-on combiner une query et des aggs ?" → R: "Oui — la query filtre les documents sur lesquels les aggs s'appliquent. Pattern très courant : query filtre + agg pour les stats des résultats filtrés."
 
 **Transition** :
-> "Aujourd'hui on passe en mode production. Plus de single-node — on va déployer 3 nœuds avec haute disponibilité, configurer des backups automatiques, et sécuriser tout ça avec TLS et RBAC."
+> "TP9 — 75 minutes pour implémenter toutes ces agrégations sur votre catalogue produits."
 
 ---
 
-## Chapitre 6 — Configuration du Cluster (09:15 — 60 min)
+## Pause (10:00 — 15 min)
 
-### Slide : Types de nœuds
+---
 
-**Timing** : 10 min
+## TP9 — Agrégations avancées (10:15 — 75 min)
+
+**Ce que tu fais** :
+- Ce TP est le plus long (75 min). Bien surveiller le rythme.
+- À 11h00 : vérifier que tout le monde est au moins à l'Exercice 3
+- Pointer `top_hits` : "C'est exactement ce qu'un front-end e-commerce utilise pour afficher les produits phares par catégorie"
+- À 11h25 : "Terminez ce que vous pouvez, les exercices 4 et 5 sont dans la solution"
+
+---
+
+## Chapitre 5b — Scoring BM25 & optimisation (11:30 — 45 min)
+
+**Timing** : 45 min
 
 **Ce que tu dis** :
-> "En single-node, notre nœud fait tout : master, data, ingest, coordinating. En production, on sépare ces rôles. Imaginez une cuisine de restaurant : le chef (master) coordonne, les cuisiniers (data) travaillent les données, les plongeurs (coordinating) font le service."
+> "On a utilisé `_explain` en TP4. Maintenant on comprend vraiment ce qu'il y a dedans."
+
+**Points clés — BM25 détaillé** :
+- TF (Term Frequency) : plus le terme apparaît dans le doc → score plus élevé
+- IDF (Inverse Document Frequency) : terme rare dans l'index → plus discriminant → score plus élevé
+- Field Length Norm : terme dans un champ court → plus pertinent que dans un champ long
+- Formule : `score = IDF × (TF × (k1+1)) / (TF + k1 × (1 - b + b × fieldLen/avgFieldLen))`
+- `k1 = 1.2`, `b = 0.75` par défaut — ajustables avec `similarity`
+
+**Points clés — Pagination profonde** :
+- `from + size` : ok jusqu'à 10 000 résultats (paramètre `max_result_window`)
+- Au-delà : `search_after` — curseur basé sur la valeur du dernier document
+- `search_after` nécessite un tri stable (inclure `_id` comme tri secondaire)
+- Scroll API : déprécié pour la pagination, utiliser `search_after`
+
+**Points clés — Optimisation** :
+- `filter` vs `must` : filter ne calcule pas de score → 2-5x plus rapide pour les critères binaires
+- `_source` filtering : `"_source": ["name", "price"]` évite de transférer les gros champs
+- Request caching : les aggs sur des requêtes `size: 0` avec des données non modifiées sont mises en cache
+- Éviter les wildcards au début, les `script` queries sur de gros volumes
+
+**Questions fréquentes** :
+- Q: "Comment améliorer la pertinence si BM25 ne convient pas ?" → R: "Boosting de champs (`name^2`), `function_score` pour intégrer des signaux métier (note, popularité), ou LTR (Learning To Rank) pour les très gros volumes."
+
+---
+
+## Démo live — Agrégations (12:15 — 15 min)
+
+**Demo** : Requête live combinant query et agrégations pipeline sur le catalogue produits.
+
+```bash
+# Catégorie la plus chère parmi les produits en stock
+curl -s -X GET "http://localhost:9200/products/_search" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "size": 0,
+    "query": { "term": { "in_stock": true } },
+    "aggs": {
+      "cats": {
+        "terms": { "field": "category", "size": 20 },
+        "aggs": { "avg_price": { "avg": { "field": "price" } } }
+      },
+      "top_cat": { "max_bucket": { "buckets_path": "cats>avg_price" } }
+    }
+  }' | python3 -m json.tool
+```
+
+> "Ce résultat, vous allez le voir dans un bar chart dans Dashboards dans 2 heures."
+
+---
+
+## Déjeuner (12:30 — 60 min)
+
+---
+
+## Chapitre 9 — OpenSearch Dashboards (13:30 — 45 min)
+
+**Timing** : 45 min
+
+**Ce que tu dis** :
+> "Dashboards, c'est l'interface graphique d'OpenSearch. C'est ce que vos clients ou vos équipes métier vont utiliser pour analyser les données. On a calculé nos agrégations ce matin — maintenant on les visualise."
 
 **Points clés** :
-- Le nœud master NE stocke PAS de données — il gère l'état du cluster
-- En dessous de 5 nœuds : multi-rôle est acceptable
-- Au-delà de 5 nœuds : dédiez 3 nœuds comme master-only
+- Index Patterns (Data Views) : lier un nom logique aux index physiques. Obligatoire avant toute visualisation.
+- Discover : explorer les données, appliquer des filtres KQL, sauvegarder des recherches
+- KQL (Kibana Query Language) : syntaxe simplifiée. `category: "Électronique" AND price > 500`
+- Visualize : Metric, Pie, Bar, Line, Data Table. Chaque visualisation = une agrégation.
+- Dashboard : assembler des visualisations. Filtres globaux appliqués à tout le dashboard.
+- Maps : mention rapide — pour les champs `geo_point`. TP optionnel dédié.
 
-**Anecdote** :
-> "J'ai vu un cluster où le nœud master exécutait aussi des grosses requêtes. Quand une query lourde saturait le CPU, le cluster devenait instable car le master ne répondait plus à temps. Séparation des rôles = stabilité."
-
----
-
-### Slide : Discovery & Quorum
-
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "Le split-brain, c'est le cauchemar de tout administrateur de cluster distribué. Imaginez : le réseau se partitionne. Nœud1 pense que Nœud2 est mort et se proclame master. Nœud2 pense que Nœud1 est mort et fait de même. Résultat : deux clusters qui divergent. Comment l'éviter ? Le quorum."
-
-**Explication quorum** :
-> "Le quorum, c'est le nombre minimum de nœuds master-eligible devant être d'accord pour élire un master. Formule : N/2 + 1. Avec 3 nœuds : 3/2 + 1 = 2. Si le réseau se coupe en 1 vs 2, seul le groupe de 2 a le quorum et peut élire un master. Le nœud isolé reste passif."
-
-**Question fréquente** :
-- Q: "Peut-on avoir 2 nœuds master-eligible ?" → R: "Techniquement oui, mais JAMAIS en production. Avec 2 nœuds, le quorum = 2. Si les 2 se voient, parfait. Si le réseau se coupe — impossible d'atteindre le quorum → cluster indisponible. Avec 3 nœuds, on peut perdre 1 et rester opérationnel."
-
-**Alerte importante** :
-> "`cluster.initial_master_nodes` ne sert QU'AU PREMIER DÉMARRAGE du cluster. Après avoir formé le cluster, RETIREZ cette ligne de la configuration. Si vous la laissez, vous risquez des comportements inattendus lors des redémarrages."
+**Questions fréquentes** :
+- Q: "Dashboards c'est comme Kibana ?" → R: "Oui, c'est un fork de Kibana — la même interface, complètement open source."
+- Q: "On peut créer des alertes ?" → R: "Oui, avec OpenSearch Alerting — un plugin intégré. Hors scope de ce TP."
 
 ---
 
-### Slide : Shards — Sizing
+## TP10 — Dashboard e-commerce (14:15 — 45 min)
 
-**Timing** : 8 min
-
-**Ce que tu dis** :
-> "Question classique : combien de shards pour mon index ? La règle empirique : 10 à 50 GB par shard. Un shard trop petit crée du overhead (chaque shard consomme de la mémoire pour ses métadonnées). Un shard trop gros rend la réallocation longue."
-
-**Calcul en live** :
-> "Exemple concret : vous avez un index de 300 GB. 300 / 30 = 10 shards primaires. Avec 1 replica, vous avez 20 shards au total répartis sur 3 nœuds — environ 6-7 shards par nœud."
-
-**CRITIQUE** :
-> "Le nombre de primary shards est IMMUABLE après création. Réfléchissez avant ! Combien de données dans 6 mois ? Dans 2 ans ? C'est la décision la plus importante à la création d'un index."
+**Ce que tu fais** :
+- S'assurer que Dashboards est accessible sur http://localhost:5601
+- Aider à la création de l'index pattern (étape souvent source de confusion)
+- À 14h50 : "Même si vous n'avez pas toutes les visualisations, assemblez le dashboard avec ce que vous avez"
 
 ---
 
-### Slide : Aliases & Index Templates
-
-**Timing** : 12 min
-
-**Ce que tu dis** :
-> "Les aliases sont mon outil préféré en production. Ils permettent de reindexer sans aucune interruption de service. La technique : créer `products-v2`, réindexer dedans, puis basculer l'alias atomiquement. L'opération `_aliases` avec plusieurs actions est exécutée de façon atomique — les clients voient soit v1, soit v2, jamais les deux ni aucun."
-
-**Démo live** :
-```
-1. GET /_cat/aliases
-2. PUT /products-v1 (index existant)
-3. POST /_aliases (add alias "products" → products-v1)
-4. GET /products/_search (fonctionne via l'alias)
-5. PUT /products-v2 (nouveau mapping)
-6. POST /_reindex
-7. POST /_aliases (remove v1, add v2 — atomique)
-8. GET /products/_search (maintenant sur v2, transparent)
-```
-
-**Index Templates** :
-> "Les templates automatisent la création d'index. Créez un template `products-template` pour `products-*`. Désormais, chaque nouvel index `products-2026-05`, `products-v3`, etc. hérite automatiquement du mapping et des settings."
+## Pause (15:00 — 15 min)
 
 ---
 
-## Chapitre 7 — Administration du Cluster (10:30 — 60 min)
+## Chapitre 10 — Reindex & Cycle de vie des index (15:15 — 45 min)
 
-### Slide : Snapshots
-
-**Timing** : 20 min
+**Timing** : 45 min
 
 **Ce que tu dis** :
-> "Première règle d'administration : les replicas NE SONT PAS des backups. Si vous supprimez un index, les replicas disparaissent aussi. Les snapshots, eux, sont des copies immuables stockées hors du cluster."
+> "On arrive au bout de la formation. Deux sujets indispensables pour maintenir un cluster en production sur le long terme : changer de mapping sans interruption de service, et automatiser la rotation des vieux index."
+
+### Reindex API (20 min)
 
 **Points clés** :
-- Snapshots = incrémentiels (seuls les segments modifiés sont copiés)
-- Repository doit être accessible par TOUS les nœuds (NFS, S3, Azure Blob, GCS)
-- En production : snapshot quotidien vers S3, rétention 30 jours minimum
-- TOUJOURS tester la restauration en pré-prod !
+- Reindex = copier les documents d'un index à un autre
+- Zero-downtime via aliases : `products-current` → `products-v1` → basculement atomique vers `products-v2`
+- Le basculement d'alias est atomique : pas de window d'indisponibilité
+- Reindex avec transformation : `"script": { "source": "ctx._source.champ = ..." }` avec Painless
+- `wait_for_completion=false` pour les gros reindex + suivi avec `_tasks`
+
+### Index Templates (5 min)
+
+**Points clés** :
+- Appliquer automatiquement un mapping et des settings à tout nouvel index correspondant à un pattern
+- Composants : `_component_template` (réutilisables) + `_index_template` (assemblage)
+
+### Aliases avancés (5 min)
+
+**Points clés** :
+- Aliases filtrés : l'alias voit seulement les documents correspondant à un filtre
+- Alias write index (`is_write_index: true`) : un seul index reçoit les écritures
+
+### ISM — Index State Management (15 min)
+
+**Points clés** :
+- Automatiser hot/warm/cold/delete basé sur l'âge ou la taille
+- `hot` : données récentes, SSD, écritures actives
+- `warm` : replicas=0, force_merge → réduire la consommation
+- `delete` : suppression automatique après la période de rétention
+- Snapshots : incrémentiels (seuls les segments modifiés), S3/GCS/Azure en prod
 
 **Anecdote** :
-> "Un client avait des backups depuis 6 mois. Un jour, crash disque. On lance la restauration... erreur. Le repository était monté uniquement sur le nœud master. Les autres nœuds n'avaient pas accès. 6 mois de backups inutilisables. Testez toujours."
+> "Sans ISM, j'ai vu des clusters avec 3 ans de logs accumulés occupant 10 TB alors que la rétention contractuelle était de 90 jours. Une politique ISM simple aurait économisé des milliers d'euros de stockage."
+
+**Questions fréquentes** :
+- Q: "Snapshots vs replicas ?" → R: "Les replicas protègent contre la perte d'un nœud. Seul un snapshot protège contre la suppression accidentelle d'un index. Les deux sont nécessaires."
 
 ---
 
-### Slide : ISM (Index State Management)
+## TP11 — Reindex + ISM (16:00 — 30 min)
 
-**Timing** : 20 min
-
-**Ce que tu dis** :
-> "ISM, c'est le gestionnaire de cycle de vie des index. Indispensable pour les logs : sans ISM, vos index de logs grossissent indéfiniment jusqu'à remplir le disque. Avec ISM, vous définissez : après 30 jours, supprime l'index. Simple et automatique."
-
-**Explication des états** :
-> "Le concept d'état : un index est toujours dans UN état à la fois. L'état définit les actions à exécuter et les conditions de transition vers l'état suivant. Pensez à une machine à états : hot → warm → cold → delete."
-
-**Question fréquente** :
-- Q: "La différence entre rollover et delete ?" → R: "Rollover crée un NOUVEL index quand le courant atteint une limite (taille, âge, nombre de docs). Delete supprime l'index courant. En général : rollover pour les logs actifs (garder des petits index), delete pour l'archivage final."
+**Ce que tu fais** :
+- TP court et ciblé. S'assurer que tout le monde voit le basculement d'alias fonctionner.
+- Pointer : "L'application continuerait de fonctionner pendant ce basculement — c'est la magie des aliases."
 
 ---
 
-### Slide : Monitoring
-
-**Timing** : 20 min
+## Récap global 3 jours + QCM + Q&A final (16:30 — 30 min)
 
 **Ce que tu dis** :
-> "Un administrateur OpenSearch surveille 4 métriques clés : heap JVM, CPU, disque, et latence. Si la heap dépasse 75%, le GC devient très agressif et peut causer des pauses. Au-delà de 85%, risque d'OOM Error."
+> "Trois jours. Voilà ce qu'on a construit ensemble : un moteur de recherche e-commerce complet, sécurisé, distribué sur 3 nœuds, avec des agrégations avancées, des dashboards et une politique de cycle de vie automatisée. C'est exactement ce qu'on retrouve en production chez les grandes plateformes e-commerce."
 
-**Commandes de diagnostic** :
-```bash
-GET /_cluster/health?pretty         # Vue globale
-GET /_nodes/stats?pretty            # Métriques détaillées par nœud
-GET /_cat/nodes?v                   # Tableau récapitulatif
-GET /_cat/allocation?v              # Espace disque par nœud
-GET /_cluster/allocation/explain    # Pourquoi ce shard n'est pas assigné ?
-```
+**Fil rouge e-commerce — résumé visuel** :
+1. Index `products` avec mapping explicite (TP2)
+2. 1000+ produits chargés via Bulk API (TP3)
+3. Recherche full-text + filtres (TP4)
+4. Accès sécurisé RBAC + FLS (TP5)
+5. Enrichissement via pipeline, analyseur français (TP6)
+6. Cluster 3 nœuds haute disponibilité (TP7)
+7. Routing optimisé (TP8)
+8. Agrégations analytiques (TP9)
+9. Dashboard de pilotage (TP10)
+10. Migration zero-downtime + rotation automatique (TP11)
 
-**_cluster/allocation/explain** est LE tool de diagnostic. Il répond à "pourquoi mon shard est UNASSIGNED ?". Causes les plus fréquentes :
-1. Disque plein (disk watermark atteint)
-2. Nœud absent ou en erreur
-3. `max_shards_per_node` dépassé
-4. Index fermé
-
----
-
-## TP6 — Cluster multi-nœuds (11:30 — 60 min)
-
-**Ce que tu dis** :
-> "On passe maintenant au cluster 3 nœuds. Basculez sur docker-compose.cluster.yml. ATTENTION : ce cluster a besoin d'au moins 6 GB de RAM disponible. Vérifiez d'abord avec `docker stats`."
-
-**Points de surveillance** :
-- Nœud qui ne rejoint pas le cluster → vérifier initial_master_nodes et seed_hosts dans le docker-compose.cluster.yml
-- Shards UNASSIGNED → vérifier _cluster/allocation/explain
-- Ex.5 snapshot : le repository filesystem est dans /usr/share/opensearch/snapshots dans le conteneur — doit être monté comme volume
-
-**Bonus — Simuler une panne** :
-> "Pour les rapides : `docker stop opensearch-node2`. Regardez _cat/shards — les shards de node2 passent à UNASSIGNED pendant quelques secondes, puis se réattribuent sur node1 et node3. Redémarrez : `docker start opensearch-node2`. Le nœud rejoindra le cluster et récupérera ses shards."
-
----
-
-## Chapitre 8 — Sécurité dans OpenSearch (13:30 — 60 min)
-
-### Slide : Vue d'ensemble
-
-**Timing** : 5 min
-
-**Ce que tu dis** :
-> "OpenSearch Security est natif et gratuit — c'était un avantage majeur sur Elasticsearch où la sécurité était payante jusqu'à récemment. Le Security Plugin gère deux couches distinctes : le transport (entre nœuds) et le REST (entre clients et cluster). Aux jours 1 et 2, on l'avait désactivé pour simplifier. Aujourd'hui on l'active."
-
----
-
-### Slide : TLS/SSL
-
-**Timing** : 15 min
-
-**Ce que tu dis** :
-> "TLS, c'est le HTTPS du monde OpenSearch. Sans TLS, vos données circulent en clair sur le réseau. En environnement de formation, on utilise les demo certificates qui sont déjà dans l'image Docker. En production — jamais les demo certs, les clés privées sont publiques sur GitHub."
-
-**Question fréquente** :
-- Q: "Quel est l'impact performance du TLS ?" → R: "Négligeable sur du matériel moderne. La négociation TLS est mise en cache (TLS session resumption). Le coût CPU du chiffrement symétrique AES-256 est quasi nul avec les instructions matérielles modernes."
-- Q: "Comment gérer les certificats en production ?" → R: "Options : Let's Encrypt (pour le REST), CA interne d'entreprise, HashiCorp Vault pour la rotation automatique."
-
----
-
-### Slide : RBAC
-
-**Timing** : 20 min
-
-**Ce que tu dis** :
-> "RBAC, c'est simple : vous définissez des Rôles avec des Permissions, puis vous assignez ces Rôles à des Utilisateurs. Principe du moindre privilège : chaque utilisateur n'a que les permissions dont il a besoin, pas plus."
-
-**Démo live** :
-```bash
-# Créer le rôle
-curl -k -u admin:Admin@1234! -X PUT https://localhost:9200/_plugins/_security/api/roles/products_reader \
-  -H 'Content-Type: application/json' \
-  -d '{"cluster_permissions":["cluster_monitor"],"index_permissions":[{"index_patterns":["products-*"],"allowed_actions":["read"]}]}'
-
-# Créer l'utilisateur
-curl -k -u admin:Admin@1234! -X PUT https://localhost:9200/_plugins/_security/api/internalusers/analyst \
-  -H 'Content-Type: application/json' \
-  -d '{"password":"Analyst@1234!"}'
-
-# Mapper
-curl -k -u admin:Admin@1234! -X PUT https://localhost:9200/_plugins/_security/api/rolesmapping/products_reader \
-  -H 'Content-Type: application/json' \
-  -d '{"users":["analyst"]}'
-
-# Tester (doit fonctionner)
-curl -k -u analyst:Analyst@1234! https://localhost:9200/products/_search
-
-# Tester suppression (doit retourner 403)
-curl -k -u analyst:Analyst@1234! -X DELETE https://localhost:9200/products
-```
-
----
-
-### Slide : DLS et FLS
-
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "Pour des besoins encore plus fins, on peut aller au niveau du document ou du champ. DLS = Document Level Security : l'utilisateur ne voit que les documents qui matchent une certaine condition. FLS = Field Level Security : certains champs sont masqués."
-
-**Exemple DLS** :
-> "Use case réel : un système multi-tenant où chaque client B2B ne voit que ses propres produits. Ou un analyste marketing qui ne voit que les données de sa région. DLS ajoute invisiblement un filtre sur chaque requête — l'utilisateur ne peut pas le contourner."
-
----
-
-### Slide : Audit Logging
-
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "L'audit logging, c'est la mémoire de votre cluster. Qui a accédé à quoi, quand. Obligatoire dans de nombreux secteurs réglementés : santé (HIPAA), finance (PCI-DSS), Europe (RGPD). OpenSearch stocke les logs d'audit dans un index dédié."
-
----
-
-## TP7 — Sécurisation du cluster (14:30 — 45 min)
-
-**Ce que tu dis** :
-> "Le TP le plus complexe de la formation. Suivez les étapes dans l'ordre — chaque étape dépend de la précédente. Ouvrez labs/tp7-securite/README.md."
-
-**Points de surveillance** :
-- Oubli du flag `-k` avec curl sur HTTPS → `curl: (60) SSL certificate problem`
-- Password trop simple → `validation_error: password must be at least 8 characters...`
-- Mauvaise URL (http au lieu de https) → `Empty reply from server`
-- User pas encore mappé → 403 même avec bon mot de passe
-
-**Alerte** : Si un participant dit "403 Forbidden" avec le bon utilisateur → vérifier que le role mapping est bien fait : `GET /_plugins/_security/api/rolesmapping/products_reader`
-
----
-
-## Récap Global — Le Fil Rouge (15:30 — 30 min)
-
-**Ce que tu dis** :
-> "Prenons un moment pour voir le chemin parcouru. Le matin du Jour 1, vous n'aviez jamais vu OpenSearch. Maintenant, vous êtes capable de déployer un cluster 3 nœuds sécurisé avec haute disponibilité, de créer des analyseurs linguistiques, de visualiser vos données, et d'administrer le tout en production."
-
-**Le fil rouge complet** :
-1. Jour 1 : cluster single-node → 1000+ produits indexés → recherche DSL et agrégations ✅
-2. Jour 2 : analyseur français → autocomplétion → géolocalisation → dashboard e-commerce ✅
-3. Jour 3 : cluster 3 nœuds HA → ISM + snapshots → RBAC + TLS → DLS + audit ✅
-
-**Ressources** :
-> "Documentation officielle : opensearch.org/docs/latest. Forum : forum.opensearch.org. GitHub : github.com/opensearch-project. Si vous avez un problème en prod, le forum est très actif — l'équipe AWS répond souvent."
-
-**Checklist production** :
-> "Avant de déployer en prod : 3+ nœuds master dédiés, TLS sur transport ET REST, snapshots S3 quotidiens, monitoring heap + disk, ISM pour les logs, principe du moindre privilège pour la sécurité."
-
----
-
-## QCM & Satisfaction (16:00 — 30 min)
-
-**À 16h00 EXACTEMENT** : Envoyer le lien Digiforma pour le quiz de validation et le questionnaire de satisfaction.
-
-**Ce que tu dis** :
-> "C'est l'heure du quiz de validation ! J'envoie le lien maintenant. Vous avez 20 minutes. 20 questions sur les 3 jours. La solution est dans quiz/quiz-final.md — mais ne trichez pas, c'est votre propre bénéfice d'évaluer votre niveau."
-
-**Pendant le quiz** : Circuler, être disponible pour les questions mais ne pas donner les réponses. Observer les hésitations → sujets à approfondir si la formation continue.
-
-**Après le quiz** :
-> "Maintenant le questionnaire de satisfaction. Votre retour est précieux — il permet d'améliorer la formation pour les prochains groupes. Soyez honnêtes, positif comme négatif."
-
-**Important** : Rappeler de signer la feuille de présence pour la dernière demi-journée !
-
----
-
-## Q&A Final & Clôture (16:30 — 30 min)
-
-**Ce que tu dis** :
-> "On a encore 30 minutes. C'est votre temps. Qu'est-ce qui vous a le plus surpris dans ces 3 jours ? Qu'est-ce que vous auriez voulu approfondir ? Des questions sur votre contexte spécifique ?"
-
-**Questions typiques en fin de formation** :
-- "Comment migrer de Elasticsearch ?" → Vérifiez la compatibilité API (OS 3.x ≈ ES 7.10). Le SDK OpenSearch est recommandé. Testez votre code sur un cluster de staging.
-- "Comment monitorer en production ?" → OpenSearch Dashboards a des dashboards de monitoring natifs. Prometheus + Grafana aussi. Alerting plugin pour les notifications.
-- "Combien de nœuds pour notre use case ?" → Ça dépend du volume de données, du throughput d'indexation, et des SLA de disponibilité. Règle de base : minimum 3 nœuds pour la HA.
+**QCM** :
+- Envoyer le lien Digiforma (20 questions, 20 minutes)
+- Distribuer le questionnaire de satisfaction pendant que les participants répondent au QCM
 
 **Clôture** :
-> "Merci pour ces 3 jours — votre participation et vos questions ont rendu la formation vivante. Vous avez maintenant les bases solides pour utiliser OpenSearch en production. N'hésitez pas à me contacter si vous avez des questions après la formation. Bonne continuation !"
-
-**Rappels finaux** :
-- Signer la feuille de présence !
-- L'attestation de formation arrivera par Digiforma dans quelques jours
-- Les fichiers de la formation restent disponibles dans le repository
-
----
-
-*Guide Jour 3 — Formation OpenSearch 3.6*
+> "Merci pour votre engagement tout au long de ces 3 jours. Les labs restent disponibles, les slides aussi. Si vous avez des questions en production, n'hésitez pas à consulter la documentation OpenSearch 3.6. Bonne continuation !"

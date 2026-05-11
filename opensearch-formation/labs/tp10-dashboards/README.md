@@ -1,12 +1,12 @@
-# TP5 — Tableau de bord e-commerce avec OpenSearch Dashboards
+# TP10 — Tableau de bord e-commerce avec OpenSearch Dashboards
 
 ## Informations générales
 
 | Paramètre  | Valeur                          |
 |------------|---------------------------------|
-| Durée      | 75 minutes                      |
+| Durée      | 45 minutes                      |
 | Difficulté | Intermédiaire                   |
-| Prérequis  | TP4 terminé                     |
+| Prérequis  | TP9 terminé (agrégations complètes requises) |
 | URL        | http://localhost:5601           |
 
 ## Objectif
@@ -280,3 +280,5 @@ A la fin de ce TP, vous devez avoir :
 - [Documentation OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/)
 - [Guide KQL (Kibana Query Language)](https://opensearch.org/docs/latest/dashboards/dql/)
 - [Types de visualisations](https://opensearch.org/docs/latest/dashboards/visualize/viz-index/)
+
+*Passez au [TP11 — Reindex + ISM](../tp11-reindex-ism/README.md)*

@@ -1,4 +1,4 @@
-# TP2 — CRUD & API
+# TP3 — CRUD & API
 
 ## Objectif
 
@@ -386,7 +386,87 @@ if errors:
 
 ---
 
-## Exercice 5 — Vérifier le chargement
+## Exercice 5 — Bonnes pratiques & antipatterns
+
+### 5.1 Antipattern : supprimer un document individuel est coûteux
+
+Dans OpenSearch, supprimer un document individuel ne libère pas immédiatement l'espace disque. Le document est marqué comme supprimé ("tombstone") et l'espace n'est récupéré qu'après un merge de segment Lucene.
+
+```bash
+# À ÉVITER en production pour de gros volumes :
+DELETE /products/_doc/1
+
+# PRÉFÉRER pour supprimer plusieurs documents selon un critère :
+curl -s -X POST "http://localhost:9200/products/_delete_by_query" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": { "term": { "in_stock": false } }
+  }' | python3 -m json.tool
+```
+
+**Règle** : Pour supprimer un index entier (ex. rotation de logs), supprimez l'index, pas les documents un par un.
+
+### 5.2 Antipattern : wildcard en début de terme
+
+Évitez les wildcards au début d'un terme — ils forcent un scan complet de l'index inversé :
+
+```bash
+# MAUVAISE pratique — scan complet, très lent :
+curl -s -X GET "http://localhost:9200/products/_search" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": { "wildcard": { "name": { "value": "*phone" } } }
+  }' | python3 -m json.tool
+
+# BONNE pratique — prefix query ou n-grams à l'indexation :
+curl -s -X GET "http://localhost:9200/products/_search" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": { "prefix": { "name.keyword": { "value": "Smart" } } }
+  }' | python3 -m json.tool
+```
+
+### 5.3 Bonne pratique : `_source` filtering pour réduire la bande passante
+
+```bash
+# Retourner seulement les champs nécessaires :
+curl -s -X GET "http://localhost:9200/products/_search" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "_source": ["name", "price", "category", "in_stock"],
+    "query": { "match_all": {} },
+    "size": 5
+  }' | python3 -m json.tool
+```
+
+> **Règle** : En production, ne retournez jamais les grands champs (`description`, `images`...) si vous n'en avez pas besoin dans l'affichage.
+
+### 5.4 Bonne pratique : Bulk API et `refresh_interval`
+
+Pour un chargement massif de données, désactivez le refresh automatique pendant l'import :
+
+```bash
+# Désactiver le refresh pendant le chargement
+curl -s -X PUT "http://localhost:9200/products/_settings" \
+  -H 'Content-Type: application/json' \
+  -d '{ "index": { "refresh_interval": "-1", "number_of_replicas": 0 } }'
+
+# Charger les données via Bulk API
+curl -s -X POST "http://localhost:9200/_bulk" \
+  -H 'Content-Type: application/x-ndjson' \
+  --data-binary @../../data/products-bulk.ndjson | python3 -m json.tool | tail -3
+
+# Réactiver le refresh
+curl -s -X PUT "http://localhost:9200/products/_settings" \
+  -H 'Content-Type: application/json' \
+  -d '{ "index": { "refresh_interval": "1s", "number_of_replicas": 1 } }'
+```
+
+> **Règle** : Toujours utiliser Bulk API pour > 100 documents. Avec `refresh_interval=-1` et `replicas=0` pendant le chargement, vous pouvez multiplier la vitesse d'indexation par 5 à 10.
+
+---
+
+## Exercice 6 — Vérifier le chargement
 
 ### 5.1 Compter les documents
 
@@ -550,7 +630,7 @@ echo "100 produits générés dans $OUTPUT"
 
 ## Vérification finale
 
-Cochez chaque point avant de passer au TP3 :
+Cochez chaque point avant de passer au TP4 :
 
 - [ ] L'index `products` existe avec le bon mapping (`GET /products/_mapping`)
 - [ ] Au moins 4 produits ont été indexés manuellement (IDs 1 à 4)
@@ -561,4 +641,4 @@ Cochez chaque point avant de passer au TP3 :
 
 ---
 
-*Passez au [TP3 — Requêtes & Agrégations](../tp3-requetes-agregations/README.md) une fois toutes les vérifications validées.*
+*Passez au [TP4 — Requêtes & Recherche](../tp4-requetes/README.md) une fois toutes les vérifications validées.*

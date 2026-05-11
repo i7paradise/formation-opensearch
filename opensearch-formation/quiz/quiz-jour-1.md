@@ -188,46 +188,46 @@ Explication : BM25 intègre une **normalisation par la longueur du champ**. Un t
 
 ---
 
-## Question 9 : Agrégations métriques
+## Question 9 : Mapping dynamique strict
 
-Vous voulez connaître le prix moyen des produits dans la catégorie "Électronique". Quelle agrégation utilisez-vous ?
+Vous créez un index `produits_complet` avec `"dynamic": "strict"`. Que se passe-t-il si vous tentez d'indexer un document contenant un champ non défini dans le mapping ?
 
-A) `{ "aggs": { "prix_moyen": { "sum": { "field": "price" } } } }`
+A) OpenSearch crée automatiquement le champ avec le type deviné à partir de la valeur
 
-B) `{ "aggs": { "prix_moyen": { "avg": { "field": "price" } } } }`
+B) Le document est indexé sans le champ non reconnu (champ silencieusement ignoré)
 
-C) `{ "aggs": { "prix_moyen": { "median": { "field": "price" } } } }`
+C) OpenSearch retourne une erreur `strict_dynamic_mapping_exception` et rejette le document
 
-D) `{ "aggs": { "prix_moyen": { "percentiles": { "field": "price" } } } }`
+D) Le document est mis en quarantaine dans un index `.rejected` dédié
+
+<details>
+<summary>Réponse</summary>
+
+**Réponse : C**
+
+Explication : Avec `"dynamic": "strict"`, OpenSearch rejette toute tentative d'indexer un champ non défini dans le mapping en levant une `strict_dynamic_mapping_exception`. C'est le comportement souhaité en production pour éviter les "mapping explosions" — situations où des champs imprévus s'accumulent automatiquement et finissent par saturer la mémoire. Avec `"dynamic": true` (défaut), le comportement serait A. Avec `"dynamic": false`, le comportement serait B.
+
+</details>
+
+---
+
+## Question 10 : Bulk API — Bonnes pratiques
+
+Parmi ces pratiques, laquelle est recommandée pour charger efficacement 50 000 documents dans OpenSearch ?
+
+A) Utiliser 50 000 requêtes `PUT` individuelles avec un délai de 100 ms entre chaque
+
+B) Utiliser le Bulk API avec `refresh_interval: -1` pendant le chargement, puis rétablir `1s` à la fin
+
+C) Désactiver le cluster entier, copier les fichiers JSON sur disque, puis redémarrer
+
+D) Utiliser `POST /index/_doc` avec un seul grand tableau JSON contenant les 50 000 documents
 
 <details>
 <summary>Réponse</summary>
 
 **Réponse : B**
 
-Explication : L'agrégation `avg` calcule la moyenne arithmétique d'un champ numérique. Les agrégations métriques disponibles incluent : `min`, `max`, `avg`, `sum`, `count` (via `value_count`), `stats` (calcule min/max/avg/sum/count en une seule passe), `extended_stats` (ajoute variance, écart-type), `percentiles`, `cardinality` (HyperLogLog pour les valeurs distinctes). Il n'existe pas d'agrégation `median` native — on utilise `percentiles` avec `percents: [50]` pour la médiane.
-
-</details>
-
----
-
-## Question 10 : Agrégations bucket
-
-Vous voulez compter le nombre de produits par catégorie, puis par plage de prix (0-100€, 100-500€, 500€+). Quelle combinaison d'agrégations convient ?
-
-A) `terms` sur `category.keyword`, puis `histogram` sur `price` en sous-agrégation
-
-B) `match` sur `category`, puis `range` sur `price` en sous-agrégation
-
-C) `filter` sur `category`, puis `avg` sur `price`
-
-D) `date_histogram` sur `category`, puis `terms` sur `price`
-
-<details>
-<summary>Réponse</summary>
-
-**Réponse : A**
-
-Explication : Les **agrégations bucket** regroupent les documents selon un critère. `terms` crée un bucket par valeur unique du champ (idéal pour les valeurs discrètes comme les catégories — utiliser `.keyword`). `range` crée des buckets avec des plages personnalisées (`{ "to": 100 }`, `{ "from": 100, "to": 500 }`, `{ "from": 500 }`). Les agrégations peuvent être **imbriquées** : on fait une `terms` sur la catégorie, et pour chaque bucket catégorie, on applique une `range` sur le prix. `histogram` crée des intervalles réguliers (ex. tous les 100€), tandis que `range` permet des intervalles personnalisés.
+Explication : Le Bulk API (format NDJSON, action + document par paire de lignes) est la méthode recommandée pour les chargements massifs. Combiner avec `refresh_interval: -1` (désactiver le refresh automatique pendant le chargement) et `number_of_replicas: 0` (réactiver après) permet d'atteindre des performances 5 à 10 fois supérieures. La taille optimale par batch Bulk est entre 5 et 15 MB. Le flag `--data-binary` est obligatoire avec curl pour préserver les sauts de ligne du format NDJSON.
 
 </details>

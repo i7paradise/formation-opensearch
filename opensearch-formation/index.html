@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formation OpenSearch 3.6</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 700; }
+    header .badge {
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+    }
+    .hero h2 { font-size: 2rem; color: #2563eb; margin-bottom: 0.5rem; }
+    .hero p { color: #64748b; font-size: 1.1rem; }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 2.5rem 0 1rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.2s, transform 0.2s;
+      display: block;
+    }
+    .card:hover {
+      box-shadow: 0 8px 24px rgba(37,99,235,0.12);
+      transform: translateY(-2px);
+    }
+    .card .day-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #2563eb;
+      margin-bottom: 0.4rem;
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .card p { color: #64748b; font-size: 0.9rem; }
+    .card .arrow {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #2563eb;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    .quick-link {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s;
+    }
+    .quick-link:hover { background: #eff6ff; }
+
+    .prereqs {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+      margin-top: 0.5rem;
+    }
+    .prereqs ul { list-style: none; padding: 0; }
+    .prereqs li { padding: 0.25rem 0; color: #166534; }
+    .prereqs li::before { content: "✓ "; color: #16a34a; font-weight: 700; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Formation OpenSearch 3.6</h1>
+  <span class="badge">3 jours · 21 heures · 11 TPs</span>
+</header>
+
+<main>
+  <div class="hero">
+    <h2>Moteur de recherche e-commerce de A à Z</h2>
+    <p>Du cluster mono-nœud à la sécurisation en production, avec agrégations et dashboards.</p>
+  </div>
+
+  <div class="section-title">Programme par jour</div>
+  <div class="cards">
+    <a href="./jour-1/index.html" class="card">
+      <div class="day-label">Jour 1</div>
+      <h3>Fondamentaux & Premières requêtes</h3>
+      <p>Installation, mappings, CRUD, Bulk API, Query DSL — 4 TPs (TP1 à TP4)</p>
+      <span class="arrow">Voir le programme →</span>
+    </a>
+    <a href="./jour-2/index.html" class="card">
+      <div class="day-label">Jour 2</div>
+      <h3>Sécurité, Fonctionnalités avancées & Cluster</h3>
+      <p>RBAC, FLS, Pipelines, Analyseurs, Architecture cluster, Routage — 4 TPs (TP5 à TP8)</p>
+      <span class="arrow">Voir le programme →</span>
+    </a>
+    <a href="./jour-3/index.html" class="card">
+      <div class="day-label">Jour 3</div>
+      <h3>Agrégations, Dashboards & Cycle de vie</h3>
+      <p>Agrégations avancées, BM25, Dashboards, Reindex, ISM — 3 TPs (TP9 à TP11)</p>
+      <span class="arrow">Voir le programme →</span>
+    </a>
+  </div>
+
+  <div class="section-title">Accès rapide</div>
+  <div class="quick-links">
+    <a href="./slides/jour-1/index.html" class="quick-link">Slides Jour 1</a>
+    <a href="./slides/jour-2/index.html" class="quick-link">Slides Jour 2</a>
+    <a href="./slides/jour-3/index.html" class="quick-link">Slides Jour 3</a>
+    <a href="./labs/" class="quick-link">Dossier Labs</a>
+    <a href="./README.md" class="quick-link">README</a>
+  </div>
+
+  <div class="section-title">Prérequis techniques</div>
+  <div class="prereqs">
+    <ul>
+      <li>Docker 20+ et Docker Compose v2 installés</li>
+      <li>4 Go de RAM minimum disponibles pour Docker</li>
+      <li>Ports 9200 et 5601 libres sur votre machine</li>
+      <li><code>curl</code> et <code>python3</code> disponibles dans le terminal</li>
+    </ul>
+  </div>
+</main>
+
+<footer>
+  Formation OpenSearch 3.6 — Anthropic
+</footer>
+
+</body>
+</html>

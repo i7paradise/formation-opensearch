@@ -1,6 +1,11 @@
 # Quiz Final — Évaluation 3 jours OpenSearch 3.6
 
 > **Instructions** : 20 questions couvrant les 3 jours de formation. 1 seule réponse correcte par question. Durée recommandée : 20 minutes.
+>
+> **Thèmes couverts** :
+> - Jour 1 : Fondamentaux, Mappings & types de champs, API CRUD & Bulk API, Query DSL
+> - Jour 2 : Sécurité RBAC/FLS/DLS, Fonctionnalités avancées (Pipelines, Analyseurs), Architecture & Cluster, Routage
+> - Jour 3 : Agrégations (métriques, bucket, pipeline), BM25 & Scoring, Dashboards, Reindex & ISM
 
 ---
 

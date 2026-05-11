@@ -1,263 +1,232 @@
-# Jour 2 — Guide formateur : Fonctionnalités Avancées & Dashboards
+# Jour 2 — Guide formateur : Sécurité, Fonctionnalités avancées & Cluster
 
 ## Timing global
 
 | Heure | Durée | Activité | Type |
 |-------|-------|----------|------|
-| 09:00 | 15 min | Récap Jour 1 — 6 questions orales | Q/A |
-| 09:15 | 60 min | Chapitre 4a : Ingest Pipelines | Cours |
-| 10:15 | 15 min | Pause | Pause |
-| 10:30 | 30 min | Chapitre 4b : Analyseurs & Tokenizers | Cours |
-| 11:00 | 30 min | Chapitre 4c : Tri, Suggestion, Géo & Optimisation | Cours |
-| 11:30 | 60 min | TP4 : Fonctionnalités avancées | TP |
+| 09:00 | 45 min | Chapitre 8 : Sécurité (RBAC, DLS, FLS) | Cours |
+| 09:45 | 15 min | Pause | Pause |
+| 10:00 | 30 min | TP5 : Sécurisation RBAC + FLS | TP |
+| 10:30 | 60 min | Chapitre 4 : Fonctionnalités avancées | Cours |
+| 11:30 | 60 min | TP6 : Pipelines & Analyseurs | TP |
 | 12:30 | 60 min | Déjeuner | Déjeuner |
-| 13:30 | 30 min | Chapitre 5a : Principes Dashboards | Cours |
-| 14:00 | 30 min | Chapitre 5b : Agrégations & Visualisations | Cours |
-| 14:30 | 30 min | Chapitre 5c : Maps & Dashboard | Cours |
-| 15:00 | 15 min | Pause | Pause |
-| 15:15 | 75 min | TP5 : Dashboard e-commerce | TP |
+| 13:30 | 75 min | Chapitre 6 : Architecture & Cluster | Cours |
+| 14:45 | 45 min | TP7 : Installation cluster 3 nœuds | TP |
+| 15:30 | 15 min | Pause | Pause |
+| 15:45 | 45 min | TP8 : Routage — démonstration (nouveau) | TP |
 | 16:30 | 30 min | Récap Jour 2 + Q&A + preview Jour 3 | Q/A |
 
 ---
 
-## Récap Jour 1 (09:00 — 15 min)
+## Récap rapide Jour 1 (début de session — 5 min)
 
-**Timing** : 15 min
-
-**Ce que tu dis** :
-> "Bonjour tout le monde ! Bien dormi ? Avant de démarrer, on va faire un récap rapide de hier. Je vais vous poser 6 questions — on lève la main pour répondre."
-
-**Questions à poser** :
-1. "Quelle est la différence entre un index et un shard ?"
-   → Index = logique (comme une table), shard = physique (index Lucene réel)
-2. "Quand utilise-t-on `text` vs `keyword` ?"
-   → text = recherche full-text analysée, keyword = valeur exacte (filtre, tri, agg)
-3. "À quoi sert le Bulk API ?"
-   → Indexer des milliers de documents en une seule requête HTTP (beaucoup plus efficace)
-4. "Quelle est la différence entre `must` et `filter` dans un bool query ?"
-   → must affecte le score + non cacheable. filter = pas de score + cacheable = plus rapide
-5. "Qu'est-ce que BM25 utilise pour calculer le score ?"
-   → TF (fréquence du terme), IDF (fréquence inverse), longueur du champ
-6. "Quelle agrégation donne les valeurs les plus fréquentes ?"
-   → `terms` aggregation sur un champ keyword
-
-**Points clés** :
-- Repérez qui a besoin d'aide pour finir les TPs d'hier
-- Si plus de 3 personnes n'ont pas fini TP2 ou TP3, proposez 15 min supplémentaires
-
-**Alerte** : Si quelqu'un répond "text" pour une agrégation par catégorie → expliquer que les aggs ne fonctionnent que sur keyword
-
-**Transition** :
-> "Super ! Aujourd'hui on monte d'un cran. On va voir comment enrichir les données automatiquement, comment rendre la recherche intelligente en français, et comment visualiser tout ça dans des dashboards professionnels."
+**Questions orales** :
+1. "Différence entre text et keyword ?"
+2. "Pourquoi `dynamic: strict` ?"
+3. "Quelle est la différence entre `must` et `filter` dans un bool query ?"
 
 ---
 
-## Chapitre 4a — Ingest Pipelines (09:15 — 60 min)
+## Chapitre 8 — Sécurité OpenSearch (09:00 — 45 min)
 
-### Slide : Concept des Pipelines
-
-**Timing** : 10 min
+**Timing** : 45 min
 
 **Ce que tu dis** :
-> "Imaginez que vous recevez des données d'un système externe. Les catégories sont en majuscules, les descriptions ont des espaces en trop, et il n'y a pas de timestamp d'indexation. Vous pourriez corriger ça dans votre code client... mais vous devrez le faire dans CHAQUE client. Avec un ingest pipeline, vous centralisez cette logique dans OpenSearch, et tous les clients en bénéficient automatiquement."
+> "Par défaut, OpenSearch en démo n'a pas de sécurité. En production, c'est inacceptable. Le Security Plugin est inclus gratuitement dans OpenSearch — c'est un avantage majeur par rapport à Elasticsearch où la sécurité est payante."
 
 **Points clés** :
-- Pipeline = séquence de processeurs, exécutée côté serveur à l'indexation
-- Différence fondamentale avec les analyseurs : pipeline s'exécute UNE FOIS sur le document entier. Analyseur s'exécute sur un champ text à l'indexation ET à la recherche
-- `_simulate` est indispensable : toujours tester avant d'appliquer en production
+- Security Plugin overview : Authentication → Authorization → Audit Logging
+- RBAC : Rôles → Permissions (cluster + index) → Mapping utilisateur/rôle
+- DLS (Document Level Security) : filtre de requête automatique selon le rôle
+- FLS (Field Level Security) : masquer des champs selon le rôle (préfixe `~`)
+- Slide "pour aller plus loin" : TLS inter-nœuds et REST, LDAP, SAML — ce sera dans la documentation mais pas dans le TP d'aujourd'hui
 
-**Anecdote** :
-> "En prod, j'ai vu un pipeline mal configuré avec un processeur `remove` sur un mauvais champ. Résultat : 2 millions de documents sans leur champ `user_id`. La seule solution : reindexer depuis une sauvegarde. _simulate aurait évité ça en 30 secondes."
+**Démonstration live** :
+```bash
+# Se connecter en admin
+curl -k -u admin:admin "https://localhost:9200/_plugins/_security/authinfo?pretty"
+
+# Créer un rôle read-only
+curl -k -u admin:admin -X PUT "https://localhost:9200/_plugins/_security/api/roles/demo_reader" \
+  -H "Content-Type: application/json" \
+  -d '{"index_permissions":[{"index_patterns":["products*"],"allowed_actions":["read"]}]}'
+```
 
 **Questions fréquentes** :
-- Q: "Peut-on appliquer un pipeline en mode batch sur des données déjà indexées ?" → R: "Oui, avec `_update_by_query?pipeline=mon-pipeline`. Attention : ça re-passe par le pipeline et consomme des ressources."
-- Q: "Le pipeline ralentit-il l'indexation ?" → R: "Légèrement, mais c'est négligeable pour des pipelines simples. Les processeurs lourds (grok sur chaque doc) peuvent impacter."
+- Q: "TLS n'est pas dans le TP ?" → R: "TLS est important mais long à configurer. Le TP se concentre sur RBAC et FLS — les deux fonctionnalités les plus utilisées quotidiennement. TLS est mentionné en slide et dans les ressources."
+- Q: "Le mot de passe admin par défaut `admin:admin` est dangereux ?" → R: "Absolument. En production : changer immédiatement. Pour la formation c'est commode."
 
 **Transition** :
-> "Maintenant qu'on sait transformer les données, voyons comment rendre la recherche intelligente avec les analyseurs."
+> "On va maintenant créer nos propres rôles et utilisateurs. TP5 — 30 minutes."
 
 ---
 
-### Slide : Processeurs courants
+## TP5 — Sécurisation RBAC + FLS (10:00 — 30 min)
 
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "Il existe une trentaine de processeurs. Les plus utilisés : `lowercase` pour normaliser les catégories, `trim` pour supprimer les espaces, `set` pour ajouter des champs calculés, `grok` pour parser des logs. Regardons comment les combiner."
-
-**Démo live** : Créer le pipeline `pipeline-produits` et le tester avec `_simulate`. Montrez la transformation de `"ELECTRONIQUE"` en `"electronique"` et la suppression des espaces.
-
-**Points clés** :
-- `ignore_missing: true` évite les erreurs si le champ n'existe pas
-- `{{_ingest.timestamp}}` est une variable magique = moment exact de l'indexation
-- Ordre des processeurs = ordre d'exécution (important si un processeur dépend d'un autre)
+**Ce que tu fais** :
+- Vérifier que tous les postes ont le cluster démarré avec sécurité activée
+- S'assurer que chaque participant voit le 403 lors de l'écriture avec l'utilisateur `analyst`
+- Point sur FLS : "Observez que le champ `price` a disparu de la réponse"
 
 ---
 
-## Chapitre 4b — Analyseurs & Tokenizers (10:30 — 30 min)
+## Pause (09:45 — 15 min)
 
-### Slide : Chaîne d'analyse
+---
 
-**Timing** : 10 min
+## Chapitre 4 — Fonctionnalités avancées (10:30 — 60 min)
+
+**Timing** : 60 min
 
 **Ce que tu dis** :
-> "C'est LE concept le plus important du jour 2. Quand vous indexez 'Vélos électriques d'entrée de gamme', OpenSearch ne stocke pas ce texte tel quel dans l'index inversé. Il le transforme en tokens. Voici comment."
+> "On a un moteur de recherche qui fonctionne. Maintenant on va le rendre intelligent : enrichissement automatique des données à l'indexation, meilleure recherche en français, et mise en valeur des termes dans les résultats."
+
+### Ingest Pipelines (20 min)
 
 **Points clés** :
-- ORDRE : Char Filter → Tokenizer → Token Filters. L'ordre est figé et obligatoire
-- `lowercase` doit venir AVANT `asciifolding` : "É" en majuscule doit d'abord être en minuscule "é" pour que asciifolding le transforme en "e"
-- Demo en live avec `_analyze` API : montrez les tokens produits étape par étape
+- Pipeline = séquence de processeurs exécutée côté serveur à l'indexation
+- Processeurs communs : `lowercase`, `trim`, `set`, `remove`, `grok` (logs), `date`
+- `_simulate` : TOUJOURS tester avant d'appliquer en production
+- Un seul pipeline peut servir tous les clients → centralisation de la logique
 
 **Anecdote** :
-> "Le problème le plus fréquent en prod : un développeur cherche 'velo' et ne trouve pas 'Vélo'. Cause : l'analyseur manque d'asciifolding ou n'est pas appliqué à la recherche. L'analyseur doit être symétrique : même transformation à l'indexation ET à la recherche."
+> "En prod, j'ai vu un processeur `remove` appliqué sur le mauvais champ — 2 millions de documents sans `user_id`. La seule solution : reindexer depuis sauvegarde. `_simulate` aurait pris 30 secondes."
+
+### Analyseurs et Tokenizers (20 min)
+
+**Points clés** :
+- Chaîne d'analyse : Char Filter → Tokenizer → Token Filters
+- `standard` tokenizer : découpe par espace et ponctuation, tout en minuscules
+- Token filters importants : `lowercase`, `asciifolding` (é→e), `stop`, `stemmer`
+- Analyseur français : `lowercase` + `asciifolding` + `french_stop` + `french_stemmer`
+- Toujours tester avec `_analyze`
+
+### Surlignage, Tri et optimisation (20 min)
+
+**Points clés** :
+- `highlight` : clause au même niveau que `query`, retourne des extraits avec les termes surlignés
+- Tris : sur les champs `keyword` ou numériques uniquement (`name.keyword` pas `name`)
+- `search_after` vs `from+size` : pour la pagination profonde (> 10 000 résultats)
+- Géolocalisation et completion suggester → TPs optionnels dédiés
+
+**Transition** :
+> "TP6 — vous allez créer un pipeline, un analyseur français et tester le highlighting."
+
+---
+
+## TP6 — Pipelines & Analyseurs (11:30 — 60 min)
+
+**Ce que tu fais** :
+- Circuler, aider sur la syntaxe des analyseurs dans les `settings`
+- À 12h15 : "Même si vous n'avez pas fini, regardez la correction — on passe au déjeuner"
+
+---
+
+## Déjeuner (12:30 — 60 min)
+
+---
+
+## Chapitre 6 — Architecture & Cluster (13:30 — 75 min)
+
+**Timing** : 75 min — chapitre dense, très important
+
+**Ce que tu dis** :
+> "On a fait des requêtes sur un seul nœud. En production, ça n'existe pas. Un seul nœud = point de défaillance unique. On va comprendre comment OpenSearch distribue les données et les requêtes."
+
+### Internals Lucene (15 min)
+
+**Points clés** :
+- Lucene = index inversé : terme → liste de documents (posting list)
+- Segments Lucene : immutables, les nouvelles données vont dans de nouveaux segments
+- Merges : en arrière-plan, Lucene consolide les petits segments en gros
+- Refresh (1s par défaut) : rend les nouveaux documents visibles (crée un nouveau segment en RAM)
+
+### Types de nœuds (10 min)
+
+**Points clés** :
+- `master` / master-eligible : gère l'état du cluster (pas de données, coordonne)
+- `data` : stocke et indexe les données, exécute les requêtes
+- `ingest` : applique les pipelines avant indexation
+- `coordinating` (implicite sur tous les nœuds) : route les requêtes vers les shards concernés
+- En production avec > 5 nœuds : nœuds master dédiés (rôle `master` uniquement)
+
+### Discovery et quorum (10 min)
+
+**Points clés** :
+- Quorum = ⌊N/2⌋ + 1 nœuds master-eligible pour élire un master
+- 3 nœuds master-eligible → quorum = 2 → peut perdre 1 nœud
+- `cluster.initial_master_nodes` : uniquement pour le bootstrap initial, à retirer ensuite
+- Split-brain : situation où deux partitions du cluster pensent chacune être le master → quorum évite ça
+
+### Sizing des shards (10 min)
+
+**Points clés** :
+- Règle d'or : 10–50 GB par shard
+- Trop de shards = overhead de coordination
+- Trop peu = shards qui ne tiennent pas en mémoire
+- Nombre de shards primaires = fixe après création → bien estimer à l'avance
+
+### Algorithme de routage (15 min) — point central de la journée
+
+**Ce que tu dis** :
+> "Quand vous indexez un document, OpenSearch doit décider dans quel shard il va. L'algorithme est déterministe : `hash(_id) % number_of_shards`. C'est pour ça qu'on ne peut pas changer le nombre de shards primaires : si on changeait N, tous les documents existants seraient introuvables."
+
+**Points clés** :
+- Routing par défaut : `hash(_id) % nb_shards`
+- Routing personnalisé : `?routing=valeur` → force le shard cible
+- Avantage routing custom : requête ne touche qu'1 shard au lieu de tous
+- Risque routing custom : hotspot (1 shard reçoit tout le trafic)
+- Demo : `_cat/shards` avant et après routing forcé
+
+### Scalabilité (15 min)
+
+**Points clés** :
+- Ajouter des nœuds : les shards se redistribuent automatiquement (rebalancing)
+- Ajouter des replicas : ne pas changer le nombre de primaires (reindex nécessaire)
+- Anticiper la croissance : mieux vaut 5 shards trop nombreux que 1 trop peu
 
 **Questions fréquentes** :
-- Q: "Peut-on avoir différents analyseurs pour l'indexation et la recherche ?" → R: "Oui, `analyzer` pour l'index, `search_analyzer` pour la recherche. Mais en pratique, 95% du temps vous utilisez le même pour les deux."
-- Q: "Où va-t-on trouver la liste de tous les token filters ?" → R: "Documentation officielle opensearch.org/docs/latest/analyzers/"
-
-**Alerte** : "Si quelqu'un applique un analyseur APRÈS avoir indexé des données → il doit réindexer ! Les tokens existants dans l'index ne changent pas rétroactivement."
+- Q: "Combien de nœuds minimum pour la production ?" → R: "3 nœuds minimum : 1 peut tomber et le cluster reste opérationnel avec quorum 2/3."
+- Q: "Que se passe-t-il si le nœud master tombe ?" → R: "Élection automatique parmi les nœuds master-eligible, en moins de 30 secondes en général. On le verra dans le bonus du TP7."
 
 **Transition** :
-> "On vient de créer notre analyseur français. Maintenant on va voir des fonctionnalités plus visuelles : l'autocomplétion, le highlighting, et la recherche géographique."
+> "On va maintenant démarrer notre propre cluster 3 nœuds. TP7."
 
 ---
 
-## Chapitre 4c — Tri, Suggestion, Géo & Optimisation (11:00 — 30 min)
+## TP7 — Installation cluster 3 nœuds (14:45 — 45 min)
 
-### Slide : Completion Suggester
-
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "Qui utilise la barre de recherche d'Amazon ? Quand vous tapez 'ord', vous avez instantanément des suggestions : 'ordinateur', 'ordinateur portable', etc. C'est le completion suggester. Il utilise une structure de données spécialisée — le Finite State Transducer — qui est chargée en mémoire et permet des suggestions en moins d'une milliseconde."
-
-**Points clés** :
-- Type `completion` obligatoire dans le mapping
-- Les données doivent être indexées dans ce champ (il faut donc réindexer ou update_by_query)
-- `fuzziness: 1` tolère une faute de frappe (distance d'édition 1)
-
-**Transition** :
-> "Pour la correction orthographique — 'Voulez-vous dire ?' — on utilise le term suggester, qui est différent. Voyons ensuite la géo."
-
-### Slide : Géo & Optimisation
-
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "Notre e-commerce a des magasins physiques. Les clients veulent trouver le magasin le plus proche. Avec geo_distance + geo_point, c'est trivial dans OpenSearch."
-
-**Démo live** : Montrez la requête geo_distance avec le sort par distance. Montrez que la distance calculée apparaît dans le résultat.
-
-**Points clés Optimisation** :
-- Le conseil le plus important : "En cas de doute entre `must` et `filter`, mettez dans `filter`"
-- `dynamic: strict` = protection contre le mapping explosion (champs inattendus créent des mappings dynamiques)
-- Évitez les wildcards en début de pattern : `*term` → scan complet de l'index
+**Ce que tu fais** :
+- S'assurer que tout le monde voit `number_of_nodes: 3` dans `_cluster/health`
+- Pointer `_cat/shards` : "Observez que les primaires et réplicas sont sur des nœuds différents"
+- Pour ceux qui vont vite : simulation de panne de nœud (bonus)
 
 ---
 
-## TP4 — Fonctionnalités avancées (11:30 — 60 min)
-
-**Ce que tu dis** :
-> "Ouvrez labs/tp4-fonctionnalites-avancees/README.md. Vous avez 60 minutes pour les 6 exercices. La solution est dans labs/tp4-fonctionnalites-avancees/solution/solution.sh si vous êtes bloqués."
-
-**Points de surveillance** :
-- Ex.1 : _simulate avant d'indexer avec le pipeline
-- Ex.2-3 : L'exercice de réindexation est le plus difficile — vérifiez que products-v2 a le bon count
-- Ex.4 : Le completion suggester nécessite un champ completion dans le mapping et de réindexer avec le script pour copier name vers name_suggest
-- Ex.6 : Vérifier que l'index stores existe : `GET /stores/_count`
-
-**Alerte** : Si quelqu'un dit "mon analyseur ne fonctionne pas" → Demandez : est-ce que l'index a été créé AVANT ou APRÈS l'analyseur ? Si avant, les données ne sont pas analysées avec le bon analyseur.
+## Pause (15:30 — 15 min)
 
 ---
 
-## Chapitre 5a — Principes Dashboards (13:30 — 30 min)
+## TP8 — Routage : démonstration (15:45 — 45 min)
 
-### Slide : Interface
+**Ce que tu dis avant le TP** :
+> "On vient de voir l'algorithme de routage en théorie. Dans ce TP, on va le voir en pratique. On va créer deux index identiques — l'un avec routing automatique, l'autre avec routing forcé par catégorie — et observer la distribution des documents dans les shards."
 
-**Timing** : 10 min
-
-**Ce que tu dis** :
-> "OpenSearch Dashboards, c'est l'équivalent de Kibana pour Elasticsearch — en fait, c'est un fork de Kibana. C'est l'interface qui permet à des non-développeurs d'explorer et visualiser les données sans écrire de JSON. Voyons l'interface."
-
-**Démo live** : Ouvrez http://localhost:5601. Faites un tour de chaque section. Insistez sur l'ordre : Management → Index Pattern → Discover → Visualize → Dashboard.
-
-**Points clés** :
-- Index Pattern = obligatoire avant TOUT
-- Le champ date dans l'Index Pattern active les filtres temporels (Time Range picker)
-- KQL est sensible à la casse sur les keyword fields
-
-**Question fréquente** :
-- Q: "Quelle est la différence avec Kibana ?" → R: "Kibana appartient à Elastic (SSPL). Dashboards est le fork OpenSearch (Apache 2.0). L'interface est similaire mais pas identique. Les saved objects ne sont pas compatibles entre les deux."
+**Ce que tu fais pendant le TP** :
+- Guider les participants sur `_cat/shards` après l'indexation : "Observez le déséquilibre"
+- Pointer la différence dans les shards interrogés avec/sans `?routing=`
+- Conclure : "Le routing custom peut être un avantage ou un piège selon votre modèle de données"
 
 ---
 
-## Chapitre 5b — Agrégations & Visualisations (14:00 — 30 min)
+## Récap Jour 2 + Q&A + preview Jour 3 (16:30 — 30 min)
 
-**Timing** : 30 min
-
-**Ce que tu dis** :
-> "Chaque visualisation Dashboards est construite sur une agrégation OpenSearch. Quand vous créez un Pie Chart, Dashboards exécute une terms aggregation en coulisse. La maîtrise des agrégations qu'on a vue hier est directement réutilisable ici."
-
-**Table de correspondance à mémoriser** :
-- Bar Chart + Terms = top N valeurs
-- Line Chart + Date Histogram = évolution dans le temps
-- Pie Chart + Terms = répartition proportionnelle
-- Metric + Count/Avg/Sum = KPI
-- Data Table + Terms + Metric = rapport détaillé
-
-**Démo live** : Créez un Pie Chart en direct. Montrez : choisir le type de viz, configurer le bucket (Terms sur category), configurer la métrique (Count), voir le résultat.
-
-**Alerte** : "Si quelqu'un essaie de faire une agrégation Terms sur un champ `text` → erreur 'Fielddata is disabled'. Il faut utiliser le sous-champ `.keyword` : `category.keyword`."
-
----
-
-## Chapitre 5c — Maps & Dashboards (14:30 — 30 min)
-
-**Ce que tu dis** :
-> "On peut placer nos données géographiques sur une carte interactive. Le Coordinate Map utilise une geohash aggregation — il divise la carte en cellules hexagonales et compte les documents dans chaque cellule."
-
-**Points clés** :
-- Le Coordinate Map nécessite l'index `stores` avec le champ `location` de type `geo_point`
-- Les tuiles de carte nécessitent une connexion internet (OpenStreetMap)
-- Construction de dashboard : ordre logique = créer toutes les viz d'abord, assembler ensuite
-
-**Ce que tu dis (Dashboard assembly)** :
-> "Pour assembler un dashboard, pensez comme un chef de cuisine : préparez tous vos ingrédients d'abord (les visualisations), puis assemblez le plat (le dashboard). Ne créez pas de viz directement depuis le dashboard — vous perdrez la possibilité de les réutiliser ailleurs."
-
----
-
-## TP5 — Dashboard e-commerce (15:15 — 75 min)
-
-**Ce que tu dis** :
-> "C'est le TP le plus visuel de la formation. Ouvrez labs/tp5-dashboards/README.md. Vous allez créer le tableau de bord e-commerce complet."
-
-**Points de surveillance** :
-- Index Pattern : vérifiez que le champ date est `created_at`
-- KQL dans Discover : rappel que les keyword fields sont case-sensitive
-- Coordinate Map : si les tuiles ne chargent pas → problème réseau. Offrez une alternative : screenshot de référence
-- Data Table : pour les produits les plus chers, trier par `price` descending
-
-**Alerte** : "Si quelqu'un obtient 0 résultats dans Discover → vérifiez la plage temporelle dans le coin supérieur droit. Par défaut c'est 'Last 15 minutes'. Changez en 'Last 1 year' ou 'Last 12 months'."
-
----
-
-## Récap Jour 2 (16:30 — 30 min)
-
-**Ce que tu dis** :
-> "Journée chargée ! Récapitulons. Ce matin : ingest pipelines pour normaliser les données, analyseur français pour une recherche linguistiquement correcte, autocomplétion et géolocalisation. Cet après-midi : Dashboards pour visualiser tout ça sans écrire une ligne de code."
-
-**Questions récap** :
-1. "Quel processeur parse du texte non structuré avec des patterns ?" → grok
-2. "Dans la chaîne d'analyse, qu'est-ce qui vient en premier ?" → Char Filter
-3. "Quel token filter supprime les accents ?" → asciifolding
-4. "Quelle visualisation pour une évolution dans le temps ?" → Line Chart + Date histogram
+**Questions orales de vérification** :
+1. "Qu'est-ce que FLS ? Comment on exclut un champ ?"
+2. "Quelle est la formule de routage par défaut ?"
+3. "Pourquoi ne peut-on pas changer le nombre de primary shards ?"
+4. "Qu'est-ce qu'un hotspot dans le contexte du routing ?"
+5. "Quel est le quorum pour 3 nœuds master-eligible ?"
 
 **Preview Jour 3** :
-> "Demain, c'est le jour de la production. On va passer à 3 nœuds, configurer la haute disponibilité, faire de la gestion de cycle de vie des index, et sécuriser le cluster avec TLS et RBAC. C'est le jour le plus technique, et aussi le plus satisfaisant."
-
-**Important** :
-> "N'oubliez pas de signer la feuille de présence pour l'après-midi ! Et si vous n'avez pas fini les TPs, vous pouvez continuer ce soir — les solutions sont dans les dossiers `solution/`."
-
----
-
-*Guide Jour 2 — Formation OpenSearch 3.6*
+> "Demain matin on attaque les agrégations — statistiques, buckets, imbriquées, pipeline. C'est la base de tout ce qu'on visualise dans Dashboards. L'après-midi : Dashboards, reindex et cycle de vie des index avec ISM."

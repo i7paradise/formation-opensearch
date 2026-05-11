@@ -1,12 +1,12 @@
-# TP3 — Requêtes & Agrégations
+# TP4 — Requêtes & Recherche
 
 ## Objectif
 
-Maîtriser le Query DSL d'OpenSearch et les agrégations pour implémenter des fonctionnalités de recherche et d'analyse sur notre catalogue e-commerce.
+Maîtriser le Query DSL d'OpenSearch pour implémenter des fonctionnalités de recherche sur notre catalogue e-commerce, sans agrégations (déplacées au TP9 — Jour 3).
 
 ## Prérequis
 
-- TP2 terminé et validé
+- TP3 terminé et validé
 - Index `products` avec au moins 1000 documents
 - Cluster OpenSearch en cours d'exécution
 
@@ -16,12 +16,11 @@ Maîtriser le Query DSL d'OpenSearch et les agrégations pour implémenter des f
 
 ## Contexte fil rouge
 
-Notre catalogue produits est chargé. Maintenant, les utilisateurs ont besoin de pouvoir **trouver des produits** et les responsables e-commerce ont besoin d'**analyser le catalogue**. Dans ce TP, vous allez implémenter :
+Notre catalogue produits est chargé. Maintenant, les utilisateurs ont besoin de pouvoir **trouver des produits**. Dans ce TP, vous allez implémenter :
 
 - La barre de recherche principale (full-text sur les noms et descriptions)
 - Les filtres produits (catégorie, prix, disponibilité)
 - La page "résultats de recherche" avec filtres combinés
-- Les statistiques du catalogue pour le back-office (prix moyen par catégorie, distribution des prix)
 
 ---
 
@@ -254,156 +253,11 @@ curl -s -X GET "http://localhost:9200/products/_search" \
 
 ---
 
-## Exercice 4 — Agrégations : prix moyen par catégorie
-
-Les agrégations permettent d'analyser les données du catalogue. Elles fonctionnent sur les champs `keyword`, `numeric` et `date`.
-
-### 4.1 Terms + Avg imbriquées
-
-Complétez le TODO dans `exercices.sh` pour calculer le **prix moyen** de chaque catégorie.
-
-Structure d'une agrégation imbriquée :
-```json
-{
-  "size": 0,
-  "aggs": {
-    "nom_agregation_parent": {
-      "terms": {
-        "field": "category",
-        "size": 20
-      },
-      "aggs": {
-        "nom_agregation_enfant": {
-          "avg": {
-            "field": "price"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-> **`"size": 0`** : Indique à OpenSearch de ne pas retourner de documents (uniquement les résultats d'agrégation). Cela améliore les performances.
-
-### 4.2 Ajouter des statistiques étendues
-
-Remplacez `avg` par `extended_stats` pour obtenir min, max, moyenne, écart-type :
-
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "size": 0,
-    "aggs": {
-      "par_categorie": {
-        "terms": {
-          "field": "category",
-          "size": 10
-        },
-        "aggs": {
-          "stats_prix": {
-            "extended_stats": {
-              "field": "price"
-            }
-          }
-        }
-      }
-    }
-  }' | python3 -m json.tool
-```
-
----
-
-## Exercice 5 — Histogramme de prix par tranches de 100€
-
-L'agrégation `histogram` divise les valeurs numériques en intervalles réguliers (buckets).
-
-### 5.1 Histogramme simple
-
-Complétez le TODO dans `exercices.sh` pour créer un histogramme de prix avec des intervalles de 100€.
-
-Structure :
-```json
-{
-  "size": 0,
-  "aggs": {
-    "tranches_prix": {
-      "histogram": {
-        "field": "price",
-        "interval": 100,
-        "min_doc_count": 1
-      }
-    }
-  }
-}
-```
-
-- `interval` : largeur de chaque tranche
-- `min_doc_count` : ignorer les tranches vides (0 document)
-
-### 5.2 Histogramme avec filtre
-
-Appliquez l'histogramme uniquement sur les produits en stock, en Électronique :
-
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "size": 0,
-    "query": {
-      "bool": {
-        "filter": [
-          { "term": { "in_stock": true } },
-          { "term": { "category": "Électronique" } }
-        ]
-      }
-    },
-    "aggs": {
-      "tranches_prix": {
-        "histogram": {
-          "field": "price",
-          "interval": 100,
-          "min_doc_count": 1
-        }
-      }
-    }
-  }' | python3 -m json.tool
-```
-
-### 5.3 Range agrégation (tranches non uniformes)
-
-Pour des tranches personnalisées (utile pour les interfaces e-commerce avec des filtres "Moins de 50€", "50€-200€", etc.) :
-
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "size": 0,
-    "aggs": {
-      "gammes_prix": {
-        "range": {
-          "field": "price",
-          "ranges": [
-            { "key": "Moins de 50€",   "to": 50 },
-            { "key": "50€ - 200€",     "from": 50,  "to": 200 },
-            { "key": "200€ - 500€",    "from": 200, "to": 500 },
-            { "key": "500€ - 1000€",   "from": 500, "to": 1000 },
-            { "key": "Plus de 1000€",  "from": 1000 }
-          ]
-        }
-      }
-    }
-  }' | python3 -m json.tool
-```
-
----
-
-## Exercice 6 — Comprendre le score avec `_explain`
+## Exercice 4 — Comprendre le score avec `_explain`
 
 L'API `_explain` vous permet de comprendre pourquoi un document a reçu un certain score de pertinence.
 
-### 6.1 Exécuter une recherche et récupérer l'ID du premier résultat
+### 4.1 Exécuter une recherche et récupérer l'ID du premier résultat
 
 ```bash
 RESULT=$(curl -s -X GET "http://localhost:9200/products/_search" \
@@ -422,9 +276,7 @@ DOC_ID=$(echo "$RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin
 echo "ID du premier document : $DOC_ID"
 ```
 
-### 6.2 Appeler `_explain` sur ce document
-
-Complétez le TODO dans `exercices.sh` :
+### 4.2 Appeler `_explain` sur ce document
 
 ```bash
 curl -s -X GET "http://localhost:9200/products/_explain/$DOC_ID" \
@@ -436,7 +288,7 @@ curl -s -X GET "http://localhost:9200/products/_explain/$DOC_ID" \
   }' | python3 -m json.tool
 ```
 
-### 6.3 Analyser l'explication
+### 4.3 Analyser l'explication
 
 La réponse de `_explain` contient une arborescence d'explication du score :
 - **`max_score`** : score final du document
@@ -450,49 +302,32 @@ Les facteurs du score BM25 :
 
 ---
 
-## TP Bonus — Agrégation imbriquée avancée
+## TP Bonus — Recherche avancée avec `function_score`
 
-Trouvez le produit le plus cher et le moins cher dans chaque catégorie :
+Boostez les produits bien notés dans les résultats de recherche :
 
 ```bash
 curl -s -X GET "http://localhost:9200/products/_search" \
   -H 'Content-Type: application/json' \
   -d '{
-    "size": 0,
-    "aggs": {
-      "top_5_categories": {
-        "terms": {
-          "field": "category",
-          "size": 5,
-          "order": { "_count": "desc" }
-        },
-        "aggs": {
-          "prix_max": {
-            "max": { "field": "price" }
-          },
-          "prix_min": {
-            "min": { "field": "price" }
-          },
-          "prix_moyen": {
-            "avg": { "field": "price" }
-          },
-          "produit_le_plus_cher": {
-            "top_hits": {
-              "size": 1,
-              "sort": [{ "price": { "order": "desc" } }],
-              "_source": ["name", "price", "brand"]
-            }
-          },
-          "produit_le_moins_cher": {
-            "top_hits": {
-              "size": 1,
-              "sort": [{ "price": { "order": "asc" } }],
-              "_source": ["name", "price", "brand"]
+    "query": {
+      "function_score": {
+        "query": { "match": { "name": "ordinateur" } },
+        "functions": [
+          {
+            "field_value_factor": {
+              "field": "rating",
+              "factor": 1.5,
+              "modifier": "sqrt",
+              "missing": 1
             }
           }
-        }
+        ],
+        "boost_mode": "multiply"
       }
-    }
+    },
+    "size": 5,
+    "_source": ["name", "price", "rating"]
   }' | python3 -m json.tool
 ```
 
@@ -500,13 +335,11 @@ curl -s -X GET "http://localhost:9200/products/_search" \
 
 ## Vérification finale
 
-Cochez chaque point avant de passer au TP4 :
+Cochez chaque point avant de passer au TP5 :
 
 - [ ] La `match` query sur "ordinateur" retourne des résultats avec des scores
 - [ ] Les filtres `in_stock` + `range` price retournent uniquement les produits correspondants
 - [ ] La `bool` query combine correctement `must`, `filter` et `must_not`
-- [ ] L'agrégation `terms` + `avg` affiche le prix moyen par catégorie
-- [ ] L'histogramme de prix montre la distribution avec des intervalles de 100€
 - [ ] `_explain` affiche la décomposition du score BM25
 
 ---
@@ -521,11 +354,8 @@ Cochez chaque point avant de passer au TP4 :
 | `terms` | Filter | Filtre multi-catégories |
 | `range` | Filter | Filtre de prix, de stock |
 | `bool` | Mixte | Combinaison de critères |
-| `terms` agg | — | Facettes de catégories |
-| `avg` agg | — | Prix moyen par catégorie |
-| `histogram` agg | — | Distribution des prix |
 | `_explain` | — | Débogage du scoring |
 
 ---
 
-*Passez au [TP4 — Fonctionnalités Avancées](../tp4-fonctionnalites-avancees/README.md) une fois toutes les vérifications validées.*
+*Passez au [TP5 — Sécurisation RBAC+FLS](../tp5-securite/README.md) une fois toutes les vérifications validées.*

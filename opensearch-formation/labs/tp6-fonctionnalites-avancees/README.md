@@ -1,17 +1,19 @@
-# TP4 — Fonctionnalités Avancées
+# TP6 — Fonctionnalités Avancées
 
 ## Objectif
-Implémenter l'enrichissement des données, l'analyse linguistique française et la recherche géographique.
+Implémenter l'enrichissement des données et l'analyse linguistique française pour le moteur de recherche e-commerce.
+
+> **Note** : Les exercices géolocalisation et completion suggester ont été déplacés dans des TPs optionnels dédiés.
 
 ## Prérequis
-- TP3 terminé, index `products` avec 1000+ documents
+- TP5 terminé, index `products` avec 1000+ documents
 - Cluster OpenSearch running sur http://localhost:9200
 
 ## Durée estimée
 60 minutes
 
 ## Contexte (fil rouge)
-Nous enrichissons notre moteur de recherche e-commerce : meilleure gestion du français, autocomplétion, et localisation des magasins.
+Nous enrichissons notre moteur de recherche e-commerce : meilleure gestion du français, surlignage des termes et optimisation des pipelines d'indexation.
 
 ## Exercices
 
@@ -45,17 +47,7 @@ Nous enrichissons notre moteur de recherche e-commerce : meilleure gestion du fr
 **Indice** : `POST _reindex { "source": {"index": "products"}, "dest": {"index": "products-v2"} }`
 **Vérification** : `products-v2` doit avoir le même nombre de documents que `products`
 
-### Exercice 4 : Autocomplétion avec Completion Suggester
-**Objectif** : Implémenter la recherche en temps réel
-**Instructions** :
-1. Ajouter un champ `name_suggest` de type `completion` dans le mapping de `products-v2`
-2. Réindexer en mappant `name` vers `name_suggest` dans le script de reindex
-3. Tester l'autocomplétion : `POST products-v2/_search` avec `suggest` pour le préfixe "ordi"
-
-**Indice** : `"type": "completion"` dans le mapping
-**Vérification** : La réponse doit contenir des suggestions pour "ordi"
-
-### Exercice 5 : Surlignage des Résultats
+### Exercice 4 : Surlignage des Résultats
 **Objectif** : Mettre en valeur les termes recherchés dans les résultats
 **Instructions** :
 1. Faire une recherche avec highlighting sur `name` et `description`
@@ -65,15 +57,15 @@ Nous enrichissons notre moteur de recherche e-commerce : meilleure gestion du fr
 **Indice** : Clé `highlight` au même niveau que `query`
 **Vérification** : Les résultats doivent contenir des champs `highlight.name` ou `highlight.description`
 
-### Exercice 6 : Recherche Géographique sur les Magasins
-**Objectif** : Trouver les magasins proches d'une position
+### Exercice 5 : Tri et Pagination avancée
+**Objectif** : Implémenter une pagination efficace pour de gros volumes
 **Instructions** :
-1. Vérifier que l'index `stores` existe : `GET stores/_count`
-2. Trouver tous les magasins dans un rayon de 5 km autour de Paris (lat: 48.8566, lon: 2.3522)
-3. Trier les résultats par distance croissante
+1. Faire une recherche triée par prix décroissant avec `sort`
+2. Tester la pagination avec `from` + `size`
+3. Implémenter `search_after` pour la pagination profonde (sans limite des 10 000 premiers résultats)
 
-**Indice** : `geo_distance` query + `_geo_distance` sort
-**Vérification** : Les résultats doivent être des magasins parisiens triés par distance
+**Indice** : `"sort": [{"price": {"order": "desc"}}]` + `"search_after": [valeur_du_dernier_doc]`
+**Vérification** : Les résultats sont triés par prix et la pagination `search_after` fonctionne sur plusieurs pages
 
 ## TP Bonus (pour les plus rapides)
 Implémenter "Voulez-vous dire ?" avec le term suggester :
@@ -85,6 +77,7 @@ Implémenter "Voulez-vous dire ?" avec le term suggester :
 - [ ] Pipeline créé et testé avec _simulate
 - [ ] Index `products-v2` avec analyseur français
 - [ ] Reindex effectué, counts identiques
-- [ ] Autocomplétion fonctionnelle
 - [ ] Highlighting présent dans les résultats
-- [ ] Recherche géo retourne des magasins parisiens
+- [ ] Tri par prix et pagination search_after fonctionnels
+
+*Passez au [TP7 — Installation cluster 3 nœuds](../tp7-cluster-3noeuds/README.md)*
