@@ -24,7 +24,7 @@
 </section>
 
 <!-- ===================== SLIDE 2 : TOUR DE TABLE ===================== -->
-<section>
+<section class="slide-content">
   <h2>Tour de table</h2>
   <ul style="font-size:0.9em;">
     <li>Votre prénom et votre rôle</li>
@@ -39,15 +39,15 @@
 </section>
 
 <!-- ===================== SLIDE 3 : PLAN DU JOUR ===================== -->
-<section>
+<section class="slide-content">
   <h2>Plan du Jour 1</h2>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
     <div style="background:#f8fafc;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
       <strong>Matin</strong><br>
       🎯 Démo live (9h30)<br>
-      📖 Chapitre 1 : Introduction<br>
-      📖 Chapitre 2 : Installation<br>
-      🔧 TP1 : Démarrage (11h30)
+      📖 CH1 : Introduction &amp; Installation<br>
+      🔧 TP1 : Installation (11h00)<br>
+      📖 Architecture distribuée &amp; Lucene
     </div>
     <div style="background:#f8fafc;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
       <strong>Après-midi</strong><br>
@@ -85,15 +85,15 @@ GET /demo-products/_search
 <!-- ===================== SLIDE 5 : CHAPITRE 1 OPENER ===================== -->
 <section style="background:#2563eb;color:#fff;">
   <h2 style="color:#fff;">Chapitre 1</h2>
-  <h3 style="color:#bfdbfe;font-weight:400;">Introduction à OpenSearch</h3>
+  <h3 style="color:#bfdbfe;font-weight:400;">Introduction &amp; Installation</h3>
   <p style="color:#dbeafe;margin-top:1em;font-style:italic;">"Et si vous pouviez chercher dans des millions de documents en quelques millisecondes ?"</p>
   <aside class="notes">
-    Diapo de transition. Posez la question rhétorique et laissez quelques secondes de silence. Timing : 30 secondes. Transition : "La réponse, c'est un moteur de recherche distribué. Découvrons OpenSearch."
+    Diapo de transition. Posez la question rhétorique et laissez quelques secondes de silence. Timing : 30 secondes. Transition : "La réponse, c'est un moteur de recherche distribué. Découvrons OpenSearch, puis on le démarre ensemble."
   </aside>
 </section>
 
 <!-- ===================== SLIDE 6 : CAS D'USAGE ===================== -->
-<section>
+<section class="slide-content">
   <h2>Cas d'usage d'OpenSearch</h2>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.85em;">
     <div style="background:#eff6ff;border-radius:8px;padding:1em;">
@@ -119,7 +119,7 @@ GET /demo-products/_search
 </section>
 
 <!-- ===================== SLIDE 7 : HISTOIRE ===================== -->
-<section>
+<section class="slide-content">
   <h2>Histoire d'OpenSearch</h2>
   <div style="font-size:0.85em;">
     <table>
@@ -135,12 +135,254 @@ GET /demo-products/_search
     </table>
   </div>
   <aside class="notes">
-    Expliquez le contexte : Elastic a changé sa licence en janvier 2021, ce qui a poussé AWS à créer un fork open source. Insistez sur le fait qu'OpenSearch est 100% Apache 2.0 — pas de piège de licence. Lucene 10 dans OS 3.x apporte des améliorations significatives sur les vecteurs et les recherches HNSW. Timing : 5 min.
+    Expliquez le contexte : Elastic a changé sa licence en janvier 2021, ce qui a poussé AWS à créer un fork open source. Insistez sur le fait qu'OpenSearch est 100% Apache 2.0 — pas de piège de licence. Lucene 10 (dans OS 3.x) apporte des améliorations significatives sur les vecteurs et les recherches HNSW. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 9 : OPENSEARCH vs ELASTICSEARCH ===================== -->
+<section class="slide-content">
+  <h2>OpenSearch vs Elasticsearch</h2>
+  <div style="font-size:0.8em;">
+    <table>
+      <thead><tr><th>Aspect</th><th>OpenSearch 3.6</th><th>Elasticsearch 8.x</th></tr></thead>
+      <tbody>
+        <tr><td>Licence</td><td style="color:#16a34a;">Apache 2.0 ✓</td><td style="color:#ea580c;">SSPL / Elastic ✗</td></tr>
+        <tr><td>Gratuit</td><td style="color:#16a34a;">Oui (tout)</td><td>Fonctions avancées payantes</td></tr>
+        <tr><td>Security</td><td style="color:#16a34a;">Natif, gratuit</td><td>Payant (Gold+)</td></tr>
+        <tr><td>API</td><td>Compatible ES 7.10</td><td>ES 8.x API</td></tr>
+        <tr><td>Dashboards</td><td>OpenSearch Dashboards</td><td>Kibana (SSPL)</td></tr>
+        <tr><td>Community</td><td style="color:#16a34a;">AWS + communauté</td><td>Elastic Inc.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    Soyez factuel. OpenSearch est sorti du fork ES 7.10. L'API est largement compatible mais pas identique. La grande différence : Security est gratuit et natif dans OpenSearch. Attention : certains clients SDK Elasticsearch ne sont pas 100% compatibles avec OpenSearch — recommandez le SDK officiel OpenSearch. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE : ARCHITECTURE DISTRIBUÉE ===================== -->
+<section class="slide-content">
+  <h2>OpenSearch — Architecture Distribuée</h2>
+  <svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:210px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="arr-b" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#3b82f6"/></marker>
+      <marker id="arr-p" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#7c3aed"/></marker>
+    </defs>
+    <rect x="3" y="3" width="614" height="234" rx="10" fill="#f8fafc" stroke="#2563eb" stroke-width="2" stroke-dasharray="7,3"/>
+    <text x="310" y="22" text-anchor="middle" font-size="12" font-family="Inter,sans-serif" fill="#2563eb" font-weight="bold">Cluster OpenSearch</text>
+    <rect x="18" y="32" width="245" height="185" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="140" y="52" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#1e40af" font-weight="bold">Nœud 1 — Master + Data</text>
+    <rect x="30" y="60" width="220" height="50" rx="5" fill="#2563eb"/>
+    <text x="140" y="80" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">■ Shard P0 (Primary)</text>
+    <text x="140" y="97" text-anchor="middle" font-size="9" font-family="monospace" fill="#bfdbfe">MacBook, iPhone... docs 1–500</text>
+    <rect x="30" y="118" width="220" height="50" rx="5" fill="#7c3aed" opacity="0.8"/>
+    <text x="140" y="138" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">◆ Shard R1 (Replica)</text>
+    <text x="140" y="155" text-anchor="middle" font-size="9" font-family="monospace" fill="#ede9fe">copie de P1 — nœud 2</text>
+    <rect x="358" y="32" width="245" height="185" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="480" y="52" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#15803d" font-weight="bold">Nœud 2 — Data</text>
+    <rect x="370" y="60" width="220" height="50" rx="5" fill="#16a34a"/>
+    <text x="480" y="80" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">■ Shard P1 (Primary)</text>
+    <text x="480" y="97" text-anchor="middle" font-size="9" font-family="monospace" fill="#bbf7d0">Dell, Lenovo... docs 501–1000</text>
+    <rect x="370" y="118" width="220" height="50" rx="5" fill="#3b82f6" opacity="0.75"/>
+    <text x="480" y="138" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">◆ Shard R0 (Replica)</text>
+    <text x="480" y="155" text-anchor="middle" font-size="9" font-family="monospace" fill="#dbeafe">copie de P0 — nœud 1</text>
+    <line x1="252" y1="85" x2="366" y2="143" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-b)"/>
+    <line x1="366" y1="85" x2="252" y2="143" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-p)"/>
+    <text x="310" y="232" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#64748b">⚡ Requête → coordinateur → shards P0+P1 en parallèle → agrégation → réponse client</text>
+  </svg>
+  <p style="text-align:center;font-size:0.72em;color:#475569;margin:0.2em 0 0;">
+    <strong style="color:#2563eb;">■ Primary</strong> = source de vérité &nbsp;|&nbsp; <strong style="color:#7c3aed;">◆ Replica</strong> = haute dispo &nbsp;|&nbsp; P et R du même shard ne coexistent <em>jamais</em> sur le même nœud
+  </p>
+  <aside class="notes">
+    Insistez sur deux points : 1) Distribution = scalabilité horizontale. 2) Réplication = haute disponibilité. Les flèches qui se croisent montrent que P0 est répliqué sur N2 et P1 sur N1 — jamais sur le même nœud. Si N1 tombe, N2 a R0 et peut le promouvoir en Primary. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE : PRICING OPENSEARCH ===================== -->
+<section class="slide-content">
+  <h2>OpenSearch — Exemples de Pricing</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7em;font-size:0.78em;">
+    <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:8px;padding:0.8em;">
+      <div style="text-align:center;font-weight:bold;color:#ea580c;margin-bottom:0.5em;">☁️ AWS OpenSearch Service</div>
+      <div style="background:#fed7aa;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>r6g.large</strong> (2 vCPU, 16 GB)<br>~0,17 $/h → <strong>~125 $/mois</strong>
+      </div>
+      <div style="background:#ffedd5;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Multi-AZ ×3 nœuds</strong><br>~375 $/mois + stockage EBS
+      </div>
+      <div style="color:#64748b;font-size:0.85em;">✓ Managé AWS · ✓ Snapshots auto<br>✗ Versions récentes en retard</div>
+    </div>
+    <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:8px;padding:0.8em;">
+      <div style="text-align:center;font-weight:bold;color:#16a34a;margin-bottom:0.5em;">🌿 Aiven for OpenSearch</div>
+      <div style="background:#bbf7d0;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Startup</strong> (2 vCPU, 8 GB)<br>~<strong>90 $/mois</strong> · 1 nœud
+      </div>
+      <div style="background:#dcfce7;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Business</strong> (4 vCPU, 16 GB ×3)<br>~<strong>400 $/mois</strong>
+      </div>
+      <div style="color:#64748b;font-size:0.85em;">✓ Multi-cloud · ✓ SLA 99,99 %<br>✓ OpenSearch natif (dernière version)</div>
+    </div>
+    <div style="background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:0.8em;">
+      <div style="text-align:center;font-weight:bold;color:#2563eb;margin-bottom:0.5em;">🏢 Self-Hosted (Entreprise)</div>
+      <div style="background:#bfdbfe;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Logiciel : GRATUIT</strong><br>Apache 2.0 — zéro licence
+      </div>
+      <div style="background:#dbeafe;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Coût réel</strong><br>Infra + MCO + expertise ops
+      </div>
+      <div style="color:#64748b;font-size:0.85em;">✓ Contrôle total · ✓ RGPD on-prem<br>✗ Ingénierie ops requise</div>
+    </div>
+  </div>
+  <div style="margin-top:0.6em;background:#f8fafc;border-left:4px solid #475569;padding:0.4em 0.7em;font-size:0.72em;color:#475569;">
+    💡 Autres providers : <strong>Elastic Cloud</strong> (from ~65 $/mo), <strong>Bonsai</strong>, <strong>OpenSearch Service sur Azure</strong> — comparez via les pricing calculators avec votre workload réel
+  </div>
+  <aside class="notes">
+    Insistez : OpenSearch est GRATUIT en self-hosted (Apache 2.0). Le coût réel c'est l'infra + les ops. Pour une startup, un service managé peut coûter moins cher au total (pas d'ingé dédié). Pour une grande entreprise avec équipe ops existante, le self-hosted à grande échelle devient rentable. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE : CLOUD MANAGÉ vs SELF-HOSTED ===================== -->
+<section class="slide-content">
+  <h2>Cloud Managé vs Installation Entreprise</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.8em;">
+    <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:8px;padding:0.9em;">
+      <div style="text-align:center;font-weight:bold;color:#ea580c;font-size:1.05em;margin-bottom:0.5em;">☁️ Service Managé (Cloud)</div>
+      <div style="color:#15803d;font-size:0.9em;margin-bottom:0.3em;"><strong>Avantages</strong></div>
+      <ul style="margin:0 0 0.5em 1.2em;padding:0;color:#374151;">
+        <li>Démarrage en quelques minutes</li>
+        <li>Mises à jour &amp; patches automatiques</li>
+        <li>Haute dispo et sauvegardes incluses</li>
+        <li>Scaling simplifié (clic ou API)</li>
+      </ul>
+      <div style="color:#dc2626;font-size:0.9em;margin-bottom:0.3em;"><strong>Inconvénients</strong></div>
+      <ul style="margin:0 0 0 1.2em;padding:0;color:#374151;">
+        <li>Coût récurrent (abonnement)</li>
+        <li>Données hébergées chez un tiers</li>
+        <li>Moins de contrôle sur la config</li>
+      </ul>
+      <div style="margin-top:0.5em;font-size:0.8em;color:#64748b;">AWS · Aiven · Elastic Cloud · Bonsai</div>
+    </div>
+    <div style="background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:0.9em;">
+      <div style="text-align:center;font-weight:bold;color:#2563eb;font-size:1.05em;margin-bottom:0.5em;">🏢 Self-Hosted (Entreprise)</div>
+      <div style="color:#15803d;font-size:0.9em;margin-bottom:0.3em;"><strong>Avantages</strong></div>
+      <ul style="margin:0 0 0.5em 1.2em;padding:0;color:#374151;">
+        <li>Contrôle total (config, réseau, tuning)</li>
+        <li>Données sur site (RGPD, compliance)</li>
+        <li>Logiciel gratuit (Apache 2.0)</li>
+        <li>Intégration réseau interne directe</li>
+      </ul>
+      <div style="color:#dc2626;font-size:0.9em;margin-bottom:0.3em;"><strong>Inconvénients</strong></div>
+      <ul style="margin:0 0 0 1.2em;padding:0;color:#374151;">
+        <li>MCO et ops à votre charge</li>
+        <li>Expertise technique requise</li>
+        <li>Mise en place plus longue</li>
+      </ul>
+      <div style="margin-top:0.5em;font-size:0.8em;color:#64748b;">VM · Bare-metal · Kubernetes (Helm chart)</div>
+    </div>
+  </div>
+  <aside class="notes">
+    Sondez la salle : "Qui est sur du cloud ? Qui est en self-hosted ?" Discutez les contraintes réglementaires (banque, santé, défense → souvent self-hosted ou cloud privé obligatoire). Pour cette formation, on utilisera Docker en local — équivalent d'un self-hosted simplifié. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 14 : PRÉREQUIS ===================== -->
+<section class="slide-content">
+  <h2>Prérequis &amp; vm.max_map_count</h2>
+  <div style="font-size:0.85em;">
+    <table>
+      <thead><tr><th>Prérequis</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>RAM minimum</td><td>4 GB (8 GB recommandé)</td></tr>
+        <tr><td>Docker</td><td>24.x ou supérieur</td></tr>
+        <tr><td>Docker Compose</td><td>v2.x</td></tr>
+        <tr><td>Disque</td><td>10 GB disponibles</td></tr>
+      </tbody>
+    </table>
+    <pre style="margin-top:0.8em;"><code class="language-bash"># Linux : obligatoire
+sudo sysctl -w vm.max_map_count=262144
+
+# Vérification
+sysctl vm.max_map_count</code></pre>
+    <p style="color:#ea580c;font-size:0.8em;">⚠️ Sans vm.max_map_count, OpenSearch refuse de démarrer</p>
+  </div>
+  <aside class="notes">
+    Expliquez vm.max_map_count : c'est la limite du nombre de zones mémoire qu'un processus peut créer. OpenSearch (Lucene) en crée beaucoup. Sur macOS, Docker gère ça dans la VM Linux interne — pas besoin de le configurer. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 15 : DOCKER COMPOSE ===================== -->
+<section class="slide-content">
+  <h2>Installation via Docker Compose</h2>
+  <pre style="font-size:0.6em;"><code class="language-yaml">services:
+  opensearch:
+    image: opensearchproject/opensearch:3.6.0
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@1234!
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:3.6.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - opensearch</code></pre>
+  <pre style="font-size:0.75em;"><code class="language-bash">docker compose up -d
+curl http://localhost:9200/_cluster/health?pretty</code></pre>
+  <aside class="notes">
+    Montrez le fichier infrastructure/docker-compose.yml. Expliquez `discovery.type=single-node` : mode développement, pas de découverte de pairs. DISABLE_SECURITY_PLUGIN=true : simplifie la formation jours 1 et 2 (on activera la sécurité au jour 3). OPENSEARCH_INITIAL_ADMIN_PASSWORD requis depuis OS 2.12+. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 16 : VÉRIFICATION ===================== -->
+<section class="slide-content">
+  <h2>Vérification de l'installation</h2>
+  <pre style="font-size:0.7em;"><code class="language-bash"># Santé du cluster
+curl http://localhost:9200/_cluster/health?pretty
+
+# Liste des nœuds
+curl http://localhost:9200/_cat/nodes?v
+
+# Version OpenSearch
+curl http://localhost:9200/</code></pre>
+  <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;font-size:0.8em;margin-top:0.5em;">
+    ✅ <strong>Cluster "green"</strong> = toutes les shards primaires ET replicas assignées<br>
+    ✅ <strong>Cluster "yellow"</strong> = OK en single-node (replicas non assignées)
+  </div>
+  <aside class="notes">
+    Exécutez les commandes en live. Expliquez les couleurs : green (prod), yellow (acceptable en single-node, toutes les primaires sont là), red (urgence : au moins une primaire manquante). L'URL de Dashboards : http://localhost:5601. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 17 : TP1 ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>🔧 TP1 — Installation en local</h2>
+  <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
+  <div style="font-size:0.85em;">
+    <ol>
+      <li>Démarrer le cluster avec <code>docker compose up -d</code></li>
+      <li>Vérifier la santé : <code>GET /_cluster/health</code> → green/yellow</li>
+      <li>Explorer les Cat APIs : <code>_cat/nodes</code>, <code>_cat/indices</code>, <code>_cat/shards</code></li>
+      <li>Naviguer dans Dashboards UI (<a href="http://localhost:5601">localhost:5601</a>)</li>
+      <li>Modifier <code>cluster.name</code>, redémarrer, vérifier</li>
+    </ol>
+    <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
+      <strong>⭐ Bonus :</strong> Installer OpenSearch sans Docker (tar.gz)
+    </div>
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp1-installation/README.md</code></p>
+  <aside class="notes">
+    Distribuez le lien vers labs/tp1-installation/README.md. Circulez pour aider. Problèmes courants : port 9200 déjà utilisé (lsof -i :9200), vm.max_map_count trop bas, manque de RAM. Rappel : "Signez la feuille de présence de la matinée !" Timing : 45 min.
   </aside>
 </section>
 
 <!-- ===================== SLIDE 8 : ARCHITECTURE ===================== -->
-<section>
+<section class="slide-content">
   <h2>Architecture : les concepts clés</h2>
   <div style="font-size:0.85em;">
     <pre style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;padding:1em;font-size:0.85em;"><code>Cluster "formation-opensearch"
@@ -161,45 +403,29 @@ GET /demo-products/_search
   </aside>
 </section>
 
-<!-- ===================== SLIDE 9 : OPENSEARCH vs ELASTICSEARCH ===================== -->
-<section>
-  <h2>OpenSearch vs Elasticsearch</h2>
-  <div style="font-size:0.8em;">
-    <table>
-      <thead><tr><th>Aspect</th><th>OpenSearch 3.6</th><th>Elasticsearch 8.x</th></tr></thead>
-      <tbody>
-        <tr><td>Licence</td><td style="color:#16a34a;">Apache 2.0 ✓</td><td style="color:#ea580c;">SSPL / Elastic ✗</td></tr>
-        <tr><td>Gratuit</td><td style="color:#16a34a;">Oui (tout)</td><td>Fonctions avancées payantes</td></tr>
-        <tr><td>Security</td><td style="color:#16a34a;">Natif, gratuit</td><td>Payant (Gold+)</td></tr>
-        <tr><td>API</td><td>Compatible ES 7.10</td><td>ES 8.x API</td></tr>
-        <tr><td>Dashboards</td><td>OpenSearch Dashboards</td><td>Kibana (SSPL)</td></tr>
-        <tr><td>Community</td><td style="color:#16a34a;">AWS + communauté</td><td>Elastic Inc.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <aside class="notes">
-    Soyez factuel. OpenSearch est sorti du fork ES 7.10. L'API est largement compatible mais pas identique. La grande différence : Security est gratuit et natif dans OpenSearch. Attention : certains clients SDK Elasticsearch ne sont pas 100% compatibles avec OpenSearch — recommandez le SDK officiel OpenSearch. Timing : 5 min.
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 10 : DEMO LIVE CH1 ===================== -->
-<section style="background:#f8fafc;">
-  <h2>🖥️ Démo Live — Architecture</h2>
+<!-- ===================== MINI TP : EXPLORER LE CLUSTER ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>💡 Mini-Exercice — Explorer le Cluster</h2>
+  <p style="color:#2563eb;font-style:italic;font-size:0.9em;margin:0.2em 0 0.8em;">~10 minutes · à faire dans Dev Tools (localhost:5601) ou terminal</p>
   <div style="font-size:0.85em;">
-    <p><strong>Commandes à exécuter :</strong></p>
-    <pre><code class="language-bash">GET /_cluster/health?pretty
-GET /_cat/nodes?v
-GET /_cat/indices?v
-GET /_cat/shards?v&index=products</code></pre>
-    <p style="color:#475569;"><strong>À montrer :</strong> cluster_name, status (green/yellow/red), node.roles, pri/rep shards</p>
+    <ol>
+      <li>Vérifiez la santé du cluster : <code>GET /_cluster/health?pretty</code></li>
+      <li>Listez les nœuds et leurs rôles : <code>GET /_cat/nodes?v</code></li>
+      <li>Listez les index et leur taille : <code>GET /_cat/indices?v</code></li>
+      <li>Inspectez les shards : <code>GET /_cat/shards?v&amp;index=products</code></li>
+      <li>Identifiez : <em>quel nœud héberge P0 ? Où est R0 ? Pourquoi "yellow" ?</em></li>
+    </ol>
+    <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.6em;">
+      <strong>Attendu :</strong> status <span style="color:#ea580c;font-weight:bold;">yellow</span> (normal en single-node) — identifiez <code>cluster_name</code>, <code>node.roles</code>, colonnes <code>pri</code>/<code>rep</code>
+    </div>
   </div>
   <aside class="notes">
-    Exécutez les commandes dans Dev Tools de Dashboards OU dans le terminal. Expliquez chaque colonne de la réponse _cat. "Le status 'yellow' en single-node est NORMAL — c'est parce que les replicas ne peuvent pas être placées sur le seul nœud existant." Timing : 8 min.
+    Laissez les participants explorer par eux-mêmes pendant 10 min. Circulez pour aider. Points à valider : cluster_name, status yellow attendu, node.roles (dm = data+master), pri=1 rep=1 pour chaque index. "Le status 'yellow' en single-node est NORMAL — les replicas ne peuvent pas être placées sur le seul nœud existant." Timing : 10 min.
   </aside>
 </section>
 
 <!-- ===================== SLIDE 10b : LUCENE — LA BIBLIOTHÈQUE ===================== -->
-<section>
+<section class="slide-content">
   <h2>Lucene — Le moteur sous le capot</h2>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;margin-top:0.5em;">
     <div style="background:#eff6ff;border-radius:8px;padding:1em;">
@@ -229,41 +455,190 @@ GET /_cat/shards?v&index=products</code></pre>
   </aside>
 </section>
 
-<!-- ===================== SLIDE 10c : LUCENE — SEGMENTS & REFRESH ===================== -->
-<section>
-  <h2>Lucene — Segments, refresh et merge</h2>
-  <div style="font-size:0.82em;">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;text-align:center;margin-bottom:0.8em;">
-      <div style="background:#eff6ff;padding:0.8em;border-radius:8px;">
-        <strong style="color:#2563eb;">Segment</strong><br>
-        Unité d'index immuable.<br>
-        Chaque <code>PUT _doc</code> crée un micro-segment.
-      </div>
-      <div style="background:#f0fdf4;padding:0.8em;border-radius:8px;">
-        <strong style="color:#16a34a;">Refresh (1 s)</strong><br>
-        Rend les nouveaux docs <em>searchable</em>.<br>
-        Coûteux — ne pas réduire en prod.
-      </div>
-      <div style="background:#faf5ff;padding:0.8em;border-radius:8px;">
-        <strong style="color:#9333ea;">Merge</strong>
-        <br>Lucene fusionne les petits segments en grands.<br>
-        Améliore les perfs de lecture.
-      </div>
-    </div>
-    <pre style="font-size:0.75em;"><code class="language-json">// Forcer un refresh immédiat (rare — pour les tests)
-POST /products/_refresh
-
-// Désactiver le refresh pendant un chargement massif
-PUT /products/_settings
-{ "index": { "refresh_interval": "-1" } }</code></pre>
+<!-- ===================== SLIDE 10c-1 : LUCENE — SEGMENTS ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Segments <span style="font-size:0.6em;color:#64748b;font-weight:400;">(1/3)</span></h2>
+  <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:182px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="seg-blue" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#2563eb"/></marker>
+      <marker id="seg-red" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#dc2626"/></marker>
+      <marker id="seg-purple" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#9333ea"/></marker>
+    </defs>
+    <!-- PUT _doc boxes -->
+    <rect x="8" y="18" width="118" height="30" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="67" y="37" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af">PUT _doc/1 {…}</text>
+    <rect x="8" y="58" width="118" height="30" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="67" y="77" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af">PUT _doc/2 {…}</text>
+    <rect x="8" y="98" width="118" height="30" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="67" y="117" text-anchor="middle" font-size="10" font-family="monospace" fill="#dc2626">DELETE _doc/5</text>
+    <!-- Arrows to buffer -->
+    <line x1="126" y1="33" x2="178" y2="68" stroke="#2563eb" stroke-width="1.5" marker-end="url(#seg-blue)"/>
+    <line x1="126" y1="73" x2="178" y2="79" stroke="#2563eb" stroke-width="1.5" marker-end="url(#seg-blue)"/>
+    <line x1="126" y1="113" x2="178" y2="91" stroke="#dc2626" stroke-width="1.5" marker-end="url(#seg-red)"/>
+    <!-- Buffer box -->
+    <rect x="182" y="52" width="122" height="65" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+    <text x="243" y="72" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#92400e" font-weight="bold">Write Buffer</text>
+    <text x="243" y="88" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#a16207">(mémoire RAM)</text>
+    <text x="243" y="104" text-anchor="middle" font-size="9" font-family="monospace" fill="#a16207">doc1, doc2, 🗑️doc5</text>
+    <!-- flush arrow -->
+    <line x1="304" y1="84" x2="358" y2="84" stroke="#9333ea" stroke-width="2" marker-end="url(#seg-purple)"/>
+    <text x="331" y="76" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#9333ea" font-weight="bold">flush</text>
+    <!-- Vertical branch from flush tip to each segment -->
+    <line x1="362" y1="38" x2="362" y2="162" stroke="#9333ea" stroke-width="1.2"/>
+    <line x1="362" y1="38" x2="382" y2="38" stroke="#9333ea" stroke-width="1.2"/>
+    <line x1="362" y1="100" x2="382" y2="100" stroke="#9333ea" stroke-width="1.2"/>
+    <line x1="362" y1="162" x2="382" y2="162" stroke="#9333ea" stroke-width="1.2"/>
+    <!-- Segment 1 -->
+    <rect x="382" y="12" width="120" height="52" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="442" y="32" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#15803d" font-weight="bold">Segment 1  🔒</text>
+    <text x="442" y="52" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc1 ✓  doc2 ✓</text>
+    <!-- Segment 2 -->
+    <rect x="382" y="74" width="120" height="52" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="442" y="94" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#15803d" font-weight="bold">Segment 2  🔒</text>
+    <text x="442" y="114" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc3 ✓  doc4 ✓</text>
+    <!-- Segment 3 (deletion marker) -->
+    <rect x="382" y="136" width="120" height="52" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <text x="442" y="156" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#dc2626" font-weight="bold">Segment 3  🔒</text>
+    <text x="442" y="176" text-anchor="middle" font-size="9" font-family="monospace" fill="#dc2626">doc5 🗑️  ← tombstone</text>
+    <!-- Explanation box -->
+    <rect x="516" y="88" width="158" height="78" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+    <text x="595" y="107" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#ea580c" font-weight="bold">⚠️ DELETE ≠ effacement physique</text>
+    <text x="595" y="125" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#92400e">→ Marqueur "deleted" ajouté</text>
+    <text x="595" y="142" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#92400e">→ Nettoyage réel au prochain merge</text>
+    <text x="595" y="159" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">doc toujours lisible jusqu'au merge</text>
+    <!-- Bottom label -->
+    <text x="442" y="198" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#64748b">Shard = collection de segments Lucene (sur disque)</text>
+  </svg>
+  <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:0.4em 0.8em;font-size:0.78em;margin-top:0.1em;">
+    <strong>Segment</strong> = mini-index inversé <em>immuable</em>. Chaque écriture crée un nouveau segment. Un UPDATE = nouveau segment + tombstone sur l'ancien. <strong>Un shard = plusieurs segments.</strong>
   </div>
   <aside class="notes">
-    Les segments sont IMMUABLES : une suppression ne détruit pas physiquement le document, elle ajoute un marqueur "deleted". Lucene nettoie lors du merge. C'est pourquoi DELETE suivi d'un GET peut encore retourner le document jusqu'au prochain refresh. En indexation massive (Bulk API), désactiver le refresh_interval accélère l'import de 3× à 5×. Timing : 6 min. Transition : "Lucene, c'est clair. Parlons maintenant d'un risque critique en production : le split-brain."
+    Points clés : 1) Un segment est un index Lucene complet en miniature, immuable une fois écrit sur disque. On ne modifie jamais un segment existant. 2) Un UPDATE = écriture d'un nouveau segment + marqueur "deleted" sur l'ancien document. 3) Un DELETE ne supprime pas physiquement le document — il pose un tombstone. Le doc est nettoyé seulement lors du prochain merge. Conséquence directe : beaucoup de petits segments ralentissent les lectures car chaque segment doit être interrogé séparément. C'est précisément pourquoi le merge existe. Timing : 4 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10c-2 : LUCENE — REFRESH ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Refresh <span style="font-size:0.6em;color:#64748b;font-weight:400;">(2/3)</span></h2>
+  <svg viewBox="0 0 680 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:168px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="ref-gray" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#94a3b8"/></marker>
+      <marker id="ref-purple" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#9333ea"/></marker>
+      <marker id="ref-green" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#16a34a"/></marker>
+    </defs>
+    <!-- Timeline axis -->
+    <line x1="28" y1="88" x2="648" y2="88" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#ref-gray)"/>
+    <text x="658" y="93" font-size="10" font-family="Inter,sans-serif" fill="#94a3b8">t</text>
+    <!-- === Phase 1 : indexation === -->
+    <circle cx="72" cy="88" r="7" fill="#2563eb"/>
+    <text x="72" y="73" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#2563eb" font-weight="bold">t = 0s</text>
+    <rect x="12" y="100" width="128" height="78" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="76" y="118" text-anchor="middle" font-size="10.5" font-family="Inter,sans-serif" fill="#334155" font-weight="bold">Indexation</text>
+    <text x="76" y="136" text-anchor="middle" font-size="9" font-family="monospace" fill="#475569">PUT _doc → buffer</text>
+    <text x="76" y="153" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#dc2626">✗ non searchable</text>
+    <text x="76" y="170" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">doc en RAM uniquement</text>
+    <!-- connector 1→2 -->
+    <line x1="142" y1="140" x2="238" y2="140" stroke="#9333ea" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ref-purple)"/>
+    <text x="190" y="131" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#9333ea">~1 seconde</text>
+    <!-- === Phase 2 : Refresh === -->
+    <circle cx="305" cy="88" r="9" fill="#9333ea"/>
+    <text x="305" y="68" text-anchor="middle" font-size="15">⏱️</text>
+    <text x="305" y="56" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#9333ea" font-weight="bold">REFRESH</text>
+    <rect x="242" y="100" width="128" height="78" rx="6" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
+    <text x="306" y="118" text-anchor="middle" font-size="10.5" font-family="Inter,sans-serif" fill="#7c3aed" font-weight="bold">Refresh (auto)</text>
+    <text x="306" y="136" text-anchor="middle" font-size="9" font-family="monospace" fill="#7c3aed">buffer → segment</text>
+    <text x="306" y="153" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#7c3aed">flush sur disque</text>
+    <text x="306" y="170" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#9333ea">refresh_interval = 1s</text>
+    <!-- connector 2→3 -->
+    <line x1="372" y1="140" x2="444" y2="140" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ref-green)"/>
+    <!-- === Phase 3 : Searchable === -->
+    <circle cx="512" cy="88" r="7" fill="#16a34a"/>
+    <text x="512" y="73" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#16a34a" font-weight="bold">visible</text>
+    <rect x="448" y="100" width="148" height="78" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="522" y="118" text-anchor="middle" font-size="10.5" font-family="Inter,sans-serif" fill="#15803d" font-weight="bold">Segment visible</text>
+    <text x="522" y="136" text-anchor="middle" font-size="9" font-family="monospace" fill="#15803d">_search → doc ✓</text>
+    <text x="522" y="153" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#16a34a">✓ searchable</text>
+    <text x="522" y="170" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#15803d">Near Real-Time (NRT)</text>
+  </svg>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5em;font-size:0.78em;margin-top:0.2em;">
+    <div style="background:#faf5ff;border-radius:6px;padding:0.4em 0.7em;border:1px solid #e9d5ff;">
+      <code>POST /products/_refresh</code><br>
+      <span style="color:#64748b;font-size:0.9em;">Refresh immédiat (tests uniquement)</span>
+    </div>
+    <div style="background:#fff7ed;border-radius:6px;padding:0.4em 0.7em;border:1px solid #fed7aa;">
+      <code>"refresh_interval": "-1"</code><br>
+      <span style="color:#64748b;font-size:0.9em;">Désactiver pendant un bulk load (×3 à ×5)</span>
+    </div>
+  </div>
+  <aside class="notes">
+    Concept fondamental : OpenSearch est "Near Real-Time" (NRT) — il y a un délai de 1 seconde maximum entre l'indexation d'un document et sa visibilité dans les recherches. Ce n'est pas du temps réel immédiat. Le refresh est coûteux car il crée un nouveau segment (flush du buffer RAM vers disque), donc Lucene ne le fait pas à chaque document individuellement. En bulk load : désactiver avec "refresh_interval": "-1" peut multiplier les perfs d'indexation par 3 à 5. Remettre à "1s" impérativement après le chargement. POST /_refresh est réservé aux tests d'intégration — ne jamais appeler manuellement en prod. Timing : 4 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10c-3 : LUCENE — MERGE ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Merge <span style="font-size:0.6em;color:#64748b;font-weight:400;">(3/3)</span></h2>
+  <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:192px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="mrg-purple" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#9333ea"/></marker>
+      <marker id="mrg-green" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#16a34a"/></marker>
+    </defs>
+    <!-- AVANT label -->
+    <text x="110" y="14" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#475569" font-weight="bold">AVANT le merge</text>
+    <text x="110" y="27" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">4 petits segments (fragmentation)</text>
+    <!-- Seg 1 — clean -->
+    <rect x="8" y="34" width="200" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="108" y="52" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af" font-weight="bold">Seg 1</text>
+    <text x="108" y="67" text-anchor="middle" font-size="9" font-family="monospace" fill="#1e40af">doc1 ✓   doc2 ✓</text>
+    <!-- Seg 2 — tombstone -->
+    <rect x="8" y="80" width="200" height="38" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="108" y="98" text-anchor="middle" font-size="10" font-family="monospace" fill="#dc2626" font-weight="bold">Seg 2</text>
+    <text x="108" y="113" text-anchor="middle" font-size="9" font-family="monospace" fill="#dc2626">doc3 🗑️   doc4 ✓</text>
+    <!-- Seg 3 — clean -->
+    <rect x="8" y="126" width="200" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="108" y="144" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af" font-weight="bold">Seg 3</text>
+    <text x="108" y="159" text-anchor="middle" font-size="9" font-family="monospace" fill="#1e40af">doc5 ✓</text>
+    <!-- Seg 4 — tombstone -->
+    <rect x="8" y="172" width="200" height="38" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="108" y="190" text-anchor="middle" font-size="10" font-family="monospace" fill="#dc2626" font-weight="bold">Seg 4</text>
+    <text x="108" y="205" text-anchor="middle" font-size="9" font-family="monospace" fill="#dc2626">doc6 🗑️   doc7 ✓</text>
+    <!-- Converging arrows to MERGE box -->
+    <line x1="210" y1="53" x2="268" y2="105" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <line x1="210" y1="99" x2="268" y2="111" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <line x1="210" y1="145" x2="268" y2="117" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <line x1="210" y1="191" x2="268" y2="123" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <!-- MERGE box -->
+    <rect x="271" y="82" width="108" height="68" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="2.5"/>
+    <text x="325" y="108" text-anchor="middle" font-size="20">⚙️</text>
+    <text x="325" y="128" text-anchor="middle" font-size="12" font-family="Inter,sans-serif" fill="#7c3aed" font-weight="bold">MERGE</text>
+    <text x="325" y="142" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#9333ea">background auto</text>
+    <!-- Output arrow -->
+    <line x1="379" y1="116" x2="422" y2="116" stroke="#16a34a" stroke-width="2.5" marker-end="url(#mrg-green)"/>
+    <!-- APRÈS label -->
+    <text x="563" y="14" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#475569" font-weight="bold">APRÈS le merge</text>
+    <text x="563" y="27" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">1 segment consolidé</text>
+    <!-- Merged segment box -->
+    <rect x="426" y="48" width="248" height="128" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5"/>
+    <text x="550" y="72" text-anchor="middle" font-size="11" font-family="monospace" fill="#15803d" font-weight="bold">Segment Fusionné  🔒</text>
+    <text x="550" y="92" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc1 ✓  doc2 ✓  doc4 ✓</text>
+    <text x="550" y="109" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc5 ✓  doc7 ✓</text>
+    <line x1="440" y1="120" x2="660" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="550" y="137" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#dc2626">doc3 🗑️ doc6 🗑️ → supprimés définitivement</text>
+    <text x="550" y="153" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#64748b">espace disque libéré</text>
+    <!-- Benefits note -->
+    <rect x="426" y="184" width="248" height="24" rx="5" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+    <text x="550" y="200" text-anchor="middle" font-size="9.5" font-family="Inter,sans-serif" fill="#15803d">✓ Moins de segments = lectures plus rapides</text>
+  </svg>
+  <div style="background:#faf5ff;border-left:4px solid #9333ea;padding:0.4em 0.8em;font-size:0.78em;margin-top:0.1em;">
+    Merge <strong>automatique</strong> en arrière-plan (heuristiques Lucene). Après un bulk load massif : <code>POST /products/_forcemerge?max_num_segments=1</code>
+  </div>
+  <aside class="notes">
+    Le merge est déclenché automatiquement par Lucene selon des heuristiques : taille des segments, nombre total de segments, proportion de docs supprimés. Avantages : 1) Moins de segments = lecture plus rapide — une recherche interroge chaque segment séparément en parallèle, moins il y en a mieux c'est. 2) Tombstones définitivement nettoyés = espace disque libéré. 3) Meilleure efficacité du cache OS. En prod : évitez forcemerge pendant les heures de trafic (I/O intensif). Après gros rechargement bulk (avec refresh_interval=-1), forcemerge max_num_segments=1 consolide tout. Récap du trio : Segment = unité immuable → Refresh = rendre searchable → Merge = consolider et nettoyer. Timing : 4 min. Transition : "Voyons maintenant qui fait quoi entre Lucene et OpenSearch."
   </aside>
 </section>
 
 <!-- ===================== SLIDE 10d : LUCENE — RÔLES CONCRETS ===================== -->
-<section>
+<section class="slide-content">
   <h2>Lucene vs OpenSearch — Qui fait quoi ?</h2>
   <div style="font-size:0.82em;">
     <table>
@@ -283,235 +658,51 @@ PUT /products/_settings
     </table>
   </div>
   <aside class="notes">
-    Cette table est utile pour ancrer la compréhension. Le message clé : "Quand tu fais un GET _search, OpenSearch reçoit la requête, la répartit sur les shards pertinents, chaque shard demande à Lucene de faire la recherche, et OpenSearch agrège les résultats." Lucene ne connaît pas le réseau — c'est OpenSearch qui orchestre tout. Question fréquente : "Peut-on utiliser Lucene sans OpenSearch ?" → Oui, mais tu dois coder la distribution toi-même, comme l'a fait Elastic au départ. Timing : 4 min. Transition : "Maintenant, un sujet critique pour la production : le split-brain."
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 10e : SPLIT-BRAIN — LE PROBLÈME ===================== -->
-<section>
-  <h2>Split-brain — Le cauchemar distribué</h2>
-  <div style="font-size:0.82em;">
-    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:1em;border-radius:4px;margin-bottom:0.8em;">
-      <strong style="color:#ea580c;">⚠️ Scénario : cluster à 2 nœuds, réseau coupé</strong><br>
-      Nœud A pense que Nœud B est mort → se proclame master<br>
-      Nœud B pense que Nœud A est mort → se proclame master<br>
-      <strong>→ 2 masters, 2 vérités, données incohérentes</strong>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
-      <div style="background:#fef2f2;padding:0.8em;border-radius:8px;text-align:center;">
-        <strong style="color:#dc2626;">❌ 2 nœuds</strong><br>
-        Réseau coupé → split-brain<br>
-        Chaque nœud = 1 vote<br>
-        Impossible de décider !
-      </div>
-      <div style="background:#f0fdf4;padding:0.8em;border-radius:8px;text-align:center;">
-        <strong style="color:#16a34a;">✓ 3 nœuds</strong><br>
-        Réseau coupe 1 + 2<br>
-        Le groupe de 2 a le quorum<br>
-        → Élit le master. Sûr !
-      </div>
-    </div>
-  </div>
-  <aside class="notes">
-    Exemple concret : "Imagine deux banques dans un système distribué qui pensent toutes les deux être la référence. Client A dépose 100€ sur nœud A, client B retire 100€ sur nœud B. Les deux opérations réussissent... le compte est à -100€ quand le réseau revient." Le split-brain en production peut corrompre des données irrémédiablement. C'est la raison numéro 1 pour laquelle on ne fait JAMAIS un cluster à 2 nœuds. Timing : 6 min. Transition : "La solution, c'est le quorum — voyons comment ça marche."
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 10f : QUORUM — LA SOLUTION ===================== -->
-<section>
-  <h2>Quorum — Pourquoi 3 nœuds minimum ?</h2>
-  <div style="font-size:0.85em;">
-    <div style="background:#eff6ff;border-radius:8px;padding:1em;margin-bottom:0.8em;">
-      <strong style="color:#2563eb;">Formule du quorum</strong><br>
-      <code style="font-size:1.1em;">quorum = ⌊ nb_master_eligible / 2 ⌋ + 1</code>
-    </div>
-    <table style="font-size:0.85em;">
-      <thead><tr><th>Nœuds master-eligible</th><th>Quorum</th><th>Tolérance aux pannes</th></tr></thead>
-      <tbody>
-        <tr style="color:#dc2626;"><td>1</td><td>1</td><td>0 panne possible ❌</td></tr>
-        <tr style="color:#dc2626;"><td>2</td><td>2</td><td>0 panne — split-brain ! ❌</td></tr>
-        <tr style="color:#16a34a;"><td><strong>3</strong></td><td>2</td><td>1 panne tolérée ✓</td></tr>
-        <tr><td>5</td><td>3</td><td>2 pannes tolérées ✓</td></tr>
-        <tr><td>7</td><td>4</td><td>3 pannes tolérées ✓</td></tr>
-      </tbody>
-    </table>
-    <p style="margin-top:0.8em;color:#475569;font-size:0.85em;">
-      💡 Toujours un nombre <strong>impair</strong> de nœuds master-eligible en production
-    </p>
-  </div>
-  <aside class="notes">
-    Avec 3 nœuds : si 1 tombe, 2 restent → quorum atteint → le cluster continue. Si 2 tombent, 1 reste → quorum non atteint → le cluster refuse d'écrire (pour éviter la corruption). Avec 2 nœuds : si 1 tombe, 1 reste mais il lui faut 2 votes → cluster en arrêt. C'est pire que le split-brain ! Ne jamais mettre 2 nœuds master-eligible. Pour la formation jour 3 en cluster, on utilisera exactement 3 nœuds. Timing : 6 min. Transition : "Voyons comment configurer ça dans OpenSearch."
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 10g : CONFIGURATION SPLIT-BRAIN ===================== -->
-<section>
-  <h2>Configuration OpenSearch — Anti-split-brain</h2>
-  <pre style="font-size:0.62em;"><code class="language-yaml"># opensearch.yml — nœud 1 sur 3
-cluster.name: formation-opensearch
-node.name: node-1
-node.roles: [ master, data ]
-
-# Découverte des pairs
-discovery.seed_hosts:
-  - node-1:9300
-  - node-2:9300
-  - node-3:9300
-
-# CRITIQUE : liste les nœuds master à la création du cluster
-# (à supprimer après le premier démarrage)
-cluster.initial_master_nodes:
-  - node-1
-  - node-2
-  - node-3</code></pre>
-  <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;font-size:0.8em;margin-top:0.5em;">
-    ✅ OpenSearch calcule automatiquement le quorum à partir de <code>initial_master_nodes</code>
-  </div>
-  <aside class="notes">
-    `cluster.initial_master_nodes` est UNIQUEMENT utilisé au tout premier démarrage du cluster (bootstrap). Une fois le cluster formé, OpenSearch maintient la liste des nœuds master-eligible lui-même. Si on redémarre un cluster existant avec cette config, il l'ignore. Erreur courante en formation : configurer initial_master_nodes mais oublier de mettre les 3 nœuds → le cluster attend indéfiniment. Rappel : le jour 3 on configure exactement ce fichier sur 3 conteneurs Docker. Timing : 5 min. Transition : "Maintenant, vérifiez que vous avez bien compris avec le quiz."
+    Cette table est utile pour ancrer la compréhension. Le message clé : "Quand tu fais un GET _search, OpenSearch reçoit la requête, la répartit sur les shards pertinents, chaque shard demande à Lucene de faire la recherche, et OpenSearch agrège les résultats." Lucene ne connaît pas le réseau — c'est OpenSearch qui orchestre tout. Question fréquente : "Peut-on utiliser Lucene sans OpenSearch ?" → Oui, mais tu dois coder la distribution toi-même, comme l'a fait Elastic au départ. Timing : 4 min. Transition : "On va maintenant tester votre compréhension avec le quiz du Chapitre 1."
   </aside>
 </section>
 
 <!-- ===================== SLIDE 11 : QUIZ CH1 ===================== -->
-<section>
+<section class="slide-content">
   <h2>⚡ Quiz — Chapitre 1</h2>
-  <ol style="font-size:0.85em;">
+  <ol style="font-size:0.83em;">
     <li>Quelle est la différence entre un <strong>index</strong> et un <strong>shard</strong> ?</li>
-    <li>Combien de nœuds minimum pour éviter le <em>split-brain</em> avec 1 master ?</li>
     <li>Qu'est-ce que Lucene par rapport à OpenSearch ?</li>
     <li>Pourquoi OpenSearch est-il préféré à Elasticsearch dans un contexte open source ?</li>
+    <li>Que signifie un cluster en statut <strong>"yellow"</strong> ? Est-ce problématique en single-node ?</li>
+    <li>Citez un avantage du <strong>cloud managé</strong> et un avantage du <strong>self-hosted</strong>.</li>
   </ol>
   <aside class="notes">
-    Posez les questions oralement. Laissez 30s par question. Réponses : 1) Un index est logique (comme une table), un shard est physique (un index Lucene sous-jacent). 2) Minimum 3 nœuds master-eligible. 3) Lucene est la bibliothèque Java d'indexation sur laquelle OpenSearch est construit. 4) Licence Apache 2.0, security gratuit, communauté. Timing : 5 min.
+    Posez les questions oralement. Laissez 30s par question. Réponses : 1) Index = logique (table), shard = physique (index Lucene). 2) Lucene est la bibliothèque Java d'indexation sur laquelle OpenSearch est construit. 3) Licence Apache 2.0, security gratuit, communauté. 4) Yellow = primaires OK, replicas non assignées = normal en single-node, pas critique. 5) Cloud = démarrage rapide, ops incluses ; Self-hosted = contrôle total, RGPD, logiciel gratuit. Timing : 5 min.
   </aside>
 </section>
 
 <!-- ===================== SLIDE 12 : RECAP CH1 ===================== -->
-<section>
-  <h2>📋 Récap Chapitre 1</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;">
-    <div style="background:#eff6ff;padding:1em;border-radius:8px;">
-      <div style="font-size:1.5em;">🌐</div>
-      <strong>Cluster</strong><br>Ensemble de nœuds
+<section class="slide-content">
+  <h2>📋 Récap CH1 — Introduction &amp; Installation</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;">
+    <div style="background:#eff6ff;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">🌐</div>
+      <strong>Architecture distribuée</strong><br>Cluster → Nœuds → Index → Shards (P + R) → Documents
     </div>
-    <div style="background:#f0fdf4;padding:1em;border-radius:8px;">
-      <div style="font-size:1.5em;">🗄️</div>
-      <strong>Index</strong><br>= Table SQL<br>
+    <div style="background:#f0fdf4;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">🔧</div>
+      <strong>Installation</strong><br>Docker (local) · DEB/RPM (serveur) · Cloud managé (AWS, Aiven)
     </div>
-    <div style="background:#faf5ff;padding:1em;border-radius:8px;">
-      <div style="font-size:1.5em;">📄</div>
-      <strong>Document</strong><br>= Ligne JSON
+    <div style="background:#faf5ff;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">📄</div>
+      <strong>Document = JSON</strong><br>Index inversé → recherche O(1) vs SQL O(n)
+    </div>
+    <div style="background:#fff7ed;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">⚖️</div>
+      <strong>Choix de déploiement</strong><br>Cloud managé = ops inclus · Self-hosted = contrôle + RGPD
     </div>
   </div>
-  <p style="margin-top:1em;text-align:center;font-size:0.85em;color:#475569;">
+  <p style="margin-top:0.8em;text-align:center;font-size:0.82em;color:#475569;">
     <strong>Cluster → Nœuds → Index → Shards (primary + replica) → Documents</strong>
   </p>
   <aside class="notes">
-    Résumez en 1 min les concepts clés. Vérifiez que tout le monde a compris la hiérarchie. Timing : 2 min. Transition : "On va maintenant voir comment démarrer OpenSearch en local."
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 13 : CH2 OPENER ===================== -->
-<section style="background:#2563eb;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 2</h2>
-  <h3 style="color:#bfdbfe;font-weight:400;">Installation &amp; Configuration</h3>
-  <p style="color:#dbeafe;font-style:italic;">"Et si vous pouviez démarrer un cluster OpenSearch en 2 commandes ?"</p>
-  <aside class="notes">Transition vers l'installation. Timing : 30 secondes.</aside>
-</section>
-
-<!-- ===================== SLIDE 14 : PRÉREQUIS ===================== -->
-<section>
-  <h2>Prérequis &amp; vm.max_map_count</h2>
-  <div style="font-size:0.85em;">
-    <table>
-      <thead><tr><th>Prérequis</th><th>Valeur</th></tr></thead>
-      <tbody>
-        <tr><td>RAM minimum</td><td>4 GB (8 GB recommandé)</td></tr>
-        <tr><td>Docker</td><td>24.x ou supérieur</td></tr>
-        <tr><td>Docker Compose</td><td>v2.x</td></tr>
-        <tr><td>Disque</td><td>10 GB disponibles</td></tr>
-      </tbody>
-    </table>
-    <pre style="margin-top:0.8em;"><code class="language-bash"># Linux : obligatoire
-sudo sysctl -w vm.max_map_count=262144
-
-# Vérification
-sysctl vm.max_map_count</code></pre>
-    <p style="color:#ea580c;font-size:0.8em;">⚠️ Sans vm.max_map_count, OpenSearch refuse de démarrer</p>
-  </div>
-  <aside class="notes">
-    Expliquez vm.max_map_count : c'est la limite du nombre de zones mémoire qu'un processus peut créer. OpenSearch (Lucene) en crée beaucoup. Sur macOS, Docker gère ça dans la VM Linux interne — pas besoin de le configurer. Timing : 5 min.
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 15 : DOCKER COMPOSE ===================== -->
-<section>
-  <h2>Installation via Docker Compose</h2>
-  <pre style="font-size:0.6em;"><code class="language-yaml">services:
-  opensearch:
-    image: opensearchproject/opensearch:3.6.0
-    environment:
-      - discovery.type=single-node
-      - DISABLE_SECURITY_PLUGIN=true
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@1234!
-      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
-    ports:
-      - "9200:9200"
-    volumes:
-      - opensearch-data:/usr/share/opensearch/data
-
-  dashboards:
-    image: opensearchproject/opensearch-dashboards:3.6.0
-    ports:
-      - "5601:5601"
-    depends_on:
-      - opensearch</code></pre>
-  <pre style="font-size:0.75em;"><code class="language-bash">docker compose up -d
-curl http://localhost:9200/_cluster/health?pretty</code></pre>
-  <aside class="notes">
-    Montrez le fichier infrastructure/docker-compose.yml. Expliquez `discovery.type=single-node` : mode développement, pas de découverte de pairs. DISABLE_SECURITY_PLUGIN=true : simplifie la formation jours 1 et 2 (on activera la sécurité au jour 3). OPENSEARCH_INITIAL_ADMIN_PASSWORD requis depuis OS 2.12+. Timing : 8 min.
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 16 : VÉRIFICATION ===================== -->
-<section>
-  <h2>Vérification de l'installation</h2>
-  <pre style="font-size:0.7em;"><code class="language-bash"># Santé du cluster
-curl http://localhost:9200/_cluster/health?pretty
-
-# Liste des nœuds
-curl http://localhost:9200/_cat/nodes?v
-
-# Version OpenSearch
-curl http://localhost:9200/</code></pre>
-  <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;font-size:0.8em;margin-top:0.5em;">
-    ✅ <strong>Cluster "green"</strong> = toutes les shards primaires ET replicas assignées<br>
-    ✅ <strong>Cluster "yellow"</strong> = OK en single-node (replicas non assignées)
-  </div>
-  <aside class="notes">
-    Exécutez les commandes en live. Expliquez les couleurs : green (prod), yellow (acceptable en single-node, toutes les primaires sont là), red (urgence : au moins une primaire manquante). L'URL de Dashboards : http://localhost:5601. Timing : 5 min.
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 17 : TP1 ===================== -->
-<section style="background:#f8fafc;">
-  <h2>🔧 TP1 — Installation en local</h2>
-  <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
-  <div style="font-size:0.85em;">
-    <ol>
-      <li>Démarrer le cluster avec <code>docker compose up -d</code></li>
-      <li>Vérifier la santé : <code>GET /_cluster/health</code> → green/yellow</li>
-      <li>Explorer les Cat APIs : <code>_cat/nodes</code>, <code>_cat/indices</code>, <code>_cat/shards</code></li>
-      <li>Naviguer dans Dashboards UI (<a href="http://localhost:5601">localhost:5601</a>)</li>
-      <li>Modifier <code>cluster.name</code>, redémarrer, vérifier</li>
-    </ol>
-    <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
-      <strong>⭐ Bonus :</strong> Installer OpenSearch sans Docker (tar.gz)
-    </div>
-  </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp1-installation/README.md</code></p>
-  <aside class="notes">
-    Distribuez le lien vers labs/tp1-installation/README.md. Circulez pour aider. Problèmes courants : port 9200 déjà utilisé (lsof -i :9200), vm.max_map_count trop bas, manque de RAM. Rappel : "Signez la feuille de présence de la matinée !" Timing : 45 min.
+    Résumez les 4 blocs. Vérifiez que tout le monde a compris la hiérarchie et les options de déploiement. Timing : 2 min. Transition : "L'après-midi, on plonge dans le fonctionnement interne d'OpenSearch."
   </aside>
 </section>
 
@@ -524,7 +715,7 @@ curl http://localhost:9200/</code></pre>
 </section>
 
 <!-- ===================== SLIDE 19 : INDEX INVERSÉ ===================== -->
-<section>
+<section class="slide-content">
   <h2>L'index inversé — le secret de la rapidité</h2>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5em;font-size:0.72em;align-items:start;">
 
@@ -596,7 +787,7 @@ curl http://localhost:9200/</code></pre>
 </section>
 
 <!-- ===================== SLIDE 20 : MAPPING ===================== -->
-<section>
+<section class="slide-content">
   <h2>Mappings — Types de champs</h2>
   <pre style="font-size:0.65em;"><code class="language-json">PUT /products
 {
@@ -626,7 +817,7 @@ curl http://localhost:9200/</code></pre>
 </section>
 
 <!-- ===================== SLIDE 21 : CRUD API ===================== -->
-<section>
+<section class="slide-content">
   <h2>API CRUD</h2>
   <pre style="font-size:0.65em;"><code class="language-bash"># CREATE — PUT avec ID ou POST sans ID
 PUT /products/_doc/1
@@ -654,7 +845,7 @@ POST /products/_bulk
 </section>
 
 <!-- ===================== SLIDE 22 : TP2 ===================== -->
-<section style="background:#f8fafc;">
+<section class="slide-content" style="background:#f8fafc;">
   <h2>🔧 TP2 — CRUD &amp; API</h2>
   <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
   <ol style="font-size:0.85em;">
@@ -682,7 +873,7 @@ POST /products/_bulk
 </section>
 
 <!-- ===================== SLIDE 24 : QUERY DSL ===================== -->
-<section>
+<section class="slide-content">
   <h2>Query DSL — Les requêtes de base</h2>
   <pre style="font-size:0.62em;"><code class="language-json">// match : full-text avec analyse
 { "query": { "match": { "name": "ordinateur portable" } } }
@@ -704,7 +895,7 @@ POST /products/_bulk
 </section>
 
 <!-- ===================== SLIDE 25 : BOOL QUERY ===================== -->
-<section>
+<section class="slide-content">
   <h2>Bool Query — Combiner les conditions</h2>
   <pre style="font-size:0.65em;"><code class="language-json">POST /products/_search
 {
@@ -735,7 +926,7 @@ POST /products/_bulk
 </section>
 
 <!-- ===================== SLIDE 26 : AGRÉGATIONS ===================== -->
-<section>
+<section class="slide-content">
   <h2>Agrégations — Analyser les données</h2>
   <pre style="font-size:0.62em;"><code class="language-json">POST /products/_search
 {
@@ -762,7 +953,7 @@ POST /products/_bulk
 </section>
 
 <!-- ===================== SLIDE 27 : SCORING ===================== -->
-<section>
+<section class="slide-content">
   <h2>Scoring BM25 — Pourquoi ce résultat en premier ?</h2>
   <pre style="font-size:0.7em;"><code class="language-bash"># Comprendre le score d'un document
 GET /products/_explain/1
@@ -783,7 +974,7 @@ GET /products/_explain/1
 </section>
 
 <!-- ===================== SLIDE 28 : PAGINATION ===================== -->
-<section>
+<section class="slide-content">
   <h2>Pagination — from/size et search_after</h2>
   <pre style="font-size:0.7em;"><code class="language-json">// Pagination classique (limité à 10 000 résultats)
 POST /products/_search
@@ -805,7 +996,7 @@ POST /products/_search
 </section>
 
 <!-- ===================== SLIDE 29 : DEMO LIVE CH3 ===================== -->
-<section style="background:#f8fafc;">
+<section class="slide-content" style="background:#f8fafc;">
   <h2>🖥️ Démo Live — Query DSL &amp; Aggs</h2>
   <div style="font-size:0.8em;">
     <p><strong>Séquence :</strong></p>
@@ -823,7 +1014,7 @@ POST /products/_search
 </section>
 
 <!-- ===================== SLIDE 30 : TP3 ===================== -->
-<section style="background:#f8fafc;">
+<section class="slide-content" style="background:#f8fafc;">
   <h2>🔧 TP3 — Requêtes &amp; Agrégations</h2>
   <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
   <ol style="font-size:0.85em;">
@@ -844,7 +1035,7 @@ POST /products/_search
 </section>
 
 <!-- ===================== SLIDE 31 : QUIZ FINAL J1 ===================== -->
-<section>
+<section class="slide-content">
   <h2>⚡ Quiz — Récap Jour 1</h2>
   <ol style="font-size:0.8em;">
     <li>Quelle est la différence entre <code>text</code> et <code>keyword</code> ?</li>
@@ -871,7 +1062,7 @@ POST /products/_search
       <strong>Recherche</strong><br>Query DSL, Bool, Scoring BM25, Aggs
     </div>
   </div>
-  <p style="margin-top:1.5em;color:#86efac;">Demain : Pipelines, Analyseurs Français, Géo, Dashboards</p>
+  <p style="margin-top:1.5em;color:#86efac;">Demain : Pipelines, Analyseurs Français, Géo, Dashboards, Split-brain &amp; Quorum</p>
   <p style="font-size:0.8em;color:#94a3b8;margin-top:0.5em;">N'oubliez pas de signer la feuille de présence ! 📋</p>
   <aside class="notes">
     Remerciez le groupe pour leur participation. Donnez un aperçu du jour 2. Rappelez la feuille de présence de l'après-midi. Demandez si des participants ont besoin de temps supplémentaire pour finir les TPs (ils peuvent le faire le soir). Timing : 10 min pour ce récap + Q&A.

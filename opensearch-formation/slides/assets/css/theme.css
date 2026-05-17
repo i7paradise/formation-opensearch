@@ -698,8 +698,10 @@
   font-size: 12px;
   color: var(--text-muted);
   background: transparent;
-  right: 12px;
+  left: 50%;
+  right: auto;
   bottom: 12px;
+  transform: translateX(-50%);
 }
 
 /* ============================================================
@@ -747,6 +749,17 @@
     --font-code: 0.85rem;
     --slide-padding: 80px 110px;
   }
+}
+
+/* ============================================================
+   SLIDE CONTENT — OVERFLOW FIX
+   Prevents dense slides from clipping content at page bottom.
+   Add class="slide-content" to any <section> that overflows.
+   Uses .present selector so Reveal.js hide (display:none) is
+   never overridden on inactive slides.
+   ============================================================ */
+.reveal .slides section.present.slide-content {
+  display: contents !important;
 }
 
 /* ============================================================

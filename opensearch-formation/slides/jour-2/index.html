@@ -50,7 +50,8 @@
       📖 Ch.5a : Principes Dashboards<br>
       📖 Ch.5b : Agrégations &amp; Viz<br>
       📖 Ch.5c : Maps &amp; Dashboard<br>
-      🔧 TP5 (75 min)
+      🔧 TP5 (75 min)<br>
+      📖 Ch.6 : Split-brain &amp; Quorum
     </div>
   </div>
   <aside class="notes">Timing : 2 min. Transition : "On commence par les ingest pipelines — le mécanisme qui transforme vos données avant de les stocker."</aside>
@@ -466,6 +467,99 @@ name: "ordinateur" OR name: "laptop"</code></pre>
   <aside class="notes">Réponses : 1) Index Pattern. 2) Line Chart avec Date histogram. 3) Terms. Timing : 5 min.</aside>
 </section>
 
+<!-- SLIDE CH6 OPENER : ARCHITECTURE DISTRIBUÉE -->
+<section style="background:#7c3aed;color:#fff;">
+  <h2 style="color:#fff;">Chapitre 6</h2>
+  <h3 style="color:#ddd6fe;font-weight:400;">Architecture distribuée — Split-brain &amp; Quorum</h3>
+  <p style="color:#ede9fe;margin-top:1em;font-style:italic;">"Comment éviter le pire cauchemar d'un cluster en production ?"</p>
+  <aside class="notes">Diapo de transition. Laissez quelques secondes de silence après la question. Timing : 30 secondes.</aside>
+</section>
+
+<!-- SLIDE 10e : SPLIT-BRAIN — LE PROBLÈME -->
+<section>
+  <h2>Split-brain — Le cauchemar distribué</h2>
+  <div style="font-size:0.82em;">
+    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:1em;border-radius:4px;margin-bottom:0.8em;">
+      <strong style="color:#ea580c;">⚠️ Scénario : cluster à 2 nœuds, réseau coupé</strong><br>
+      Nœud A pense que Nœud B est mort → se proclame master<br>
+      Nœud B pense que Nœud A est mort → se proclame master<br>
+      <strong>→ 2 masters, 2 vérités, données incohérentes</strong>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
+      <div style="background:#fef2f2;padding:0.8em;border-radius:8px;text-align:center;">
+        <strong style="color:#dc2626;">❌ 2 nœuds</strong><br>
+        Réseau coupé → split-brain<br>
+        Chaque nœud = 1 vote<br>
+        Impossible de décider !
+      </div>
+      <div style="background:#f0fdf4;padding:0.8em;border-radius:8px;text-align:center;">
+        <strong style="color:#16a34a;">✓ 3 nœuds</strong><br>
+        Réseau coupe 1 + 2<br>
+        Le groupe de 2 a le quorum<br>
+        → Élit le master. Sûr !
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    Exemple concret : "Imagine deux banques dans un système distribué qui pensent toutes les deux être la référence. Client A dépose 100€ sur nœud A, client B retire 100€ sur nœud B. Les deux opérations réussissent... le compte est à -100€ quand le réseau revient." Le split-brain en production peut corrompre des données irrémédiablement. C'est la raison numéro 1 pour laquelle on ne fait JAMAIS un cluster à 2 nœuds. Timing : 6 min. Transition : "La solution, c'est le quorum — voyons comment ça marche."
+  </aside>
+</section>
+
+<!-- SLIDE 10f : QUORUM — LA SOLUTION -->
+<section>
+  <h2>Quorum — Pourquoi 3 nœuds minimum ?</h2>
+  <div style="font-size:0.85em;">
+    <div style="background:#eff6ff;border-radius:8px;padding:1em;margin-bottom:0.8em;">
+      <strong style="color:#2563eb;">Formule du quorum</strong><br>
+      <code style="font-size:1.1em;">quorum = ⌊ nb_master_eligible / 2 ⌋ + 1</code>
+    </div>
+    <table style="font-size:0.85em;">
+      <thead><tr><th>Nœuds master-eligible</th><th>Quorum</th><th>Tolérance aux pannes</th></tr></thead>
+      <tbody>
+        <tr style="color:#dc2626;"><td>1</td><td>1</td><td>0 panne possible ❌</td></tr>
+        <tr style="color:#dc2626;"><td>2</td><td>2</td><td>0 panne — split-brain ! ❌</td></tr>
+        <tr style="color:#16a34a;"><td><strong>3</strong></td><td>2</td><td>1 panne tolérée ✓</td></tr>
+        <tr><td>5</td><td>3</td><td>2 pannes tolérées ✓</td></tr>
+        <tr><td>7</td><td>4</td><td>3 pannes tolérées ✓</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:0.8em;color:#475569;font-size:0.85em;">
+      💡 Toujours un nombre <strong>impair</strong> de nœuds master-eligible en production
+    </p>
+  </div>
+  <aside class="notes">
+    Avec 3 nœuds : si 1 tombe, 2 restent → quorum atteint → le cluster continue. Si 2 tombent, 1 reste → quorum non atteint → le cluster refuse d'écrire (pour éviter la corruption). Avec 2 nœuds : si 1 tombe, 1 reste mais il lui faut 2 votes → cluster en arrêt. C'est pire que le split-brain ! Ne jamais mettre 2 nœuds master-eligible. Pour la formation jour 3 en cluster, on utilisera exactement 3 nœuds. Timing : 6 min. Transition : "Voyons comment configurer ça dans OpenSearch."
+  </aside>
+</section>
+
+<!-- SLIDE 10g : CONFIGURATION SPLIT-BRAIN -->
+<section>
+  <h2>Configuration OpenSearch — Anti-split-brain</h2>
+  <pre style="font-size:0.62em;"><code class="language-yaml"># opensearch.yml — nœud 1 sur 3
+cluster.name: formation-opensearch
+node.name: node-1
+node.roles: [ master, data ]
+
+# Découverte des pairs
+discovery.seed_hosts:
+  - node-1:9300
+  - node-2:9300
+  - node-3:9300
+
+# CRITIQUE : liste les nœuds master à la création du cluster
+# (à supprimer après le premier démarrage)
+cluster.initial_master_nodes:
+  - node-1
+  - node-2
+  - node-3</code></pre>
+  <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;font-size:0.8em;margin-top:0.5em;">
+    ✅ OpenSearch calcule automatiquement le quorum à partir de <code>initial_master_nodes</code>
+  </div>
+  <aside class="notes">
+    `cluster.initial_master_nodes` est UNIQUEMENT utilisé au tout premier démarrage du cluster (bootstrap). Une fois le cluster formé, OpenSearch maintient la liste des nœuds master-eligible lui-même. Si on redémarre un cluster existant avec cette config, il l'ignore. Erreur courante en formation : configurer initial_master_nodes mais oublier de mettre les 3 nœuds → le cluster attend indéfiniment. Rappel : le jour 3 on configure exactement ce fichier sur 3 conteneurs Docker. Timing : 5 min. Transition : "Maintenant, vérifiez que vous avez bien compris avec le quiz."
+  </aside>
+</section>
+
 <!-- SLIDE 23 : RÉCAP JOUR 2 -->
 <section style="background:#0f172a;color:#fff;">
   <h2 style="color:#86efac;">Récap Jour 2 — Ce que vous savez maintenant</h2>
@@ -481,6 +575,9 @@ name: "ordinateur" OR name: "laptop"</code></pre>
     </div>
     <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
       <strong>Dashboards</strong><br>Index Patterns, KQL, 6 types de viz
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
+      <strong>Split-brain &amp; Quorum</strong><br>Quorum, anti-split-brain, opensearch.yml
     </div>
   </div>
   <p style="margin-top:1.5em;color:#86efac;">Demain : Cluster multi-nœuds, Administration, Sécurité</p>
