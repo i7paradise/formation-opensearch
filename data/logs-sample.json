@@ -1,0 +1,4824 @@
+[
+  {
+    "timestamp": "2026-04-08T08:39:40Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Stock mis à jour",
+    "trace_id": "8ccfd651a7fc8cd5eac4a7d723235471",
+    "http_status": 502,
+    "response_time_ms": 3464,
+    "user_id": "usr-521f43afa979"
+  },
+  {
+    "timestamp": "2026-04-13T12:47:03Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "ccd34f9bdf4ec4202acf144dd97cf1e8",
+    "http_status": 502,
+    "response_time_ms": 4089
+  },
+  {
+    "timestamp": "2026-04-06T06:27:28Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "dd63b811f090e2e47f958f4ebcd78c3f",
+    "http_status": 500,
+    "response_time_ms": 1336,
+    "user_id": "usr-60089b895f8f"
+  },
+  {
+    "timestamp": "2026-04-21T23:10:51Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "5ea9f8d0f4d08520b08ab7e89339bc97",
+    "http_status": 200,
+    "response_time_ms": 133,
+    "user_id": "usr-305b3e0050b8"
+  },
+  {
+    "timestamp": "2026-05-04T00:31:27Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Stock mis à jour",
+    "trace_id": "7148681ea6d3f8132df26d81414f4f6b",
+    "http_status": 204,
+    "response_time_ms": 3457,
+    "user_id": "usr-302c3a944497"
+  },
+  {
+    "timestamp": "2026-04-30T06:43:13Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Paiement validé",
+    "trace_id": "77ec5c81d9924777609dc7d8cbfc8184",
+    "http_status": 204,
+    "response_time_ms": 4129,
+    "user_id": "usr-0f149dcf63d8"
+  },
+  {
+    "timestamp": "2026-04-08T01:07:40Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "cdb76ba1bdbf688cbe881626a81d70c2",
+    "http_status": 401,
+    "response_time_ms": 1789
+  },
+  {
+    "timestamp": "2026-05-02T11:38:44Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "705f1a33b2c32e3999ae1e4fcf8a54b9",
+    "http_status": 200,
+    "response_time_ms": 4523,
+    "user_id": "usr-29453fa65405"
+  },
+  {
+    "timestamp": "2026-04-07T16:07:23Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Paiement refusé",
+    "trace_id": "04dbcc3db1f1d622838f12dfb2b4406a",
+    "http_status": 200,
+    "response_time_ms": 3157,
+    "user_id": "usr-93e84a5540c4"
+  },
+  {
+    "timestamp": "2026-05-01T18:26:50Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Commande créée",
+    "trace_id": "45bb2758a07f68983aa5a3962d309548",
+    "http_status": 502,
+    "response_time_ms": 4473,
+    "user_id": "usr-d9a44745d78c"
+  },
+  {
+    "timestamp": "2026-05-02T00:57:54Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "7be1e794c7de61a2a4d370702399c63a",
+    "http_status": 200,
+    "response_time_ms": 2062,
+    "user_id": "usr-aaaf9a7a694b"
+  },
+  {
+    "timestamp": "2026-04-09T06:30:10Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Stock mis à jour",
+    "trace_id": "418577afd73ecc7148d6840e1a832ab6",
+    "http_status": 403,
+    "response_time_ms": 999,
+    "user_id": "usr-956793d784e3"
+  },
+  {
+    "timestamp": "2026-04-28T11:54:31Z",
+    "level": "ERROR",
+    "service": "api-gateway",
+    "message": "Erreur d'authentification",
+    "trace_id": "82ca24691ec307aa9b41809deb0b94e7",
+    "http_status": 403,
+    "response_time_ms": 2350
+  },
+  {
+    "timestamp": "2026-04-24T06:12:33Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Stock faible pour le produit",
+    "trace_id": "f025cc2001dd77cfbc84fc5580f9d987",
+    "http_status": 502,
+    "response_time_ms": 4323
+  },
+  {
+    "timestamp": "2026-04-11T01:29:34Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "d7f4bb15e24e3ddff08e6be742c75c6a",
+    "http_status": 403,
+    "response_time_ms": 4786
+  },
+  {
+    "timestamp": "2026-04-27T09:47:20Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "570c399fcfd9726eb25a86fc6ed3c788",
+    "http_status": 500,
+    "response_time_ms": 1755,
+    "user_id": "usr-20a65b9f8d57"
+  },
+  {
+    "timestamp": "2026-04-18T16:53:48Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Cache actualisé",
+    "trace_id": "30f5da5fa7022509ede288d5a81d3c55",
+    "http_status": 200,
+    "response_time_ms": 1171,
+    "user_id": "usr-b378e4e74890"
+  },
+  {
+    "timestamp": "2026-05-05T18:05:09Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "8631ad07614a327add0b94d9e4baf86f",
+    "http_status": 201,
+    "response_time_ms": 869,
+    "user_id": "usr-d2f8779e47fa"
+  },
+  {
+    "timestamp": "2026-04-22T15:22:24Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Stock mis à jour",
+    "trace_id": "0ee935b58aa6fcd04cbc813ec460215c",
+    "http_status": 404,
+    "response_time_ms": 3030,
+    "user_id": "usr-ae486ba54f56"
+  },
+  {
+    "timestamp": "2026-04-14T15:14:21Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "1a132feb25a8d9f1f821cf0bde19aea9",
+    "http_status": 502,
+    "response_time_ms": 373
+  },
+  {
+    "timestamp": "2026-05-03T05:13:45Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Paiement validé",
+    "trace_id": "c1df17f08e344b7371db1e17c0d55bac",
+    "http_status": 200,
+    "response_time_ms": 4132,
+    "user_id": "usr-b7751f88a2d1"
+  },
+  {
+    "timestamp": "2026-04-10T05:53:04Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "3e42230128039218c539ce2786ab0ced",
+    "http_status": 200,
+    "response_time_ms": 3255,
+    "user_id": "usr-bf3dc9efd39c"
+  },
+  {
+    "timestamp": "2026-04-19T13:29:17Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Données synchronisées",
+    "trace_id": "42277ba72d86ab4747e7715924bc714f",
+    "http_status": 404,
+    "response_time_ms": 2175
+  },
+  {
+    "timestamp": "2026-05-05T18:32:11Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "16b40331d7efe4cc74996870a3e3bd9c",
+    "http_status": 500,
+    "response_time_ms": 673,
+    "user_id": "usr-a537ac6c564f"
+  },
+  {
+    "timestamp": "2026-04-10T14:24:15Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Commande créée",
+    "trace_id": "f90e4bc8b379b973f08a8653eef7b5a7",
+    "http_status": 404,
+    "response_time_ms": 2742,
+    "user_id": "usr-d8b4b7331c69"
+  },
+  {
+    "timestamp": "2026-05-02T19:38:11Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "4f311619313bed158082d959feea4fbf",
+    "http_status": 200,
+    "response_time_ms": 1569,
+    "user_id": "usr-9f31481e6a14"
+  },
+  {
+    "timestamp": "2026-04-24T22:31:35Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Stock mis à jour",
+    "trace_id": "26cd800bbae557fde8f92b5a9e2922bc",
+    "http_status": 502,
+    "response_time_ms": 4873
+  },
+  {
+    "timestamp": "2026-04-07T12:22:57Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Données synchronisées",
+    "trace_id": "4864f9d05e773ce3c2fda8aa18fb5837",
+    "http_status": 200,
+    "response_time_ms": 1747,
+    "user_id": "usr-82dfa8595549"
+  },
+  {
+    "timestamp": "2026-04-10T01:36:46Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "137a6195c3b30ed3692d12f38d48f790",
+    "http_status": 204,
+    "response_time_ms": 82,
+    "user_id": "usr-42743cb56211"
+  },
+  {
+    "timestamp": "2026-04-06T07:07:02Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "e547c6b472aa84e8846d43da258ad0f2",
+    "http_status": 200,
+    "response_time_ms": 2289,
+    "user_id": "usr-a392b907d567"
+  },
+  {
+    "timestamp": "2026-04-12T12:17:28Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "e5611c2ad15948657d880329df9f83f7",
+    "http_status": 201,
+    "response_time_ms": 1360
+  },
+  {
+    "timestamp": "2026-04-28T04:15:59Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Stock faible pour le produit",
+    "trace_id": "34ecd020bf8b38d048f92063a3f96d2a",
+    "http_status": 500,
+    "response_time_ms": 569
+  },
+  {
+    "timestamp": "2026-04-13T12:18:08Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Stock mis à jour",
+    "trace_id": "e40462c22c10611119ca1fb8adf494ec",
+    "http_status": 502,
+    "response_time_ms": 147
+  },
+  {
+    "timestamp": "2026-05-02T11:20:08Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "d368cf77941227f811197051d8b2079e",
+    "http_status": 200,
+    "response_time_ms": 2562,
+    "user_id": "usr-be2c5eb2ddcd"
+  },
+  {
+    "timestamp": "2026-04-25T09:47:55Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "fafaa6a94812bb2ccd328bc8c9146ab7",
+    "http_status": 502,
+    "response_time_ms": 3139
+  },
+  {
+    "timestamp": "2026-05-03T19:59:51Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Stock mis à jour",
+    "trace_id": "080c8fe354a2d090459153a00952e442",
+    "http_status": 201,
+    "response_time_ms": 257
+  },
+  {
+    "timestamp": "2026-04-11T07:36:19Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recherche effectuée",
+    "trace_id": "7835b9c20734c4c10db039d84f6d7040",
+    "http_status": 400,
+    "response_time_ms": 4856
+  },
+  {
+    "timestamp": "2026-05-01T08:09:26Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "b77744aa8e944212278b4e57a21ee5ff",
+    "http_status": 200,
+    "response_time_ms": 2736
+  },
+  {
+    "timestamp": "2026-05-01T02:08:55Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "f65a295f084b8b669334cc32cf1bfb30",
+    "http_status": 500,
+    "response_time_ms": 1307,
+    "user_id": "usr-2a3df3e14ab7"
+  },
+  {
+    "timestamp": "2026-04-21T12:10:34Z",
+    "level": "ERROR",
+    "service": "inventory-service",
+    "message": "Paiement refusé",
+    "trace_id": "3c50bc85c7f82e73a02e3ad1be07b004",
+    "http_status": 204,
+    "response_time_ms": 4113,
+    "user_id": "usr-76f90d68f7d0"
+  },
+  {
+    "timestamp": "2026-04-27T12:30:29Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "3461174322f7be404571d4604ad723f3",
+    "http_status": 200,
+    "response_time_ms": 1070
+  },
+  {
+    "timestamp": "2026-04-19T21:49:10Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Cache actualisé",
+    "trace_id": "2ed38fdb97d1a51d86ad1dbe3c78fee2",
+    "http_status": 503,
+    "response_time_ms": 2119
+  },
+  {
+    "timestamp": "2026-04-13T23:46:54Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Données synchronisées",
+    "trace_id": "9a4f4dd97676d44e36d37aa4e06e6e9e",
+    "http_status": 503,
+    "response_time_ms": 4323
+  },
+  {
+    "timestamp": "2026-04-18T13:58:07Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Cache actualisé",
+    "trace_id": "0bd335f1cda3ff838a858d7dab8f154d",
+    "http_status": 200,
+    "response_time_ms": 4687,
+    "user_id": "usr-3276e697ae02"
+  },
+  {
+    "timestamp": "2026-04-13T10:47:44Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Session démarrée",
+    "trace_id": "c4c9ed502c502cc1e3f98804b6e8645a",
+    "http_status": 200,
+    "response_time_ms": 4026
+  },
+  {
+    "timestamp": "2026-04-24T13:14:25Z",
+    "level": "FATAL",
+    "service": "cart-service",
+    "message": "Perte de connexion critique",
+    "trace_id": "5d912995a4a7a0b23f62b5ee4967b774",
+    "http_status": 204,
+    "response_time_ms": 3477
+  },
+  {
+    "timestamp": "2026-04-29T03:26:40Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "93f58507cafec7d21f0361206bb108cb",
+    "http_status": 503,
+    "response_time_ms": 1737,
+    "user_id": "usr-07e983434520"
+  },
+  {
+    "timestamp": "2026-05-05T20:05:06Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Session démarrée",
+    "trace_id": "df2a6ff4ed0ded2e4b863712e85c6236",
+    "http_status": 401,
+    "response_time_ms": 2693
+  },
+  {
+    "timestamp": "2026-04-22T06:58:53Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Cache actualisé",
+    "trace_id": "81ff023fc26914bc253feb92d53fbb4f",
+    "http_status": 200,
+    "response_time_ms": 2104,
+    "user_id": "usr-ade9bae1626d"
+  },
+  {
+    "timestamp": "2026-04-18T11:35:45Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Requête traitée avec succès",
+    "trace_id": "bdace0170d96e9887caa1a0e593f87b7",
+    "http_status": 400,
+    "response_time_ms": 1623,
+    "user_id": "usr-3486341cc406"
+  },
+  {
+    "timestamp": "2026-05-01T09:20:33Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "5e4dcd1b40912724fef49e2873954f3e",
+    "http_status": 429,
+    "response_time_ms": 2127
+  },
+  {
+    "timestamp": "2026-04-11T16:37:45Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Paiement validé",
+    "trace_id": "e680060847141fa24987816cad87859d",
+    "http_status": 204,
+    "response_time_ms": 4685,
+    "user_id": "usr-be090818bf0d"
+  },
+  {
+    "timestamp": "2026-04-21T18:05:35Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Session démarrée",
+    "trace_id": "f27c7085b12b568f9bb312b846c47c6d",
+    "http_status": 201,
+    "response_time_ms": 3564,
+    "user_id": "usr-4cdc7c4a5916"
+  },
+  {
+    "timestamp": "2026-04-09T17:36:31Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "529ec182db29b30f6a8613eea1ce6f74",
+    "http_status": 400,
+    "response_time_ms": 4444,
+    "user_id": "usr-6b3d28cd9c37"
+  },
+  {
+    "timestamp": "2026-04-24T17:47:48Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Paiement validé",
+    "trace_id": "ee122e5f41cb3940a8cc6083091cb9df",
+    "http_status": 503,
+    "response_time_ms": 1105
+  },
+  {
+    "timestamp": "2026-04-18T10:46:54Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Recherche effectuée",
+    "trace_id": "9178f8123fcc97966e07b0f0f2c46be8",
+    "http_status": 500,
+    "response_time_ms": 1514,
+    "user_id": "usr-da92bafab2b4"
+  },
+  {
+    "timestamp": "2026-04-19T12:30:45Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "bd8b6c4b6d5684d7993ce1b0bca29499",
+    "http_status": 400,
+    "response_time_ms": 3272
+  },
+  {
+    "timestamp": "2026-04-28T12:13:33Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Stock mis à jour",
+    "trace_id": "6ab4c4dd8d6c54ab3a02f8461c5ff574",
+    "http_status": 503,
+    "response_time_ms": 2860,
+    "user_id": "usr-822637a2d4a1"
+  },
+  {
+    "timestamp": "2026-04-07T09:19:21Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Recherche effectuée",
+    "trace_id": "dab541bd41ffa6e9e3ad838607fb8541",
+    "http_status": 201,
+    "response_time_ms": 3624,
+    "user_id": "usr-a3aad769edea"
+  },
+  {
+    "timestamp": "2026-04-24T08:04:40Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Données synchronisées",
+    "trace_id": "df6a70dccdfd236d39ce2a979729b1a0",
+    "http_status": 401,
+    "response_time_ms": 1568,
+    "user_id": "usr-35260c6dd052"
+  },
+  {
+    "timestamp": "2026-04-24T05:53:17Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recherche effectuée",
+    "trace_id": "8df0e57b7779bcfa62472f263c4a6183",
+    "http_status": 204,
+    "response_time_ms": 3252,
+    "user_id": "usr-44e82e3e5a8f"
+  },
+  {
+    "timestamp": "2026-04-29T12:54:39Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "7688f0157c3e94307679ce5600e2598c",
+    "http_status": 200,
+    "response_time_ms": 4208
+  },
+  {
+    "timestamp": "2026-04-24T08:12:41Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "242c5b49c847f34377816689e775e809",
+    "http_status": 404,
+    "response_time_ms": 810,
+    "user_id": "usr-2c8e57b9a075"
+  },
+  {
+    "timestamp": "2026-04-14T05:47:43Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Cache actualisé",
+    "trace_id": "07acda5706dc890ee84be29942718c74",
+    "http_status": 502,
+    "response_time_ms": 3791,
+    "user_id": "usr-079fcc3862e7"
+  },
+  {
+    "timestamp": "2026-04-29T15:16:01Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Données synchronisées",
+    "trace_id": "fd390ade987fab25ab4d9cbfa8e323ea",
+    "http_status": 400,
+    "response_time_ms": 2381,
+    "user_id": "usr-d734b3a24ea6"
+  },
+  {
+    "timestamp": "2026-04-28T11:09:18Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Données synchronisées",
+    "trace_id": "4be1d7cb378c39b95a47a970c3f75eca",
+    "http_status": 200,
+    "response_time_ms": 4760,
+    "user_id": "usr-44fbf0cdc8ec"
+  },
+  {
+    "timestamp": "2026-04-24T18:30:25Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Stock faible pour le produit",
+    "trace_id": "81c9cc9e565932513ababf60b7cc2866",
+    "http_status": 500,
+    "response_time_ms": 2261,
+    "user_id": "usr-0c97fd401d9a"
+  },
+  {
+    "timestamp": "2026-04-28T10:48:27Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recherche effectuée",
+    "trace_id": "890c21179976e9cb9ab5ccfa08fe30ca",
+    "http_status": 500,
+    "response_time_ms": 4378,
+    "user_id": "usr-7322a9a1d844"
+  },
+  {
+    "timestamp": "2026-04-13T22:53:43Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "e7f84c81ff54287dd8da0205007b5678",
+    "http_status": 503,
+    "response_time_ms": 2737,
+    "user_id": "usr-645f3402a74a"
+  },
+  {
+    "timestamp": "2026-04-10T01:00:56Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Cache actualisé",
+    "trace_id": "f4f72eb1a788d7036f180beab6bf1b59",
+    "http_status": 201,
+    "response_time_ms": 3450,
+    "user_id": "usr-85c5f61d8039"
+  },
+  {
+    "timestamp": "2026-04-21T01:27:42Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recherche effectuée",
+    "trace_id": "3a143bdd7582e4cf0356aa0c5906ad41",
+    "http_status": 503,
+    "response_time_ms": 1199
+  },
+  {
+    "timestamp": "2026-04-09T11:02:24Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Données synchronisées",
+    "trace_id": "a6be000e67bd864a7f28eeb799d253d6",
+    "http_status": 400,
+    "response_time_ms": 669,
+    "user_id": "usr-248bc168ded5"
+  },
+  {
+    "timestamp": "2026-05-04T17:23:17Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "48f93f86370529280499d37ff3409dac",
+    "http_status": 503,
+    "response_time_ms": 890,
+    "user_id": "usr-3ad0fa300387"
+  },
+  {
+    "timestamp": "2026-05-04T05:56:02Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "a46fdddc3093b7ef46f33fee1c41cda5",
+    "http_status": 200,
+    "response_time_ms": 1847,
+    "user_id": "usr-42883b4fa9c3"
+  },
+  {
+    "timestamp": "2026-04-19T06:22:06Z",
+    "level": "WARN",
+    "service": "inventory-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "c92308cf2546f37650695fc2b58dfdb3",
+    "http_status": 503,
+    "response_time_ms": 4370,
+    "user_id": "usr-17c36fc45118"
+  },
+  {
+    "timestamp": "2026-05-04T18:50:14Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Données invalides reçues",
+    "trace_id": "3552c93dab39d30c4dcd52468cece7ff",
+    "http_status": 403,
+    "response_time_ms": 1954
+  },
+  {
+    "timestamp": "2026-04-28T01:22:49Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Stock mis à jour",
+    "trace_id": "fb616c3dcbfef6acf8bd5589a762aefa",
+    "http_status": 404,
+    "response_time_ms": 2828,
+    "user_id": "usr-969ab543841e"
+  },
+  {
+    "timestamp": "2026-04-07T07:12:00Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "a6706ed83c6da683f63759c79052f2b8",
+    "http_status": 403,
+    "response_time_ms": 2914,
+    "user_id": "usr-939217b37a64"
+  },
+  {
+    "timestamp": "2026-04-09T19:25:56Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Timeout de la requête",
+    "trace_id": "6d92a076258cd68a329b6d06569c097e",
+    "http_status": 200,
+    "response_time_ms": 398,
+    "user_id": "usr-83bf97fbe520"
+  },
+  {
+    "timestamp": "2026-04-15T22:32:30Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Données synchronisées",
+    "trace_id": "e306f7278e2e6a347ee7fc8507546942",
+    "http_status": 429,
+    "response_time_ms": 1465,
+    "user_id": "usr-7dbefbce05c4"
+  },
+  {
+    "timestamp": "2026-04-06T14:04:27Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "6020d73777bb9db65833f0810f4a1ba4",
+    "http_status": 404,
+    "response_time_ms": 1578,
+    "user_id": "usr-1071c73e44ba"
+  },
+  {
+    "timestamp": "2026-04-27T14:19:51Z",
+    "level": "WARN",
+    "service": "notification-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "4fb511ee88025b8ad615ee2435e9cce5",
+    "http_status": 404,
+    "response_time_ms": 4012,
+    "user_id": "usr-6edcbcd7efa7"
+  },
+  {
+    "timestamp": "2026-04-12T05:20:57Z",
+    "level": "ERROR",
+    "service": "cart-service",
+    "message": "Service indisponible",
+    "trace_id": "4c123617d695d96231ac777226fcb7fc",
+    "http_status": 200,
+    "response_time_ms": 4985,
+    "user_id": "usr-6c6eeb9833de"
+  },
+  {
+    "timestamp": "2026-04-23T14:41:10Z",
+    "level": "ERROR",
+    "service": "notification-service",
+    "message": "Timeout de la requête",
+    "trace_id": "c0632975ffc2afb4e4b799e376ff4871",
+    "http_status": 204,
+    "response_time_ms": 4341
+  },
+  {
+    "timestamp": "2026-04-10T23:58:42Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Recherche effectuée",
+    "trace_id": "b9cae994544da4f4bb65ad8cc0b22f72",
+    "http_status": 200,
+    "response_time_ms": 3770,
+    "user_id": "usr-b010e0f265b9"
+  },
+  {
+    "timestamp": "2026-04-28T18:26:30Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "4912cfd5cbfa55522d31baf7dfa5f256",
+    "http_status": 200,
+    "response_time_ms": 3107
+  },
+  {
+    "timestamp": "2026-04-28T02:31:09Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Recommandations générées",
+    "trace_id": "486bfea04f364903820be47bacb7098f",
+    "http_status": 400,
+    "response_time_ms": 2038
+  },
+  {
+    "timestamp": "2026-04-26T18:26:35Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "31bd9bbe17e88eccdf4f41a9395cae9a",
+    "http_status": 500,
+    "response_time_ms": 1832,
+    "user_id": "usr-a117553af36d"
+  },
+  {
+    "timestamp": "2026-04-17T22:29:25Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recherche effectuée",
+    "trace_id": "d459c8fe3e5424389298ac2c95088185",
+    "http_status": 404,
+    "response_time_ms": 1176,
+    "user_id": "usr-44917e7b0ee2"
+  },
+  {
+    "timestamp": "2026-04-28T13:10:28Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "8ed4a3b9318bd809d09a2031674e5c8f",
+    "http_status": 204,
+    "response_time_ms": 3737,
+    "user_id": "usr-9e3768c1e039"
+  },
+  {
+    "timestamp": "2026-05-01T09:08:37Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "634c8ac1a2b329e6ad68590dc1ac9ce3",
+    "http_status": 500,
+    "response_time_ms": 3738
+  },
+  {
+    "timestamp": "2026-04-06T10:13:55Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "a72322613f59bf4ce982d718f025cb9e",
+    "http_status": 503,
+    "response_time_ms": 908
+  },
+  {
+    "timestamp": "2026-04-06T18:58:10Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Cache actualisé",
+    "trace_id": "46a390a43674eac4eafc22c3d60c0c6c",
+    "http_status": 200,
+    "response_time_ms": 3284
+  },
+  {
+    "timestamp": "2026-05-05T15:26:39Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "c02365359d7e8482c43058910e8fbbc8",
+    "http_status": 200,
+    "response_time_ms": 3137,
+    "user_id": "usr-82f309894588"
+  },
+  {
+    "timestamp": "2026-04-24T10:05:59Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "c432569365b418fd3f3ac965ca0216d1",
+    "http_status": 500,
+    "response_time_ms": 3676
+  },
+  {
+    "timestamp": "2026-05-03T16:05:32Z",
+    "level": "FATAL",
+    "service": "recommendation-service",
+    "message": "Corruption de données détectée",
+    "trace_id": "1e20fa509ca1172795e80f3bcc7971ea",
+    "http_status": 404,
+    "response_time_ms": 166,
+    "user_id": "usr-ce71fd3c248d"
+  },
+  {
+    "timestamp": "2026-04-18T16:07:33Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "eabea8fd41d62cfcea178fcafef53db6",
+    "http_status": 500,
+    "response_time_ms": 4020,
+    "user_id": "usr-4c574c02800c"
+  },
+  {
+    "timestamp": "2026-04-07T22:28:42Z",
+    "level": "ERROR",
+    "service": "payment-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "b293059e4e3e74cd277dbc7193556ce8",
+    "http_status": 500,
+    "response_time_ms": 1242
+  },
+  {
+    "timestamp": "2026-04-29T06:46:46Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Commande créée",
+    "trace_id": "09981eff6097e3335381d462387b52bc",
+    "http_status": 502,
+    "response_time_ms": 3672,
+    "user_id": "usr-d33e50521d8d"
+  },
+  {
+    "timestamp": "2026-04-08T06:30:55Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Données synchronisées",
+    "trace_id": "12103071c189e6ebfe5c3692c428942d",
+    "http_status": 204,
+    "response_time_ms": 2904
+  },
+  {
+    "timestamp": "2026-04-30T12:50:53Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Stock faible pour le produit",
+    "trace_id": "7aa5bb2b778ba875682fb5c21d7d6efb",
+    "http_status": 429,
+    "response_time_ms": 4281,
+    "user_id": "usr-e5fc76d12e40"
+  },
+  {
+    "timestamp": "2026-04-30T18:41:42Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "9b3f278bb9fac0eb0f7ffdaad0f489b6",
+    "http_status": 400,
+    "response_time_ms": 3620,
+    "user_id": "usr-9f58b840b023"
+  },
+  {
+    "timestamp": "2026-05-04T17:44:26Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recherche effectuée",
+    "trace_id": "44f5766507e39a0bfebfb77684b93e25",
+    "http_status": 204,
+    "response_time_ms": 344
+  },
+  {
+    "timestamp": "2026-04-12T12:57:48Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "16d8323dc4020875f95aea9f929480f3",
+    "http_status": 401,
+    "response_time_ms": 125,
+    "user_id": "usr-342a1029d84d"
+  },
+  {
+    "timestamp": "2026-05-04T17:43:08Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "77ba4bb6161f7fe78b09e1a54c0d3d49",
+    "http_status": 200,
+    "response_time_ms": 1122,
+    "user_id": "usr-27cd466b582c"
+  },
+  {
+    "timestamp": "2026-04-25T00:00:17Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Commande créée",
+    "trace_id": "6f1dfa0437789f6f3f83181d2999b7d9",
+    "http_status": 201,
+    "response_time_ms": 3726,
+    "user_id": "usr-4359c34d19bc"
+  },
+  {
+    "timestamp": "2026-04-29T23:31:37Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "51579d22b8412ef86f8f0c973f3441da",
+    "http_status": 429,
+    "response_time_ms": 834,
+    "user_id": "usr-41c3838bdbdf"
+  },
+  {
+    "timestamp": "2026-04-06T20:43:23Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Session démarrée",
+    "trace_id": "0c617b5764c3af1565ecb1804e94dd42",
+    "http_status": 429,
+    "response_time_ms": 1994
+  },
+  {
+    "timestamp": "2026-04-09T01:43:08Z",
+    "level": "ERROR",
+    "service": "cart-service",
+    "message": "Données invalides reçues",
+    "trace_id": "85227ac4b9d582eb6bf1d5fe41694939",
+    "http_status": 404,
+    "response_time_ms": 1712
+  },
+  {
+    "timestamp": "2026-05-01T14:37:37Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Paiement validé",
+    "trace_id": "a57a73423356a46b760390524d947ffc",
+    "http_status": 204,
+    "response_time_ms": 1984,
+    "user_id": "usr-f087fdaf8994"
+  },
+  {
+    "timestamp": "2026-04-24T01:27:15Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "c4c2db3b51874a748aee4bf6b608de8f",
+    "http_status": 200,
+    "response_time_ms": 672,
+    "user_id": "usr-a8f6482b353b"
+  },
+  {
+    "timestamp": "2026-04-22T13:36:08Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "e44fc5ee915450d66364f211fe9bc99d",
+    "http_status": 404,
+    "response_time_ms": 3335,
+    "user_id": "usr-94302cb8b269"
+  },
+  {
+    "timestamp": "2026-05-02T23:33:02Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recommandations générées",
+    "trace_id": "240a105b528817a0fff7b7490a8e77d7",
+    "http_status": 403,
+    "response_time_ms": 3552,
+    "user_id": "usr-bffcee00743c"
+  },
+  {
+    "timestamp": "2026-04-22T07:43:20Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Paiement validé",
+    "trace_id": "dd1db1ab7f5251d41d789ba9e0065d1e",
+    "http_status": 502,
+    "response_time_ms": 2182,
+    "user_id": "usr-36a626b7729e"
+  },
+  {
+    "timestamp": "2026-04-24T03:05:42Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recommandations générées",
+    "trace_id": "a608e628ca8c4192a559e20f8f2b2155",
+    "http_status": 200,
+    "response_time_ms": 4462
+  },
+  {
+    "timestamp": "2026-04-17T06:05:08Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "0826e841ca207330d8573933c59ab602",
+    "http_status": 204,
+    "response_time_ms": 3848,
+    "user_id": "usr-1cfb92aebe32"
+  },
+  {
+    "timestamp": "2026-04-16T16:15:18Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "7493d33a0ef97f022f90932b55c3ab92",
+    "http_status": 503,
+    "response_time_ms": 139
+  },
+  {
+    "timestamp": "2026-04-28T09:00:26Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Paiement validé",
+    "trace_id": "290802471934851f95e9af282156ce04",
+    "http_status": 204,
+    "response_time_ms": 106
+  },
+  {
+    "timestamp": "2026-04-24T12:07:05Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "26c4d6fea4696a7ee4ffc554cd97002d",
+    "http_status": 201,
+    "response_time_ms": 2618
+  },
+  {
+    "timestamp": "2026-04-17T00:32:36Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recherche effectuée",
+    "trace_id": "2d2d288c490857fa9c95ab6b97a5eae4",
+    "http_status": 502,
+    "response_time_ms": 409,
+    "user_id": "usr-8cffc3292a91"
+  },
+  {
+    "timestamp": "2026-04-27T19:05:38Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "84fc47c93b2a7e1cf87eeda344a606a9",
+    "http_status": 502,
+    "response_time_ms": 2508,
+    "user_id": "usr-f5ef55830ae6"
+  },
+  {
+    "timestamp": "2026-04-19T21:42:37Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "4c9cbbc93eed255efa6f83ee3ad5f2b0",
+    "http_status": 502,
+    "response_time_ms": 177,
+    "user_id": "usr-91dc931e55ac"
+  },
+  {
+    "timestamp": "2026-04-15T04:06:45Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Données synchronisées",
+    "trace_id": "fa443a35b3bb48ab78ee2f0688dcf758",
+    "http_status": 404,
+    "response_time_ms": 3129
+  },
+  {
+    "timestamp": "2026-04-12T09:01:09Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recommandations générées",
+    "trace_id": "c7abea53d72efec4526ce91402306613",
+    "http_status": 403,
+    "response_time_ms": 665,
+    "user_id": "usr-5bf0d141eefa"
+  },
+  {
+    "timestamp": "2026-04-10T10:45:33Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "02bf20cb793a6fc6f6aad326b4ff496e",
+    "http_status": 200,
+    "response_time_ms": 3964,
+    "user_id": "usr-9e29fec0fbaa"
+  },
+  {
+    "timestamp": "2026-04-06T16:39:28Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "5545113a06672268723a54466b81d4f7",
+    "http_status": 503,
+    "response_time_ms": 1532,
+    "user_id": "usr-148f0dc57a62"
+  },
+  {
+    "timestamp": "2026-04-11T17:25:09Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Session démarrée",
+    "trace_id": "16b139120c9a89ef822aa6e381d1b87b",
+    "http_status": 200,
+    "response_time_ms": 4208,
+    "user_id": "usr-b8804a2eae1d"
+  },
+  {
+    "timestamp": "2026-04-17T13:33:46Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "aaef5eb7af43723d835ba3a676966be3",
+    "http_status": 200,
+    "response_time_ms": 736,
+    "user_id": "usr-fe70e5a3148c"
+  },
+  {
+    "timestamp": "2026-04-18T01:29:30Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "8b66db71866925588e5d8b59aa08a6d5",
+    "http_status": 201,
+    "response_time_ms": 1606,
+    "user_id": "usr-a9c59d4f73ac"
+  },
+  {
+    "timestamp": "2026-05-03T08:22:26Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "5705ab78d4d6e7b823904460e9a5b2c8",
+    "http_status": 201,
+    "response_time_ms": 4897
+  },
+  {
+    "timestamp": "2026-04-19T06:07:12Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Recommandations générées",
+    "trace_id": "5e85b3ca001d464b5f79a32d47989701",
+    "http_status": 503,
+    "response_time_ms": 1645,
+    "user_id": "usr-1d5d371c5c12"
+  },
+  {
+    "timestamp": "2026-04-16T05:25:39Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "db4628db3cf02041632d5412b11e1a2e",
+    "http_status": 200,
+    "response_time_ms": 2558
+  },
+  {
+    "timestamp": "2026-04-12T04:51:36Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Recommandations générées",
+    "trace_id": "ef37308c8d485730da8ba67e27527592",
+    "http_status": 200,
+    "response_time_ms": 225,
+    "user_id": "usr-a64bc1798e7b"
+  },
+  {
+    "timestamp": "2026-04-09T20:18:44Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "c0659f29ddeba57c2079ae979a1921d4",
+    "http_status": 200,
+    "response_time_ms": 3054,
+    "user_id": "usr-825049999a70"
+  },
+  {
+    "timestamp": "2026-04-17T20:14:35Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "5af2747d947231fdbbc9cc7c1c91c845",
+    "http_status": 502,
+    "response_time_ms": 26
+  },
+  {
+    "timestamp": "2026-04-11T13:00:30Z",
+    "level": "WARN",
+    "service": "notification-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "1642a30f10bc90d31471458ed664c226",
+    "http_status": 200,
+    "response_time_ms": 29
+  },
+  {
+    "timestamp": "2026-04-21T09:18:23Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "d3a635fb089d66b7b8a087e2817386a4",
+    "http_status": 404,
+    "response_time_ms": 2600,
+    "user_id": "usr-6e256a815bd2"
+  },
+  {
+    "timestamp": "2026-05-03T11:28:39Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "8ca674dca1dc4042e3eecd1c50bd3997",
+    "http_status": 502,
+    "response_time_ms": 4616,
+    "user_id": "usr-6d33e5ac41d1"
+  },
+  {
+    "timestamp": "2026-04-29T15:20:14Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "3cd29029aec550a17ea9a701c2b000d5",
+    "http_status": 200,
+    "response_time_ms": 1123
+  },
+  {
+    "timestamp": "2026-04-21T17:35:02Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "9e0d0612a9ccea7a42c79dde03880b41",
+    "http_status": 200,
+    "response_time_ms": 2596
+  },
+  {
+    "timestamp": "2026-04-24T07:29:20Z",
+    "level": "ERROR",
+    "service": "search-service",
+    "message": "Paiement refusé",
+    "trace_id": "17f658eba417521e65015fef3cd607e9",
+    "http_status": 404,
+    "response_time_ms": 4467,
+    "user_id": "usr-b01ef96b9698"
+  },
+  {
+    "timestamp": "2026-05-03T22:37:23Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Session démarrée",
+    "trace_id": "595bc953c942a777022c6803273461ec",
+    "http_status": 404,
+    "response_time_ms": 4430,
+    "user_id": "usr-67c327d848f1"
+  },
+  {
+    "timestamp": "2026-04-11T12:56:30Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Cache actualisé",
+    "trace_id": "0cbe667d03e17a233b9e8fd9d98d99ae",
+    "http_status": 502,
+    "response_time_ms": 1784,
+    "user_id": "usr-fab3a3adf027"
+  },
+  {
+    "timestamp": "2026-04-10T16:20:45Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Paiement validé",
+    "trace_id": "091e00aa11bbb1be64c451ee75453171",
+    "http_status": 204,
+    "response_time_ms": 207,
+    "user_id": "usr-eb574c98437a"
+  },
+  {
+    "timestamp": "2026-04-30T11:18:03Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "780228151d1a176ba2b186103392b208",
+    "http_status": 200,
+    "response_time_ms": 1135,
+    "user_id": "usr-e133b510372e"
+  },
+  {
+    "timestamp": "2026-04-19T23:22:04Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Stock mis à jour",
+    "trace_id": "353372bc055e698cb4114db0df51e8fa",
+    "http_status": 500,
+    "response_time_ms": 2130,
+    "user_id": "usr-2f6b6f710316"
+  },
+  {
+    "timestamp": "2026-05-02T13:09:07Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recommandations générées",
+    "trace_id": "1871ecbc5ab20da1c912327cca78d962",
+    "http_status": 200,
+    "response_time_ms": 3544,
+    "user_id": "usr-075dfaa34650"
+  },
+  {
+    "timestamp": "2026-05-03T05:54:08Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Commande créée",
+    "trace_id": "44d3bfb421f0f203f3ec64f4abb5166a",
+    "http_status": 200,
+    "response_time_ms": 2837,
+    "user_id": "usr-35a1afed7827"
+  },
+  {
+    "timestamp": "2026-04-10T03:37:55Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Session démarrée",
+    "trace_id": "a941f3213eecfca43b91e5d9c12562bc",
+    "http_status": 200,
+    "response_time_ms": 1102,
+    "user_id": "usr-023bb5c6cddb"
+  },
+  {
+    "timestamp": "2026-04-26T15:24:54Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "979879a81ccbb3205eada4fb6d68f9d0",
+    "http_status": 503,
+    "response_time_ms": 828,
+    "user_id": "usr-9db94e53e2bc"
+  },
+  {
+    "timestamp": "2026-04-17T09:09:12Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "315707a9cfebed98b9e29b0ca32598db",
+    "http_status": 204,
+    "response_time_ms": 1863
+  },
+  {
+    "timestamp": "2026-04-10T02:00:03Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "9e953e852779d9ba7809eb0109657d77",
+    "http_status": 400,
+    "response_time_ms": 3019
+  },
+  {
+    "timestamp": "2026-05-02T17:13:23Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "ec9a537830adc9addbe4eddf63aeb88f",
+    "http_status": 429,
+    "response_time_ms": 4050
+  },
+  {
+    "timestamp": "2026-04-10T16:23:27Z",
+    "level": "DEBUG",
+    "service": "user-service",
+    "message": "Démarrage du traitement de la requête",
+    "trace_id": "0df109688775f04f3c815ec516789a14"
+  },
+  {
+    "timestamp": "2026-04-15T07:42:37Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "a365171fb1d743c8553a3dfb66c082e7",
+    "http_status": 200,
+    "response_time_ms": 1617,
+    "user_id": "usr-f30c0d8934cc"
+  },
+  {
+    "timestamp": "2026-04-27T13:20:55Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "6fbcb6ebf3700f33deab2ae2bd27af1f",
+    "http_status": 502,
+    "response_time_ms": 3358,
+    "user_id": "usr-d163417fc4f0"
+  },
+  {
+    "timestamp": "2026-04-22T23:58:42Z",
+    "level": "FATAL",
+    "service": "api-gateway",
+    "message": "Corruption de données détectée",
+    "trace_id": "6aec1ad6ab93f82fd6372ef5bbe8e62c",
+    "http_status": 404,
+    "response_time_ms": 2066,
+    "user_id": "usr-dc7df65e0497"
+  },
+  {
+    "timestamp": "2026-04-19T20:21:49Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "eaed4010f64333eb8844f0713c842b74",
+    "http_status": 404,
+    "response_time_ms": 2004
+  },
+  {
+    "timestamp": "2026-04-10T23:24:46Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recherche effectuée",
+    "trace_id": "e119e603b32bd191718b7ec338176a00",
+    "http_status": 201,
+    "response_time_ms": 4426,
+    "user_id": "usr-e4fabb82fecd"
+  },
+  {
+    "timestamp": "2026-04-11T04:25:44Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Paiement validé",
+    "trace_id": "148efff8fd4420cb6439b6613ea6cc7f",
+    "http_status": 502,
+    "response_time_ms": 2092,
+    "user_id": "usr-009484aa01e8"
+  },
+  {
+    "timestamp": "2026-04-19T07:00:38Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "62f2833f94ba957025cddfc6f58b2bd2",
+    "http_status": 429,
+    "response_time_ms": 1772,
+    "user_id": "usr-8fdff60ae69f"
+  },
+  {
+    "timestamp": "2026-04-21T18:10:56Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "c9ba42b24cc33e88e8b68e26d0c3bce3",
+    "http_status": 404,
+    "response_time_ms": 4383,
+    "user_id": "usr-07c876ff6545"
+  },
+  {
+    "timestamp": "2026-05-04T14:21:12Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "1c8560efb72a6a0014e3d26a1d4e445d",
+    "http_status": 503,
+    "response_time_ms": 3940,
+    "user_id": "usr-f33bfbf625cd"
+  },
+  {
+    "timestamp": "2026-04-14T04:26:58Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "dc6e0561fd0d10e870fa3f3a92e73fc3",
+    "http_status": 201,
+    "response_time_ms": 3774,
+    "user_id": "usr-b06456d2ea6b"
+  },
+  {
+    "timestamp": "2026-04-10T02:09:00Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Recommandations générées",
+    "trace_id": "6a68ef121e9b370a839dd8f3f8eaaff3",
+    "http_status": 200,
+    "response_time_ms": 2298,
+    "user_id": "usr-26376d5b2377"
+  },
+  {
+    "timestamp": "2026-04-11T01:02:59Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "a3fc4a6a59c481abbe97e980092c6ebf",
+    "http_status": 201,
+    "response_time_ms": 583,
+    "user_id": "usr-c9382522c840"
+  },
+  {
+    "timestamp": "2026-04-10T22:52:57Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Stock mis à jour",
+    "trace_id": "556ef0e29c5a3c10866254b0bacf893e",
+    "http_status": 404,
+    "response_time_ms": 764,
+    "user_id": "usr-52a1c4f6ff0d"
+  },
+  {
+    "timestamp": "2026-04-06T14:40:23Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recommandations générées",
+    "trace_id": "fff64b2891ae40e0885aaebbebd0b08e",
+    "http_status": 503,
+    "response_time_ms": 610,
+    "user_id": "usr-5b729fb7f8db"
+  },
+  {
+    "timestamp": "2026-05-04T16:30:29Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Commande créée",
+    "trace_id": "389486148b9446128b0653851ac22951",
+    "http_status": 201,
+    "response_time_ms": 2205
+  },
+  {
+    "timestamp": "2026-04-26T11:44:13Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Paiement validé",
+    "trace_id": "4948e1be0134280fc59bcb7b1ae8296d",
+    "http_status": 201,
+    "response_time_ms": 3508,
+    "user_id": "usr-6ee950b21847"
+  },
+  {
+    "timestamp": "2026-05-05T16:03:30Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "554a2373a3770fe03449f82f47696241",
+    "http_status": 200,
+    "response_time_ms": 2822,
+    "user_id": "usr-3e18a1c013f2"
+  },
+  {
+    "timestamp": "2026-04-08T11:06:01Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recommandations générées",
+    "trace_id": "d51eca51550ac88fc24b964ccaff30b8",
+    "http_status": 429,
+    "response_time_ms": 4942
+  },
+  {
+    "timestamp": "2026-04-24T09:55:36Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Stock mis à jour",
+    "trace_id": "36c671929ce33fc38e3c37e8210356df",
+    "http_status": 201,
+    "response_time_ms": 3670,
+    "user_id": "usr-87af0a9740c9"
+  },
+  {
+    "timestamp": "2026-04-07T04:15:50Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Stock mis à jour",
+    "trace_id": "28e1caec443d99ae22726436250c21d4",
+    "http_status": 404,
+    "response_time_ms": 3569
+  },
+  {
+    "timestamp": "2026-04-21T04:35:55Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Commande créée",
+    "trace_id": "681a7a7d29db809d6dea6d1c9b25942e",
+    "http_status": 502,
+    "response_time_ms": 2959
+  },
+  {
+    "timestamp": "2026-04-16T20:54:37Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "220bd76f03a6f01490bd9206c7357518",
+    "http_status": 429,
+    "response_time_ms": 1333,
+    "user_id": "usr-f4bf2ec58f68"
+  },
+  {
+    "timestamp": "2026-04-23T22:37:32Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Requête traitée avec succès",
+    "trace_id": "51daac44833ba81044d8e6b09e097943",
+    "http_status": 200,
+    "response_time_ms": 724,
+    "user_id": "usr-2290e8fad61e"
+  },
+  {
+    "timestamp": "2026-04-27T17:01:06Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "5630975ccc6c42c679c58e64323b43ca",
+    "http_status": 200,
+    "response_time_ms": 4903,
+    "user_id": "usr-ec5a2c0cd6cf"
+  },
+  {
+    "timestamp": "2026-04-08T09:48:40Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Paiement validé",
+    "trace_id": "16a875416172cf9f6aa9976083a1400b",
+    "http_status": 201,
+    "response_time_ms": 3958
+  },
+  {
+    "timestamp": "2026-04-06T08:58:56Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Données synchronisées",
+    "trace_id": "f0af4e65c67c9148875054935413363a",
+    "http_status": 429,
+    "response_time_ms": 433,
+    "user_id": "usr-bc27c4e46e13"
+  },
+  {
+    "timestamp": "2026-04-11T02:29:28Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recommandations générées",
+    "trace_id": "92bff2ed6492391b954a7e88e2deaf40",
+    "http_status": 200,
+    "response_time_ms": 696,
+    "user_id": "usr-df228d83230b"
+  },
+  {
+    "timestamp": "2026-04-30T07:21:49Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Commande créée",
+    "trace_id": "7e69f34906a21934b73c4bcdb864d35b",
+    "http_status": 200,
+    "response_time_ms": 2841,
+    "user_id": "usr-64c65b44f8b8"
+  },
+  {
+    "timestamp": "2026-04-29T11:55:26Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Timeout de la requête",
+    "trace_id": "dacc4eb1cfd5cc590cd25d3ed4041ebc",
+    "http_status": 200,
+    "response_time_ms": 1800,
+    "user_id": "usr-69716fce475f"
+  },
+  {
+    "timestamp": "2026-04-22T11:12:40Z",
+    "level": "ERROR",
+    "service": "inventory-service",
+    "message": "Erreur de connexion à la base de données",
+    "trace_id": "b8f5f25290601a20f821d7f9f725b3ab",
+    "http_status": 200,
+    "response_time_ms": 3805,
+    "user_id": "usr-aa750262b70c"
+  },
+  {
+    "timestamp": "2026-04-10T14:25:38Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "dd6522900c3f203b97436da08ee5de19",
+    "http_status": 200,
+    "response_time_ms": 1449,
+    "user_id": "usr-956eff0a10fe"
+  },
+  {
+    "timestamp": "2026-04-28T09:13:35Z",
+    "level": "ERROR",
+    "service": "cart-service",
+    "message": "Timeout de la requête",
+    "trace_id": "ce52278a52a5fae30ea7f3fce8be1f28",
+    "http_status": 500,
+    "response_time_ms": 238
+  },
+  {
+    "timestamp": "2026-04-07T09:33:11Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "5122049c6dc28fc5844dd006a71100fc",
+    "http_status": 429,
+    "response_time_ms": 963,
+    "user_id": "usr-16c679fd68f6"
+  },
+  {
+    "timestamp": "2026-04-28T02:12:12Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "2dffa7be3a185e8ecc6a918bf0a6934b",
+    "http_status": 503,
+    "response_time_ms": 659,
+    "user_id": "usr-33069900b260"
+  },
+  {
+    "timestamp": "2026-04-17T21:43:30Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "3de0ff957764845ae9bbc59e23a11dbd",
+    "http_status": 429,
+    "response_time_ms": 3709,
+    "user_id": "usr-6ff101005cf6"
+  },
+  {
+    "timestamp": "2026-04-30T19:51:41Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "19ab191d2ead98e69b0051d3bac04147",
+    "http_status": 400,
+    "response_time_ms": 4494,
+    "user_id": "usr-2b83dcb20f31"
+  },
+  {
+    "timestamp": "2026-04-27T17:37:14Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Stock faible pour le produit",
+    "trace_id": "4215e455f724e504fff3cd8ba04db532",
+    "http_status": 500,
+    "response_time_ms": 4925,
+    "user_id": "usr-191f36bc437f"
+  },
+  {
+    "timestamp": "2026-04-16T19:16:35Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "dcbc5ea9f54c33d34858246f16b53b5a",
+    "http_status": 404,
+    "response_time_ms": 1247
+  },
+  {
+    "timestamp": "2026-04-12T18:33:22Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Stock mis à jour",
+    "trace_id": "2d0252bd21b8c238599cd5b027b87774",
+    "http_status": 503,
+    "response_time_ms": 131,
+    "user_id": "usr-5aa4ba9073c7"
+  },
+  {
+    "timestamp": "2026-04-10T04:59:10Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Commande créée",
+    "trace_id": "349b3202f087de6cfc08f2f600beb35c",
+    "http_status": 200,
+    "response_time_ms": 3951
+  },
+  {
+    "timestamp": "2026-05-01T08:45:45Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "32c05b8bae33dd57a08003b24445a249",
+    "http_status": 400,
+    "response_time_ms": 1661
+  },
+  {
+    "timestamp": "2026-04-30T17:40:47Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Cache actualisé",
+    "trace_id": "d21facdc1e33f949ff7c68888352e658",
+    "http_status": 429,
+    "response_time_ms": 4161,
+    "user_id": "usr-21846e48d656"
+  },
+  {
+    "timestamp": "2026-04-20T05:21:18Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Paiement validé",
+    "trace_id": "2ab1a7acbb8d6e28262667ef111c02fc",
+    "http_status": 200,
+    "response_time_ms": 4718,
+    "user_id": "usr-4505787cffa2"
+  },
+  {
+    "timestamp": "2026-04-24T03:25:12Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Données synchronisées",
+    "trace_id": "9713f9a18e77c909a39eb067b8596649",
+    "http_status": 201,
+    "response_time_ms": 2934,
+    "user_id": "usr-1c5a4a625fc8"
+  },
+  {
+    "timestamp": "2026-04-22T16:24:49Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "1ff13c45d07bb2e57950870055946f79",
+    "http_status": 404,
+    "response_time_ms": 3523,
+    "user_id": "usr-bd37b5be0377"
+  },
+  {
+    "timestamp": "2026-05-05T22:53:04Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "81c1363f2c45ea9d3019044fc0f16bd3",
+    "http_status": 401,
+    "response_time_ms": 497,
+    "user_id": "usr-3a1beb951545"
+  },
+  {
+    "timestamp": "2026-04-09T15:34:37Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "013016ff7d26bdbf8985ccc12587ac9d",
+    "http_status": 403,
+    "response_time_ms": 1779,
+    "user_id": "usr-6104e17f4a46"
+  },
+  {
+    "timestamp": "2026-05-03T11:31:31Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Commande créée",
+    "trace_id": "1cd409d007fd4098cac7885b896db37c",
+    "http_status": 500,
+    "response_time_ms": 4297,
+    "user_id": "usr-5f02e7e96782"
+  },
+  {
+    "timestamp": "2026-04-08T22:06:34Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Session démarrée",
+    "trace_id": "f381dcc5c8dfa445762212a3729af028",
+    "http_status": 200,
+    "response_time_ms": 3300,
+    "user_id": "usr-7c9f8642a0a8"
+  },
+  {
+    "timestamp": "2026-04-28T08:16:51Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Cache actualisé",
+    "trace_id": "c99ad537772c93c1059f6a843f88e284",
+    "http_status": 404,
+    "response_time_ms": 505,
+    "user_id": "usr-129383fee418"
+  },
+  {
+    "timestamp": "2026-05-05T16:21:49Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "7d5795b98d88b6ab2b14cbbaed47c9af",
+    "http_status": 404,
+    "response_time_ms": 3814,
+    "user_id": "usr-c9bb8fe8a683"
+  },
+  {
+    "timestamp": "2026-04-21T08:09:10Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Recherche effectuée",
+    "trace_id": "b910f896d2f837bb3afef33707a9ed7d",
+    "http_status": 200,
+    "response_time_ms": 2477,
+    "user_id": "usr-31f281c13743"
+  },
+  {
+    "timestamp": "2026-04-08T21:57:54Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "4747613af516f9ab5e4b36eb80139154",
+    "http_status": 200,
+    "response_time_ms": 4606,
+    "user_id": "usr-1d5c206b1fd9"
+  },
+  {
+    "timestamp": "2026-04-23T10:12:20Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "c02e2dad622ac484fa5ef301b6f4bcc3",
+    "http_status": 403,
+    "response_time_ms": 3060,
+    "user_id": "usr-4046b871ad8a"
+  },
+  {
+    "timestamp": "2026-04-14T07:36:23Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "bd277fd0d044eda64620eee4d6e9addb",
+    "http_status": 200,
+    "response_time_ms": 2593,
+    "user_id": "usr-01224a8e3ceb"
+  },
+  {
+    "timestamp": "2026-05-05T04:05:04Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "6365ad4170973bf91eb4edfce8b9d3e0",
+    "http_status": 201,
+    "response_time_ms": 2094,
+    "user_id": "usr-4760238ee5a7"
+  },
+  {
+    "timestamp": "2026-05-05T15:26:19Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Recommandations générées",
+    "trace_id": "47d02ed78ac0687f29fd5d00349c15b1",
+    "http_status": 200,
+    "response_time_ms": 4478,
+    "user_id": "usr-7ed72bc5f55c"
+  },
+  {
+    "timestamp": "2026-04-10T18:57:09Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Données synchronisées",
+    "trace_id": "7879f09e06e66ee3a27a36e80729a910",
+    "http_status": 204,
+    "response_time_ms": 3829,
+    "user_id": "usr-7858cd88838a"
+  },
+  {
+    "timestamp": "2026-05-04T16:30:20Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Données synchronisées",
+    "trace_id": "72e0e9382e1f88a91757dd042de5fa8a",
+    "http_status": 429,
+    "response_time_ms": 3647
+  },
+  {
+    "timestamp": "2026-05-01T05:18:56Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "785234aee265f443034b35e89b744cf8",
+    "http_status": 429,
+    "response_time_ms": 3821,
+    "user_id": "usr-9b0394fc929e"
+  },
+  {
+    "timestamp": "2026-04-26T07:57:42Z",
+    "level": "ERROR",
+    "service": "search-service",
+    "message": "Timeout de la requête",
+    "trace_id": "7eb56f1bd0fa892120b0d8062bd4e9a2",
+    "http_status": 200,
+    "response_time_ms": 2619,
+    "user_id": "usr-c2ae218e5cfb"
+  },
+  {
+    "timestamp": "2026-04-06T17:34:35Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recommandations générées",
+    "trace_id": "bedfd096b445ced18d475c2af6206b4b",
+    "http_status": 404,
+    "response_time_ms": 42,
+    "user_id": "usr-321869afcff3"
+  },
+  {
+    "timestamp": "2026-04-17T10:56:43Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Stock mis à jour",
+    "trace_id": "a0b8385cbcd735fb5600210692b32b93",
+    "http_status": 500,
+    "response_time_ms": 1465
+  },
+  {
+    "timestamp": "2026-04-18T02:32:25Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "1064bde235291831d7c8260f03045ca6",
+    "http_status": 204,
+    "response_time_ms": 4815,
+    "user_id": "usr-1e05c5f8c5f4"
+  },
+  {
+    "timestamp": "2026-05-04T11:05:06Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "037ffb0c6e1c738b4e9d9f679bd31f9d",
+    "http_status": 201,
+    "response_time_ms": 1996
+  },
+  {
+    "timestamp": "2026-04-19T19:48:38Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "3cd11578cb1b419ba650701b8089dac7",
+    "http_status": 502,
+    "response_time_ms": 248,
+    "user_id": "usr-cc2cd6295a81"
+  },
+  {
+    "timestamp": "2026-05-05T14:03:31Z",
+    "level": "ERROR",
+    "service": "payment-service",
+    "message": "Service indisponible",
+    "trace_id": "ea55b35600d37fe19c65bce5da023176",
+    "http_status": 503,
+    "response_time_ms": 2851,
+    "user_id": "usr-7fbb3f5e942d"
+  },
+  {
+    "timestamp": "2026-04-18T11:28:10Z",
+    "level": "DEBUG",
+    "service": "recommendation-service",
+    "message": "Résultat du cache",
+    "trace_id": "4251f5868f82dec8a9a459a70245138c",
+    "user_id": "usr-b9aa4154f140"
+  },
+  {
+    "timestamp": "2026-04-10T20:40:36Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "d0df3059727af27e56ff607c7555420f",
+    "http_status": 500,
+    "response_time_ms": 2699,
+    "user_id": "usr-8222f3c4404e"
+  },
+  {
+    "timestamp": "2026-04-19T12:09:34Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Requête traitée avec succès",
+    "trace_id": "8c094ec4384e9d4145748df8193e7201",
+    "http_status": 403,
+    "response_time_ms": 4770
+  },
+  {
+    "timestamp": "2026-04-10T00:14:06Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Service indisponible",
+    "trace_id": "4308c807cac410a8ab63a2ee07a075aa",
+    "http_status": 404,
+    "response_time_ms": 1806,
+    "user_id": "usr-e09444257308"
+  },
+  {
+    "timestamp": "2026-04-11T02:51:16Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Données synchronisées",
+    "trace_id": "5971ed5609f91e062f4e15ef409a9038",
+    "http_status": 503,
+    "response_time_ms": 1194,
+    "user_id": "usr-ed43123b2469"
+  },
+  {
+    "timestamp": "2026-04-08T07:09:09Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Utilisateur connecté",
+    "trace_id": "38286f4198be8ecbeae34a1bcdb23f83",
+    "http_status": 201,
+    "response_time_ms": 491,
+    "user_id": "usr-1496446e8623"
+  },
+  {
+    "timestamp": "2026-04-26T15:05:37Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Stock mis à jour",
+    "trace_id": "4353ee4ab753d6331136c7ff40124e02",
+    "http_status": 401,
+    "response_time_ms": 4131
+  },
+  {
+    "timestamp": "2026-04-13T02:57:00Z",
+    "level": "ERROR",
+    "service": "search-service",
+    "message": "Données invalides reçues",
+    "trace_id": "9985c86a2d3fd286b3a9afc55e673a85",
+    "http_status": 403,
+    "response_time_ms": 2626
+  },
+  {
+    "timestamp": "2026-04-26T08:47:38Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Session démarrée",
+    "trace_id": "520dc2d03d2d1d296b61e1010f3d4212",
+    "http_status": 200,
+    "response_time_ms": 4705,
+    "user_id": "usr-99f571ce1da2"
+  },
+  {
+    "timestamp": "2026-04-17T19:04:36Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "23ed8ad94c3304fae717da5d4976ad44",
+    "http_status": 204,
+    "response_time_ms": 2537
+  },
+  {
+    "timestamp": "2026-04-23T15:02:01Z",
+    "level": "WARN",
+    "service": "notification-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "df000c10e915884a108129736b677fc9",
+    "http_status": 401,
+    "response_time_ms": 488,
+    "user_id": "usr-68fac1bf2302"
+  },
+  {
+    "timestamp": "2026-04-10T00:16:57Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Commande créée",
+    "trace_id": "669342826c635c1897add32ac2f75968",
+    "http_status": 429,
+    "response_time_ms": 854
+  },
+  {
+    "timestamp": "2026-04-22T06:54:49Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "1cfc091e241c90466bddf09e18c830da",
+    "http_status": 204,
+    "response_time_ms": 735,
+    "user_id": "usr-beead4fc9a9b"
+  },
+  {
+    "timestamp": "2026-04-11T20:12:48Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "da4fe511b536d6ebf827503bad89ec53",
+    "http_status": 502,
+    "response_time_ms": 4215,
+    "user_id": "usr-6a7d4a7f296c"
+  },
+  {
+    "timestamp": "2026-04-20T05:00:40Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Stock mis à jour",
+    "trace_id": "9691981a304906788c838f72e9abb288",
+    "http_status": 500,
+    "response_time_ms": 2170,
+    "user_id": "usr-b20dd76f0644"
+  },
+  {
+    "timestamp": "2026-04-26T18:57:38Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "87d93376789a4349e9dcb0611fc45c9f",
+    "http_status": 401,
+    "response_time_ms": 3144,
+    "user_id": "usr-0de530434a7c"
+  },
+  {
+    "timestamp": "2026-04-29T23:36:43Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Utilisateur connecté",
+    "trace_id": "28403181ab3bbc7f6508e532716fc51b",
+    "http_status": 204,
+    "response_time_ms": 1733
+  },
+  {
+    "timestamp": "2026-05-02T05:41:02Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "4e0e5e10ef1bdb4ba0f5174460e80989",
+    "http_status": 404,
+    "response_time_ms": 227
+  },
+  {
+    "timestamp": "2026-04-06T13:37:13Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "c000ef37e5f8e1199410c1200c7d07e3",
+    "http_status": 200,
+    "response_time_ms": 2864,
+    "user_id": "usr-cfc6500b0fbc"
+  },
+  {
+    "timestamp": "2026-05-04T04:05:15Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "8bae6a00aadc14fe5c64ed269b3bd0f5",
+    "http_status": 500,
+    "response_time_ms": 328,
+    "user_id": "usr-d695090de9f2"
+  },
+  {
+    "timestamp": "2026-05-04T17:45:46Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "d8d7d92d4ed37355b70b0a0ae2b00f7e",
+    "http_status": 429,
+    "response_time_ms": 1695
+  },
+  {
+    "timestamp": "2026-05-03T17:56:51Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Paiement validé",
+    "trace_id": "e302ad772ae26ee94d9d08916ebf796e",
+    "http_status": 200,
+    "response_time_ms": 2980,
+    "user_id": "usr-59591c1e2a2b"
+  },
+  {
+    "timestamp": "2026-04-12T05:40:31Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Données synchronisées",
+    "trace_id": "6fca187ce956e0fb9ba1f5a198cfeaf9",
+    "http_status": 503,
+    "response_time_ms": 3589
+  },
+  {
+    "timestamp": "2026-04-16T15:42:42Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "2ba5c6bde2e69d1b0d5bdcae1454966d",
+    "http_status": 200,
+    "response_time_ms": 4169,
+    "user_id": "usr-17551359fb4a"
+  },
+  {
+    "timestamp": "2026-04-18T00:51:27Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "00243b3f4f2a0494d6c38bb1c8c8f257",
+    "http_status": 400,
+    "response_time_ms": 3099
+  },
+  {
+    "timestamp": "2026-04-26T20:04:43Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "2c6b0c883b2511ed9028f31b7e0251c2",
+    "http_status": 200,
+    "response_time_ms": 2135,
+    "user_id": "usr-c638efbeb77d"
+  },
+  {
+    "timestamp": "2026-05-04T20:50:12Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Session démarrée",
+    "trace_id": "13d5a0bc9856bfa21253143d1d4cc9c8",
+    "http_status": 429,
+    "response_time_ms": 3403,
+    "user_id": "usr-689d118a1dd6"
+  },
+  {
+    "timestamp": "2026-04-16T22:11:43Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Commande créée",
+    "trace_id": "a2ef1898eeeede070ac46fe1a49604f2",
+    "http_status": 429,
+    "response_time_ms": 4293,
+    "user_id": "usr-873f004fa376"
+  },
+  {
+    "timestamp": "2026-05-04T16:51:39Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Paiement validé",
+    "trace_id": "f7f03aa3e311c360f670f68b87862968",
+    "http_status": 401,
+    "response_time_ms": 3397,
+    "user_id": "usr-096dfe86dc01"
+  },
+  {
+    "timestamp": "2026-04-23T00:02:34Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recherche effectuée",
+    "trace_id": "d1cffb8accc4b0e2f2748e3cac55370c",
+    "http_status": 204,
+    "response_time_ms": 3188
+  },
+  {
+    "timestamp": "2026-04-08T23:35:04Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Données synchronisées",
+    "trace_id": "1ec8df76ffa95643406ca98c0fa95851",
+    "http_status": 204,
+    "response_time_ms": 1190,
+    "user_id": "usr-dc6552a8ac6c"
+  },
+  {
+    "timestamp": "2026-04-07T00:26:23Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Paiement validé",
+    "trace_id": "7e7fc9a75534b222cf3d767b7f8f2d87",
+    "http_status": 500,
+    "response_time_ms": 2712,
+    "user_id": "usr-d13e3587f7de"
+  },
+  {
+    "timestamp": "2026-05-02T14:38:19Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "efff3a8f7cd27ca27da879736e37e6df",
+    "http_status": 401,
+    "response_time_ms": 2425,
+    "user_id": "usr-aa8bf73b44d8"
+  },
+  {
+    "timestamp": "2026-04-22T08:04:42Z",
+    "level": "WARN",
+    "service": "inventory-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "6d2074149e5755a10d05571c1960cadc",
+    "http_status": 400,
+    "response_time_ms": 1752,
+    "user_id": "usr-5c62735ab48f"
+  },
+  {
+    "timestamp": "2026-04-28T10:54:12Z",
+    "level": "ERROR",
+    "service": "cart-service",
+    "message": "Paiement refusé",
+    "trace_id": "f8fc02ccc55c294d2bf9725a56da767b",
+    "http_status": 502,
+    "response_time_ms": 734,
+    "user_id": "usr-ef312fc9f61d"
+  },
+  {
+    "timestamp": "2026-04-30T01:24:59Z",
+    "level": "ERROR",
+    "service": "search-service",
+    "message": "Paiement refusé",
+    "trace_id": "c8da89b2a243cb362491142416f14205",
+    "http_status": 401,
+    "response_time_ms": 1503
+  },
+  {
+    "timestamp": "2026-05-03T12:33:52Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "0403df2117653a2a2d0adc0fbf147ada",
+    "http_status": 200,
+    "response_time_ms": 3591
+  },
+  {
+    "timestamp": "2026-05-05T07:32:00Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Produit ajouté au panier",
+    "trace_id": "3850216c1a8e7a33237a4ee24d4cbf82",
+    "http_status": 404,
+    "response_time_ms": 809,
+    "user_id": "usr-5f9d582d757b"
+  },
+  {
+    "timestamp": "2026-04-29T22:24:37Z",
+    "level": "ERROR",
+    "service": "inventory-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "f0d41a0486460fb188f82775bc908295",
+    "http_status": 403,
+    "response_time_ms": 2358,
+    "user_id": "usr-3dd4b7fb53ca"
+  },
+  {
+    "timestamp": "2026-04-27T16:38:20Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recommandations générées",
+    "trace_id": "30ad84047fd6e5ac205873561f8a0bfe",
+    "http_status": 200,
+    "response_time_ms": 3215
+  },
+  {
+    "timestamp": "2026-04-24T14:10:37Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "d3f8a52252de84bf40d5bd18eee63cfe",
+    "http_status": 500,
+    "response_time_ms": 972,
+    "user_id": "usr-4d815532c9f1"
+  },
+  {
+    "timestamp": "2026-04-12T06:23:43Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "68ccd146e309423f8dac360af248a659",
+    "http_status": 200,
+    "response_time_ms": 4867
+  },
+  {
+    "timestamp": "2026-05-03T13:23:12Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Données synchronisées",
+    "trace_id": "6f2b96fac603dd92e203cec23726b826",
+    "http_status": 503,
+    "response_time_ms": 4438
+  },
+  {
+    "timestamp": "2026-05-01T17:30:21Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Paiement refusé",
+    "trace_id": "85c929bc3afb6de5b9dc10ca7778bf52",
+    "http_status": 429,
+    "response_time_ms": 3043
+  },
+  {
+    "timestamp": "2026-04-28T08:55:49Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Données invalides reçues",
+    "trace_id": "84fb43c6f42469fe95fcf4867c458247",
+    "http_status": 200,
+    "response_time_ms": 1552,
+    "user_id": "usr-c5e50b42a971"
+  },
+  {
+    "timestamp": "2026-05-01T12:18:03Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "b1fa5f2b18ab2baaf1a08ae461526ff2",
+    "http_status": 403,
+    "response_time_ms": 1214
+  },
+  {
+    "timestamp": "2026-04-17T20:23:15Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Recherche effectuée",
+    "trace_id": "92ce0eebfb40a761ab670c9861afd7ff",
+    "http_status": 500,
+    "response_time_ms": 3354,
+    "user_id": "usr-231deda1485c"
+  },
+  {
+    "timestamp": "2026-04-18T18:22:22Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Session démarrée",
+    "trace_id": "e72b6cf62de0b6d9ae6f279f4d20fcc1",
+    "http_status": 400,
+    "response_time_ms": 1773,
+    "user_id": "usr-88fa42bd745f"
+  },
+  {
+    "timestamp": "2026-04-26T16:02:43Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Données synchronisées",
+    "trace_id": "7ea00c255a542bc4f177dbb5aaa39222",
+    "http_status": 429,
+    "response_time_ms": 3590,
+    "user_id": "usr-b2ce4fedebcb"
+  },
+  {
+    "timestamp": "2026-04-17T16:46:43Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Recommandations générées",
+    "trace_id": "10cbfc42b89fb293f8b0d3fd13903338",
+    "http_status": 401,
+    "response_time_ms": 3245,
+    "user_id": "usr-51e59b7d5a6b"
+  },
+  {
+    "timestamp": "2026-04-19T23:50:12Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Session démarrée",
+    "trace_id": "b0cc8d8203cc3827ea52b49dfb31482a",
+    "http_status": 204,
+    "response_time_ms": 3433,
+    "user_id": "usr-5134db373985"
+  },
+  {
+    "timestamp": "2026-05-04T09:45:19Z",
+    "level": "DEBUG",
+    "service": "inventory-service",
+    "message": "Résultat du cache",
+    "trace_id": "e8e628cbe38617e8ec8b42cf7aad707a",
+    "user_id": "usr-51cb775672d1"
+  },
+  {
+    "timestamp": "2026-04-13T01:30:46Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Session démarrée",
+    "trace_id": "07f6a63abede4c6d26cebe259272618c",
+    "http_status": 200,
+    "response_time_ms": 37,
+    "user_id": "usr-d89842e3485f"
+  },
+  {
+    "timestamp": "2026-04-15T17:12:30Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "14a8cac795e2967aa1cbe5e878edd0cf",
+    "http_status": 401,
+    "response_time_ms": 3173,
+    "user_id": "usr-9ae739670bef"
+  },
+  {
+    "timestamp": "2026-05-05T12:08:12Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "39cddc88f3e5c389803c8c7e97cdce44",
+    "http_status": 201,
+    "response_time_ms": 3901,
+    "user_id": "usr-21cd65f53b16"
+  },
+  {
+    "timestamp": "2026-04-26T11:45:17Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Données synchronisées",
+    "trace_id": "1c8d51db0409743786f6af2460bd0b83",
+    "http_status": 503,
+    "response_time_ms": 1144
+  },
+  {
+    "timestamp": "2026-04-23T05:41:55Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "19068e549c4f2b5bcdb85b7090bb730d",
+    "http_status": 500,
+    "response_time_ms": 3197,
+    "user_id": "usr-0cfd68ca5fd7"
+  },
+  {
+    "timestamp": "2026-05-05T08:16:35Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "fb8f728afa3dc5b3af207aada6fbe5b6",
+    "http_status": 502,
+    "response_time_ms": 68,
+    "user_id": "usr-48416a8b76af"
+  },
+  {
+    "timestamp": "2026-04-30T15:09:02Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "43ece3bbf1eb1f578f75595ce7b7f530",
+    "http_status": 403,
+    "response_time_ms": 181,
+    "user_id": "usr-9c3776949d2d"
+  },
+  {
+    "timestamp": "2026-04-22T13:01:49Z",
+    "level": "ERROR",
+    "service": "payment-service",
+    "message": "Service indisponible",
+    "trace_id": "0b6df235b62dda88b61bb180827ed5b9",
+    "http_status": 500,
+    "response_time_ms": 534,
+    "user_id": "usr-82140f6d5643"
+  },
+  {
+    "timestamp": "2026-04-09T22:04:17Z",
+    "level": "ERROR",
+    "service": "notification-service",
+    "message": "Données invalides reçues",
+    "trace_id": "65d647461c2a6c578ccc341e34524aee",
+    "http_status": 400,
+    "response_time_ms": 111,
+    "user_id": "usr-cf1432957b7f"
+  },
+  {
+    "timestamp": "2026-04-17T00:47:51Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Stock faible pour le produit",
+    "trace_id": "897bdbb9e82413076b7f6dc0f6a98ebd",
+    "http_status": 403,
+    "response_time_ms": 802
+  },
+  {
+    "timestamp": "2026-04-18T22:35:20Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Commande créée",
+    "trace_id": "de89c62578530004062bd5b7b421c19b",
+    "http_status": 404,
+    "response_time_ms": 1506
+  },
+  {
+    "timestamp": "2026-04-18T19:33:43Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "b356a05a84f779ccc39e69bdc6b380e9",
+    "http_status": 403,
+    "response_time_ms": 4155,
+    "user_id": "usr-459c8b89d475"
+  },
+  {
+    "timestamp": "2026-04-06T08:43:22Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Données synchronisées",
+    "trace_id": "d20ad3a26963b2929143fa31725fad1c",
+    "http_status": 200,
+    "response_time_ms": 2132
+  },
+  {
+    "timestamp": "2026-04-09T09:42:10Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "d8eb945f95f67e7a627cb21a3ecfe6e8",
+    "http_status": 204,
+    "response_time_ms": 3252
+  },
+  {
+    "timestamp": "2026-04-13T15:17:28Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "f198eb02ba5282fe9510e624ebf90b5e",
+    "http_status": 429,
+    "response_time_ms": 123,
+    "user_id": "usr-ef09d375214c"
+  },
+  {
+    "timestamp": "2026-04-28T14:49:31Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "91dd479a5d16e1b6dce737dcee3ca0bc",
+    "http_status": 200,
+    "response_time_ms": 556
+  },
+  {
+    "timestamp": "2026-04-06T17:05:08Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "7667a615650de8e5c2069abc8b7b0c7c",
+    "http_status": 401,
+    "response_time_ms": 1129,
+    "user_id": "usr-cbc061fb9503"
+  },
+  {
+    "timestamp": "2026-04-27T14:40:17Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Données invalides reçues",
+    "trace_id": "44cc193c62aa97b7c3b8a59695307e29",
+    "http_status": 403,
+    "response_time_ms": 325,
+    "user_id": "usr-bef00aedfedd"
+  },
+  {
+    "timestamp": "2026-04-14T19:11:56Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Session démarrée",
+    "trace_id": "3ede137e63a5aaf83842e861c775c75b",
+    "http_status": 200,
+    "response_time_ms": 1010
+  },
+  {
+    "timestamp": "2026-04-14T01:52:04Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Requête traitée avec succès",
+    "trace_id": "afeace8f853c0d55fb47be15dd6ed515",
+    "http_status": 200,
+    "response_time_ms": 3266
+  },
+  {
+    "timestamp": "2026-04-28T23:35:27Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Données synchronisées",
+    "trace_id": "768238484ebedd703be2db9ab0547e78",
+    "http_status": 401,
+    "response_time_ms": 3269,
+    "user_id": "usr-15e9f604f34c"
+  },
+  {
+    "timestamp": "2026-04-29T02:43:27Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recommandations générées",
+    "trace_id": "9973600a9f3d91d5d51f08d6108242c4",
+    "http_status": 401,
+    "response_time_ms": 3519
+  },
+  {
+    "timestamp": "2026-04-20T13:43:03Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "e0c44f02457384e8d3ba6c4dc3ade2d7",
+    "http_status": 403,
+    "response_time_ms": 4110,
+    "user_id": "usr-60c306af5cfc"
+  },
+  {
+    "timestamp": "2026-04-22T12:04:27Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "5a78f6ea11f55b066a69ec4524c9cd95",
+    "http_status": 429,
+    "response_time_ms": 207,
+    "user_id": "usr-55fca5ca1462"
+  },
+  {
+    "timestamp": "2026-04-24T13:30:15Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Cache actualisé",
+    "trace_id": "ab7f4f128107e8b4f75ccd5d4cc765b1",
+    "http_status": 502,
+    "response_time_ms": 1430,
+    "user_id": "usr-d2213d1b7e9b"
+  },
+  {
+    "timestamp": "2026-04-19T02:26:14Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Utilisateur connecté",
+    "trace_id": "ca04b4f46fd2d3e68836568aff5cb248",
+    "http_status": 200,
+    "response_time_ms": 338,
+    "user_id": "usr-5dca90ae3de2"
+  },
+  {
+    "timestamp": "2026-04-09T22:12:36Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "f7cd4951b237d64b3154ed16f2cb1377",
+    "http_status": 503,
+    "response_time_ms": 742,
+    "user_id": "usr-1d16e06d91e9"
+  },
+  {
+    "timestamp": "2026-04-10T02:39:26Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recherche effectuée",
+    "trace_id": "663a439e562974de6b4cdd494d0ee730",
+    "http_status": 403,
+    "response_time_ms": 1498
+  },
+  {
+    "timestamp": "2026-04-07T06:05:01Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "521051864dd24db998670864bf1c6004",
+    "http_status": 200,
+    "response_time_ms": 3846,
+    "user_id": "usr-114039a21c48"
+  },
+  {
+    "timestamp": "2026-04-09T14:17:09Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "5e395b0e7d3413363e522dda813ff9bd",
+    "http_status": 500,
+    "response_time_ms": 1454
+  },
+  {
+    "timestamp": "2026-04-21T17:19:39Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "16ea3f9ca0e02d8ee4bb806c42659314",
+    "http_status": 200,
+    "response_time_ms": 3398,
+    "user_id": "usr-9c90fc3d94d8"
+  },
+  {
+    "timestamp": "2026-04-28T18:41:40Z",
+    "level": "ERROR",
+    "service": "payment-service",
+    "message": "Timeout de la requête",
+    "trace_id": "0c310099e78fdcd4620d99edbd8c7e43",
+    "http_status": 500,
+    "response_time_ms": 3259
+  },
+  {
+    "timestamp": "2026-04-19T02:00:13Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Données synchronisées",
+    "trace_id": "b7467f1d73b109bb21382231ecc4cde7",
+    "http_status": 502,
+    "response_time_ms": 348
+  },
+  {
+    "timestamp": "2026-04-28T18:48:44Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "ad6c833c164dd271ef041d8640ce8d3f",
+    "http_status": 500,
+    "response_time_ms": 4595,
+    "user_id": "usr-884e48676660"
+  },
+  {
+    "timestamp": "2026-04-15T02:30:37Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Recommandations générées",
+    "trace_id": "79155567db0580565c4ef0a4b674f9bc",
+    "http_status": 502,
+    "response_time_ms": 2714,
+    "user_id": "usr-f7b0f640dd71"
+  },
+  {
+    "timestamp": "2026-04-20T02:01:29Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Cache actualisé",
+    "trace_id": "dab72715ab6b79ad9370a1cc8a13e9f3",
+    "http_status": 200,
+    "response_time_ms": 3564
+  },
+  {
+    "timestamp": "2026-04-29T15:11:34Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Session démarrée",
+    "trace_id": "be70d29d72542859ec582eb13c8d3d39",
+    "http_status": 400,
+    "response_time_ms": 2986
+  },
+  {
+    "timestamp": "2026-04-12T22:54:20Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "32052345e4e12836cd80aee34bf0c361",
+    "http_status": 400,
+    "response_time_ms": 2103
+  },
+  {
+    "timestamp": "2026-04-10T17:01:20Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "f017ff9755b17ed5a60e67025a62425f",
+    "http_status": 201,
+    "response_time_ms": 1944,
+    "user_id": "usr-bad4eb401db0"
+  },
+  {
+    "timestamp": "2026-05-05T02:42:57Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "4770d8b1a116b423fd0cac145ed256b5",
+    "http_status": 200,
+    "response_time_ms": 542,
+    "user_id": "usr-f14fc72b044a"
+  },
+  {
+    "timestamp": "2026-04-15T05:32:59Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "6c8b34c941f2fee160c937380107ccdb",
+    "http_status": 200,
+    "response_time_ms": 3045,
+    "user_id": "usr-541b582e81d5"
+  },
+  {
+    "timestamp": "2026-04-29T14:34:58Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Commande créée",
+    "trace_id": "f6bc2b2d5d23404250c07f7b7e748e8c",
+    "http_status": 201,
+    "response_time_ms": 391
+  },
+  {
+    "timestamp": "2026-04-26T04:18:43Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "9d48ef74827d632faa5ce4364f12c770",
+    "http_status": 401,
+    "response_time_ms": 3890,
+    "user_id": "usr-99d39f7263a8"
+  },
+  {
+    "timestamp": "2026-04-29T00:36:46Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Recommandations générées",
+    "trace_id": "3e439e57c383d3eef0c0e9188684bdd3",
+    "http_status": 500,
+    "response_time_ms": 4637,
+    "user_id": "usr-f248560ef177"
+  },
+  {
+    "timestamp": "2026-04-24T08:43:40Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Données invalides reçues",
+    "trace_id": "11b87ff169754cd8e511dd60ee95376a",
+    "http_status": 503,
+    "response_time_ms": 1827,
+    "user_id": "usr-6b57096c85d9"
+  },
+  {
+    "timestamp": "2026-04-14T05:26:23Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "67a070cd7cffe962f38c4fb9baad0d45",
+    "http_status": 200,
+    "response_time_ms": 3033,
+    "user_id": "usr-4a00b1abcb93"
+  },
+  {
+    "timestamp": "2026-04-25T06:35:50Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Utilisateur connecté",
+    "trace_id": "0844be7839f954633dfda372165ff0dc",
+    "http_status": 502,
+    "response_time_ms": 3507,
+    "user_id": "usr-f87ebba5a897"
+  },
+  {
+    "timestamp": "2026-04-21T19:58:35Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Données synchronisées",
+    "trace_id": "d78b0f48d469ff167d8f7bdd54a45220",
+    "http_status": 429,
+    "response_time_ms": 248
+  },
+  {
+    "timestamp": "2026-04-13T11:05:28Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Cache actualisé",
+    "trace_id": "33953515d611198056abf6dfee3ae5b5",
+    "http_status": 502,
+    "response_time_ms": 4591
+  },
+  {
+    "timestamp": "2026-04-06T00:21:37Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recherche effectuée",
+    "trace_id": "4112d19819f27cf43f4f137bebab2a41",
+    "http_status": 200,
+    "response_time_ms": 4713
+  },
+  {
+    "timestamp": "2026-04-30T06:48:17Z",
+    "level": "FATAL",
+    "service": "user-service",
+    "message": "Corruption de données détectée",
+    "trace_id": "a04d638afe85cbd76162f27c5ee57690",
+    "http_status": 404,
+    "response_time_ms": 3921
+  },
+  {
+    "timestamp": "2026-04-08T13:23:12Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Requête traitée avec succès",
+    "trace_id": "c7ffaea5f5261e30626005f7b67ccf79",
+    "http_status": 500,
+    "response_time_ms": 3972
+  },
+  {
+    "timestamp": "2026-05-01T08:19:36Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "f7b3a1a57636c14a57bd957a946675b4",
+    "http_status": 200,
+    "response_time_ms": 2371
+  },
+  {
+    "timestamp": "2026-04-15T14:17:32Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Service indisponible",
+    "trace_id": "2013048b59ef9f0364d441755f2e8ab0",
+    "http_status": 429,
+    "response_time_ms": 2361,
+    "user_id": "usr-f3b0b5657e35"
+  },
+  {
+    "timestamp": "2026-04-12T08:21:11Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "9c08339175ae76a73eca29fe5eaf4d1d",
+    "http_status": 503,
+    "response_time_ms": 199,
+    "user_id": "usr-37e445cddc28"
+  },
+  {
+    "timestamp": "2026-04-20T14:38:34Z",
+    "level": "ERROR",
+    "service": "notification-service",
+    "message": "Paiement refusé",
+    "trace_id": "037ad8c6c3da27eff21f2237d21d9425",
+    "http_status": 401,
+    "response_time_ms": 326,
+    "user_id": "usr-14fc55ce085b"
+  },
+  {
+    "timestamp": "2026-04-19T15:03:50Z",
+    "level": "WARN",
+    "service": "notification-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "fe269c7e652543b47108bee30d860f65",
+    "http_status": 502,
+    "response_time_ms": 1485
+  },
+  {
+    "timestamp": "2026-04-07T15:35:01Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Recommandations générées",
+    "trace_id": "3a965b28d69a95d269ba3c596e909e0b",
+    "http_status": 400,
+    "response_time_ms": 1785,
+    "user_id": "usr-f3f95f656df8"
+  },
+  {
+    "timestamp": "2026-05-05T23:38:17Z",
+    "level": "ERROR",
+    "service": "notification-service",
+    "message": "Timeout de la requête",
+    "trace_id": "7ff532939f2e69c2ff7387cd4b22cba6",
+    "http_status": 404,
+    "response_time_ms": 3542,
+    "user_id": "usr-511f18f96a62"
+  },
+  {
+    "timestamp": "2026-04-30T07:13:33Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recherche effectuée",
+    "trace_id": "96213b5e35139a495308fed4fb2e6364",
+    "http_status": 404,
+    "response_time_ms": 1677,
+    "user_id": "usr-5414c1d2e00c"
+  },
+  {
+    "timestamp": "2026-04-07T22:39:43Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "14aa43f1663b16c2b359320c08b72ccf",
+    "http_status": 401,
+    "response_time_ms": 4398,
+    "user_id": "usr-9df84f6fdede"
+  },
+  {
+    "timestamp": "2026-04-13T12:04:58Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Données synchronisées",
+    "trace_id": "e6041571342b3ae3369c7c94b3c59f73",
+    "http_status": 404,
+    "response_time_ms": 4304
+  },
+  {
+    "timestamp": "2026-04-25T04:54:55Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Données synchronisées",
+    "trace_id": "de0f2b665453b3aa9921da0b1cfd9d8c",
+    "http_status": 429,
+    "response_time_ms": 3338,
+    "user_id": "usr-db9e0a990376"
+  },
+  {
+    "timestamp": "2026-04-13T19:09:22Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "0e7991fe9f8a9832b49c21d68acbf640",
+    "http_status": 200,
+    "response_time_ms": 4460
+  },
+  {
+    "timestamp": "2026-05-01T23:21:55Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "fad3644e813a2f4f98911b9a64140e4e",
+    "http_status": 200,
+    "response_time_ms": 86,
+    "user_id": "usr-d91dbb7c2b8c"
+  },
+  {
+    "timestamp": "2026-04-08T11:29:05Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "1d2a19cc618e2a1a5c6bf84103ed5e1a",
+    "http_status": 401,
+    "response_time_ms": 1776,
+    "user_id": "usr-21cc914052c9"
+  },
+  {
+    "timestamp": "2026-04-29T12:41:55Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "1878a77c0fe6774e11d31d1c1cef8051",
+    "http_status": 503,
+    "response_time_ms": 1902
+  },
+  {
+    "timestamp": "2026-04-11T18:55:24Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "41b9e034354ecec77e14584d48cc6fc6",
+    "http_status": 201,
+    "response_time_ms": 2654,
+    "user_id": "usr-70421c92bc2f"
+  },
+  {
+    "timestamp": "2026-04-26T17:21:00Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "9990aeb9d65faafe06cc79ebb8a414ba",
+    "http_status": 204,
+    "response_time_ms": 2639
+  },
+  {
+    "timestamp": "2026-04-11T19:23:43Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Paiement validé",
+    "trace_id": "67ab781c409509073b3d83e9f19798b3",
+    "http_status": 401,
+    "response_time_ms": 4361,
+    "user_id": "usr-decdba8ad441"
+  },
+  {
+    "timestamp": "2026-04-26T00:09:55Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Stock mis à jour",
+    "trace_id": "4256c9b576845cd4d5ccf8c76326df28",
+    "http_status": 400,
+    "response_time_ms": 3883,
+    "user_id": "usr-bd9db9d43987"
+  },
+  {
+    "timestamp": "2026-05-03T05:36:29Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "bfeefbb3b43b266a49dbc4009e03dbd6",
+    "http_status": 503,
+    "response_time_ms": 4073,
+    "user_id": "usr-77f7cbaae5a7"
+  },
+  {
+    "timestamp": "2026-04-23T13:07:42Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "f79b6d5645ce1985ef1d6fb993ff6943",
+    "http_status": 404,
+    "response_time_ms": 4379,
+    "user_id": "usr-bde7729a3018"
+  },
+  {
+    "timestamp": "2026-04-08T01:04:17Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recherche effectuée",
+    "trace_id": "4b234714b86e83eba7afc4e6cbf67eb3",
+    "http_status": 401,
+    "response_time_ms": 2878,
+    "user_id": "usr-bc167c02d32f"
+  },
+  {
+    "timestamp": "2026-04-16T22:41:59Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Recommandations générées",
+    "trace_id": "25c1b62ae987e6c0b5b65441cf66b5a6",
+    "http_status": 201,
+    "response_time_ms": 4786,
+    "user_id": "usr-cd213a05e8e3"
+  },
+  {
+    "timestamp": "2026-04-11T01:27:49Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Recherche effectuée",
+    "trace_id": "63c8a23667d26a751c4f8482d3fb65e8",
+    "http_status": 401,
+    "response_time_ms": 2592,
+    "user_id": "usr-bc4950d82277"
+  },
+  {
+    "timestamp": "2026-05-01T13:18:30Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Recherche effectuée",
+    "trace_id": "e525b5c71658c0423879646f88a6a415",
+    "http_status": 403,
+    "response_time_ms": 2024
+  },
+  {
+    "timestamp": "2026-04-11T16:00:53Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Erreur de connexion à la base de données",
+    "trace_id": "15115fcc8c348ba2e6d5f6e5eac2522b",
+    "http_status": 201,
+    "response_time_ms": 2797
+  },
+  {
+    "timestamp": "2026-04-20T12:28:03Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Commande créée",
+    "trace_id": "2023fd862d1295c5330d09fdc50f6dee",
+    "http_status": 503,
+    "response_time_ms": 4621,
+    "user_id": "usr-be81672484d6"
+  },
+  {
+    "timestamp": "2026-04-13T02:02:41Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "e6f8a2886b32ec04d21482557b3abc2b",
+    "http_status": 400,
+    "response_time_ms": 4219
+  },
+  {
+    "timestamp": "2026-04-28T15:44:15Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Stock faible pour le produit",
+    "trace_id": "9d9cf5f164668d563078150da6070d18",
+    "http_status": 200,
+    "response_time_ms": 1182,
+    "user_id": "usr-c49b26e7d493"
+  },
+  {
+    "timestamp": "2026-05-03T02:31:04Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "7d9f66b4e27dbe6832d972102aa6f780",
+    "http_status": 201,
+    "response_time_ms": 1656
+  },
+  {
+    "timestamp": "2026-04-06T21:22:02Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "2f7d1ee1ec1d46eb109d0e7a3bc43099",
+    "http_status": 200,
+    "response_time_ms": 2551,
+    "user_id": "usr-9c91e9fbad11"
+  },
+  {
+    "timestamp": "2026-04-15T04:32:27Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Recommandations générées",
+    "trace_id": "88a9b29a26ad99097e7dbc41269a6363",
+    "http_status": 500,
+    "response_time_ms": 1457,
+    "user_id": "usr-3b860c8835bc"
+  },
+  {
+    "timestamp": "2026-05-04T14:42:54Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "19914e620c1d6869be43c3df284dd6ca",
+    "http_status": 429,
+    "response_time_ms": 857
+  },
+  {
+    "timestamp": "2026-04-30T10:57:05Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recommandations générées",
+    "trace_id": "c013150626f13b5629900cc361dc708d",
+    "http_status": 200,
+    "response_time_ms": 4739,
+    "user_id": "usr-c0ed6ac578ff"
+  },
+  {
+    "timestamp": "2026-04-14T09:39:33Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Données synchronisées",
+    "trace_id": "780204df1f37bbe2e3fd0bdf30aa22b7",
+    "http_status": 429,
+    "response_time_ms": 2498,
+    "user_id": "usr-dc6b75f863e4"
+  },
+  {
+    "timestamp": "2026-04-16T02:37:16Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Cache actualisé",
+    "trace_id": "67e38990aec1bb32b7838a5faf6b5621",
+    "http_status": 401,
+    "response_time_ms": 3827,
+    "user_id": "usr-b13d84290d38"
+  },
+  {
+    "timestamp": "2026-04-06T09:17:08Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "81378ece6c7d9970fa75b1840c689f63",
+    "http_status": 503,
+    "response_time_ms": 2546,
+    "user_id": "usr-2748889fe3d3"
+  },
+  {
+    "timestamp": "2026-04-10T19:25:41Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "a8dc77b20dc1e3a5acea41dab413f6ac",
+    "http_status": 200,
+    "response_time_ms": 4098,
+    "user_id": "usr-50b782dbee0a"
+  },
+  {
+    "timestamp": "2026-04-27T00:56:45Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Cache actualisé",
+    "trace_id": "d3eec32bf76ec49321b525f6a81ea30f",
+    "http_status": 200,
+    "response_time_ms": 2458,
+    "user_id": "usr-c220025d6885"
+  },
+  {
+    "timestamp": "2026-04-11T16:10:06Z",
+    "level": "WARN",
+    "service": "notification-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "5db5a5b7e04497c171c6ddc4dd8cffae",
+    "http_status": 401,
+    "response_time_ms": 2297,
+    "user_id": "usr-6852158567ba"
+  },
+  {
+    "timestamp": "2026-04-12T00:58:45Z",
+    "level": "ERROR",
+    "service": "payment-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "f709903f5b60066e937ee93a3fa31dd0",
+    "http_status": 200,
+    "response_time_ms": 4153,
+    "user_id": "usr-83e37d130234"
+  },
+  {
+    "timestamp": "2026-04-22T15:20:36Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "3a43e3480338e75855bf4b97ba7ad23c",
+    "http_status": 404,
+    "response_time_ms": 4139,
+    "user_id": "usr-518ef59220aa"
+  },
+  {
+    "timestamp": "2026-05-03T03:51:48Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Commande créée",
+    "trace_id": "1a6c9df83903e6e4ce06d31a5108346c",
+    "http_status": 201,
+    "response_time_ms": 4097
+  },
+  {
+    "timestamp": "2026-05-01T15:11:03Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Cache actualisé",
+    "trace_id": "09bb6add1288989b63eee52ee665ba95",
+    "http_status": 503,
+    "response_time_ms": 771
+  },
+  {
+    "timestamp": "2026-04-29T10:36:17Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Tentative de connexion suspecte",
+    "trace_id": "8bd35c96cda41b205b9cbcde1e2c7a5d",
+    "http_status": 403,
+    "response_time_ms": 253
+  },
+  {
+    "timestamp": "2026-04-12T09:36:15Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "948868cccb789f750cd93a299cf2ac69",
+    "http_status": 502,
+    "response_time_ms": 1429,
+    "user_id": "usr-bb3f185f8a66"
+  },
+  {
+    "timestamp": "2026-04-27T15:34:46Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "d80e7e9d8dc169257eff1681245e0efb",
+    "http_status": 401,
+    "response_time_ms": 952
+  },
+  {
+    "timestamp": "2026-04-30T14:44:03Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Stock mis à jour",
+    "trace_id": "0cedbb798989da0d16e090c12eb5f086",
+    "http_status": 401,
+    "response_time_ms": 1917
+  },
+  {
+    "timestamp": "2026-04-07T17:57:01Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Commande créée",
+    "trace_id": "28bf4b7630e7dc844e139f4a9c64b3ef",
+    "http_status": 500,
+    "response_time_ms": 1707,
+    "user_id": "usr-8cae1763cb07"
+  },
+  {
+    "timestamp": "2026-04-23T11:52:01Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "68a8fb02f41ab6d5472cfaebcb9bcf78",
+    "http_status": 200,
+    "response_time_ms": 4104
+  },
+  {
+    "timestamp": "2026-04-06T09:15:28Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Paiement validé",
+    "trace_id": "7345be6394c4b52a042e6a950d9f694d",
+    "http_status": 201,
+    "response_time_ms": 969,
+    "user_id": "usr-9550514c3c20"
+  },
+  {
+    "timestamp": "2026-04-08T04:06:52Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Recommandations générées",
+    "trace_id": "fb99bb2679064d4e01d3ac5df230f813",
+    "http_status": 201,
+    "response_time_ms": 1669,
+    "user_id": "usr-335c316d70db"
+  },
+  {
+    "timestamp": "2026-04-12T18:28:36Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Recherche effectuée",
+    "trace_id": "132d532cb05860c9a5e8658f8ca2c48d",
+    "http_status": 404,
+    "response_time_ms": 350,
+    "user_id": "usr-73c5ee6f14de"
+  },
+  {
+    "timestamp": "2026-04-21T08:26:33Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "bd2811c850c8f369533d3be647325727",
+    "http_status": 200,
+    "response_time_ms": 4964,
+    "user_id": "usr-18e8247eeea7"
+  },
+  {
+    "timestamp": "2026-04-19T09:45:35Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Timeout de la requête",
+    "trace_id": "9bb253c8d8f975f3ef1517a6bceb530e",
+    "http_status": 502,
+    "response_time_ms": 1115
+  },
+  {
+    "timestamp": "2026-04-26T19:44:11Z",
+    "level": "DEBUG",
+    "service": "search-service",
+    "message": "Appel SQL exécuté",
+    "trace_id": "836721bdf8401288d9bc4e3e925ce34d"
+  },
+  {
+    "timestamp": "2026-04-08T22:24:58Z",
+    "level": "ERROR",
+    "service": "payment-service",
+    "message": "Erreur de connexion à la base de données",
+    "trace_id": "aa804eef50912522187a505dced92710",
+    "http_status": 200,
+    "response_time_ms": 3945
+  },
+  {
+    "timestamp": "2026-04-06T11:12:11Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Stock faible pour le produit",
+    "trace_id": "994942560e666ef6d3d6a20272a78561",
+    "http_status": 429,
+    "response_time_ms": 2791,
+    "user_id": "usr-e53c20fcd5cb"
+  },
+  {
+    "timestamp": "2026-04-15T19:17:38Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Stock mis à jour",
+    "trace_id": "847a0dddb6a4578983f3041e992a212b",
+    "http_status": 400,
+    "response_time_ms": 1250,
+    "user_id": "usr-0fa866240914"
+  },
+  {
+    "timestamp": "2026-04-16T07:13:55Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Données synchronisées",
+    "trace_id": "88faf66e845df6b6402e1793c5678fdd",
+    "http_status": 429,
+    "response_time_ms": 2912,
+    "user_id": "usr-ffeb0722d90a"
+  },
+  {
+    "timestamp": "2026-05-03T09:26:54Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Cache actualisé",
+    "trace_id": "f08056e9f1b2e9459cdd049f6d38a9ff",
+    "http_status": 403,
+    "response_time_ms": 1190,
+    "user_id": "usr-6833f0c4516a"
+  },
+  {
+    "timestamp": "2026-04-26T07:02:53Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Paiement validé",
+    "trace_id": "644d80690ee43061eaac1b03fe359e9a",
+    "http_status": 200,
+    "response_time_ms": 2581,
+    "user_id": "usr-c1b91da2518a"
+  },
+  {
+    "timestamp": "2026-05-01T06:58:08Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Stock mis à jour",
+    "trace_id": "1ee302867c61f55835aecb0595095f83",
+    "http_status": 201,
+    "response_time_ms": 3805
+  },
+  {
+    "timestamp": "2026-04-09T16:19:15Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "b8e72b6ea48f39826ca807e415a4ff35",
+    "http_status": 500,
+    "response_time_ms": 2256,
+    "user_id": "usr-33ab72999f20"
+  },
+  {
+    "timestamp": "2026-04-14T12:43:15Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Stock mis à jour",
+    "trace_id": "75f4172619e96a1fb5cfc6b89bb0880c",
+    "http_status": 502,
+    "response_time_ms": 1114,
+    "user_id": "usr-455b8db7ba68"
+  },
+  {
+    "timestamp": "2026-04-22T05:37:43Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Données synchronisées",
+    "trace_id": "593ff9f779126bcd53b0f8415ae3459f",
+    "http_status": 500,
+    "response_time_ms": 403,
+    "user_id": "usr-7398f3da7c1f"
+  },
+  {
+    "timestamp": "2026-04-15T11:12:36Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Session démarrée",
+    "trace_id": "939e591b8a313c64a574fd49c52d5eeb",
+    "http_status": 403,
+    "response_time_ms": 4230,
+    "user_id": "usr-2bd31bb43ebf"
+  },
+  {
+    "timestamp": "2026-05-01T21:46:49Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "54e3ba203346ceb841c130e542d02d69",
+    "http_status": 502,
+    "response_time_ms": 1523,
+    "user_id": "usr-affc1da2cb56"
+  },
+  {
+    "timestamp": "2026-05-03T04:20:47Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "18a86e48aff2dd2bea3e07cc5d38fecd",
+    "http_status": 204,
+    "response_time_ms": 1699,
+    "user_id": "usr-c032ccfad077"
+  },
+  {
+    "timestamp": "2026-05-03T18:42:38Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recherche effectuée",
+    "trace_id": "b57cb6d8736bc2d8ed1d9c7ef229a77a",
+    "http_status": 500,
+    "response_time_ms": 19,
+    "user_id": "usr-a9b2b0128248"
+  },
+  {
+    "timestamp": "2026-05-03T08:53:09Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "cd9d78f871d28f6750cf7008dd2d7baa",
+    "http_status": 404,
+    "response_time_ms": 2970
+  },
+  {
+    "timestamp": "2026-05-01T16:00:44Z",
+    "level": "ERROR",
+    "service": "search-service",
+    "message": "Paiement refusé",
+    "trace_id": "ea8469540dc524741c2570ba254f2166",
+    "http_status": 429,
+    "response_time_ms": 252,
+    "user_id": "usr-5e691bf45b68"
+  },
+  {
+    "timestamp": "2026-04-09T04:45:27Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Timeout de la requête",
+    "trace_id": "4fae252341f2b49783de7d04ae1cc84b",
+    "http_status": 500,
+    "response_time_ms": 717,
+    "user_id": "usr-80367fd57a8f"
+  },
+  {
+    "timestamp": "2026-04-23T01:06:29Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "dedaa5817ae6b793444f53a9a1cae03d",
+    "http_status": 500,
+    "response_time_ms": 2410,
+    "user_id": "usr-37299c46e0b6"
+  },
+  {
+    "timestamp": "2026-04-17T18:15:42Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "b2ebeb7ff71a11de191087d2a6539237",
+    "http_status": 200,
+    "response_time_ms": 1490
+  },
+  {
+    "timestamp": "2026-04-18T15:52:53Z",
+    "level": "DEBUG",
+    "service": "user-service",
+    "message": "Résultat du cache",
+    "trace_id": "06dadc97346be8ff85b169d98fee3e86",
+    "user_id": "usr-4bee709af947"
+  },
+  {
+    "timestamp": "2026-04-19T20:41:27Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Session démarrée",
+    "trace_id": "2de8b40e6fe7afca98e0d39186642de3",
+    "http_status": 503,
+    "response_time_ms": 2806,
+    "user_id": "usr-18a793abc6c0"
+  },
+  {
+    "timestamp": "2026-04-15T07:15:41Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "1bda1e1f611af0c12039e287b8f5f64b",
+    "http_status": 429,
+    "response_time_ms": 3256,
+    "user_id": "usr-2309ec7478e0"
+  },
+  {
+    "timestamp": "2026-04-22T09:15:39Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "b7119b4d9e8feed269729768d0678895",
+    "http_status": 401,
+    "response_time_ms": 3231
+  },
+  {
+    "timestamp": "2026-04-07T05:24:46Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "c88da395a3f1259b17a7082d796aeeff",
+    "http_status": 200,
+    "response_time_ms": 1723
+  },
+  {
+    "timestamp": "2026-04-10T15:35:32Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Recommandations générées",
+    "trace_id": "0c1a47b446585c1d249884c135bf0e81",
+    "http_status": 429,
+    "response_time_ms": 3999,
+    "user_id": "usr-8777589254ad"
+  },
+  {
+    "timestamp": "2026-04-06T23:34:28Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Timeout de la requête",
+    "trace_id": "ebc3b3e327a05cb74600afb217cfa623",
+    "http_status": 200,
+    "response_time_ms": 4241,
+    "user_id": "usr-b7530f51c977"
+  },
+  {
+    "timestamp": "2026-04-28T02:00:43Z",
+    "level": "ERROR",
+    "service": "inventory-service",
+    "message": "Service indisponible",
+    "trace_id": "24780efaa2fbc1018a9e99f7dcafd462",
+    "http_status": 502,
+    "response_time_ms": 1503,
+    "user_id": "usr-ffc6a7d0ab22"
+  },
+  {
+    "timestamp": "2026-04-24T02:48:21Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Recherche effectuée",
+    "trace_id": "f7a3427d0eb57b6e974983bdf193f2db",
+    "http_status": 200,
+    "response_time_ms": 3688,
+    "user_id": "usr-513725a31f56"
+  },
+  {
+    "timestamp": "2026-04-17T12:41:12Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "c7f8187c21b7a56c8465770099aabf93",
+    "http_status": 204,
+    "response_time_ms": 307
+  },
+  {
+    "timestamp": "2026-04-28T19:26:26Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "2aceb6163fae510232633bf37757d638",
+    "http_status": 200,
+    "response_time_ms": 1016
+  },
+  {
+    "timestamp": "2026-04-23T08:11:11Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Recommandations générées",
+    "trace_id": "4a743b2c58d8ab18a27d0b9e494c4885",
+    "http_status": 403,
+    "response_time_ms": 2578,
+    "user_id": "usr-8c780376f5c2"
+  },
+  {
+    "timestamp": "2026-04-11T21:09:33Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "23a2721edeb3006521c5efa8f0e9e274",
+    "http_status": 400,
+    "response_time_ms": 3169,
+    "user_id": "usr-20629ce21261"
+  },
+  {
+    "timestamp": "2026-05-02T08:35:30Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "cdd6f36f2623e1f55d40bc628fa118a9",
+    "http_status": 403,
+    "response_time_ms": 1833
+  },
+  {
+    "timestamp": "2026-04-29T09:46:41Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recommandations générées",
+    "trace_id": "b9a35d72582fea9fae7d51a79a54a3f0",
+    "http_status": 200,
+    "response_time_ms": 1979,
+    "user_id": "usr-4c6f00a49dd8"
+  },
+  {
+    "timestamp": "2026-05-03T17:03:28Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Stock mis à jour",
+    "trace_id": "e35b6a34aed68d6427695dcf5a7655f5",
+    "http_status": 201,
+    "response_time_ms": 2820,
+    "user_id": "usr-0f95ead88e44"
+  },
+  {
+    "timestamp": "2026-04-10T22:57:26Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Session démarrée",
+    "trace_id": "d0ab3720f98dcbbb2f6fbd0c778a3e70",
+    "http_status": 500,
+    "response_time_ms": 2140
+  },
+  {
+    "timestamp": "2026-04-20T08:24:11Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "28784f1d28327fd0c9390edb5b72f9a1",
+    "http_status": 201,
+    "response_time_ms": 3590,
+    "user_id": "usr-b51e343bfc2b"
+  },
+  {
+    "timestamp": "2026-04-26T07:22:02Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Commande créée",
+    "trace_id": "030ae452fa35393d3f1c21a1b4f0ddf8",
+    "http_status": 201,
+    "response_time_ms": 1817,
+    "user_id": "usr-8657d47ceb42"
+  },
+  {
+    "timestamp": "2026-05-04T23:12:15Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Recherche effectuée",
+    "trace_id": "e56246eadbd401319425b9c437243266",
+    "http_status": 500,
+    "response_time_ms": 1629,
+    "user_id": "usr-fcf11328ae46"
+  },
+  {
+    "timestamp": "2026-04-14T04:54:58Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Paiement validé",
+    "trace_id": "1ea6f0b9cf3baa6c0d5ad47249af2a7c",
+    "http_status": 201,
+    "response_time_ms": 3369,
+    "user_id": "usr-f0125c1ed544"
+  },
+  {
+    "timestamp": "2026-05-02T18:58:52Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Requête traitée avec succès",
+    "trace_id": "4a6cd2ee69b3b619102a613db230ec60",
+    "http_status": 204,
+    "response_time_ms": 2589,
+    "user_id": "usr-0c8a20341c16"
+  },
+  {
+    "timestamp": "2026-05-02T12:10:53Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Paiement validé",
+    "trace_id": "d68e90c94a34861a0a67181b263ae4f6",
+    "http_status": 400,
+    "response_time_ms": 2670,
+    "user_id": "usr-808f667befb3"
+  },
+  {
+    "timestamp": "2026-04-18T16:19:14Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "c681e875cd4ff298602ac61daa6aa27d",
+    "http_status": 502,
+    "response_time_ms": 4185
+  },
+  {
+    "timestamp": "2026-04-25T09:24:43Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Recommandations générées",
+    "trace_id": "0752d8f03f9dc5e3fa1cf06b2cbe6ec3",
+    "http_status": 500,
+    "response_time_ms": 2460,
+    "user_id": "usr-82af2d8fd8d5"
+  },
+  {
+    "timestamp": "2026-05-01T06:56:59Z",
+    "level": "WARN",
+    "service": "user-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "8c546e26c1940a48171773fbc4bc88dd",
+    "http_status": 200,
+    "response_time_ms": 790
+  },
+  {
+    "timestamp": "2026-04-14T16:19:19Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "2abfbafeec1ebdf3b6c1a0b97a6b1ac8",
+    "http_status": 401,
+    "response_time_ms": 3284
+  },
+  {
+    "timestamp": "2026-04-22T19:37:16Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Stock mis à jour",
+    "trace_id": "2b37f1229e0d4d834d454ffb98f7a69a",
+    "http_status": 502,
+    "response_time_ms": 4417,
+    "user_id": "usr-669c38a4c641"
+  },
+  {
+    "timestamp": "2026-04-16T08:08:01Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Paiement validé",
+    "trace_id": "4112c12c23405393614f9504038f5941",
+    "http_status": 401,
+    "response_time_ms": 3741,
+    "user_id": "usr-e843b603b4d1"
+  },
+  {
+    "timestamp": "2026-04-29T21:08:22Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "6591cb86a7c4446ed5e7425f56e779f5",
+    "http_status": 403,
+    "response_time_ms": 3902,
+    "user_id": "usr-86b21fe2c177"
+  },
+  {
+    "timestamp": "2026-04-24T17:24:10Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Session démarrée",
+    "trace_id": "2f99f129669d5e77475a4505b9355e22",
+    "http_status": 404,
+    "response_time_ms": 2756,
+    "user_id": "usr-f4dd6251d0f7"
+  },
+  {
+    "timestamp": "2026-04-10T08:47:20Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "4a421e4e37b2554131f850bb21055ce7",
+    "http_status": 404,
+    "response_time_ms": 3094,
+    "user_id": "usr-fa3524b0fbb3"
+  },
+  {
+    "timestamp": "2026-04-09T06:47:18Z",
+    "level": "DEBUG",
+    "service": "payment-service",
+    "message": "Appel SQL exécuté",
+    "trace_id": "8dfad146a4f9c644a95e785a4dfad068",
+    "user_id": "usr-cda86f218742"
+  },
+  {
+    "timestamp": "2026-04-12T16:31:30Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "64b263360c6d7fb43201dae7ec9259a5",
+    "http_status": 503,
+    "response_time_ms": 2050,
+    "user_id": "usr-17dae2be2dad"
+  },
+  {
+    "timestamp": "2026-04-15T13:59:10Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "2648db2e16762d9b2862c9683e290896",
+    "http_status": 200,
+    "response_time_ms": 3486,
+    "user_id": "usr-0a3cda318e7a"
+  },
+  {
+    "timestamp": "2026-04-27T16:03:12Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "0ddac96f95a6b43822f5297c22596763",
+    "http_status": 403,
+    "response_time_ms": 1870,
+    "user_id": "usr-3445d95ec635"
+  },
+  {
+    "timestamp": "2026-04-20T00:51:11Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Stock mis à jour",
+    "trace_id": "9501a990532e4482442e3db4b59b5a00",
+    "http_status": 503,
+    "response_time_ms": 4867,
+    "user_id": "usr-99f8a40663b0"
+  },
+  {
+    "timestamp": "2026-04-24T03:59:48Z",
+    "level": "ERROR",
+    "service": "api-gateway",
+    "message": "Erreur d'authentification",
+    "trace_id": "c01c64f8b84b45db23a2815487eeb7fc",
+    "http_status": 400,
+    "response_time_ms": 4393
+  },
+  {
+    "timestamp": "2026-04-24T01:58:09Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Service indisponible",
+    "trace_id": "8040c0eae1407db06631ad56bf478b7c",
+    "http_status": 429,
+    "response_time_ms": 3019,
+    "user_id": "usr-fffc24c65826"
+  },
+  {
+    "timestamp": "2026-04-20T18:29:17Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Cache actualisé",
+    "trace_id": "3d9797b2752fee3974c8c652d68e17f9",
+    "http_status": 204,
+    "response_time_ms": 3910
+  },
+  {
+    "timestamp": "2026-04-06T06:08:12Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Cache actualisé",
+    "trace_id": "41fb0b20fa3d03023aff87902c88a450",
+    "http_status": 201,
+    "response_time_ms": 1281,
+    "user_id": "usr-3ecb3a55a4aa"
+  },
+  {
+    "timestamp": "2026-04-25T11:19:43Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Commande créée",
+    "trace_id": "6bf6db417a0ca2135e45726497f8f578",
+    "http_status": 403,
+    "response_time_ms": 1575,
+    "user_id": "usr-a1c7221b2693"
+  },
+  {
+    "timestamp": "2026-04-14T02:47:24Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "af45d65d99ee0e16efeb046e014eae50",
+    "http_status": 503,
+    "response_time_ms": 4573
+  },
+  {
+    "timestamp": "2026-04-28T02:47:58Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Cache actualisé",
+    "trace_id": "2abc41e4309ee7b73b11591374beff61",
+    "http_status": 502,
+    "response_time_ms": 3674,
+    "user_id": "usr-59989da0b24c"
+  },
+  {
+    "timestamp": "2026-04-16T04:30:51Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Commande créée",
+    "trace_id": "6b30794272176056fe23a7e974234c98",
+    "http_status": 502,
+    "response_time_ms": 187
+  },
+  {
+    "timestamp": "2026-04-24T11:40:08Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Stock mis à jour",
+    "trace_id": "e9c9d3893556ab4f138983ee61759c75",
+    "http_status": 503,
+    "response_time_ms": 1890,
+    "user_id": "usr-80dddeb4d964"
+  },
+  {
+    "timestamp": "2026-04-06T02:31:43Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "da30a6887b217c5eca0069c0ad7723b3",
+    "http_status": 401,
+    "response_time_ms": 4273
+  },
+  {
+    "timestamp": "2026-04-24T14:57:14Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Stock mis à jour",
+    "trace_id": "c5725492ee811c8d9f485f381c8458d1",
+    "http_status": 200,
+    "response_time_ms": 1332,
+    "user_id": "usr-1d491f01c91b"
+  },
+  {
+    "timestamp": "2026-04-24T17:15:07Z",
+    "level": "WARN",
+    "service": "api-gateway",
+    "message": "Timeout de connexion à la base de données",
+    "trace_id": "badec5abf18db18add4b0bc6115d533b",
+    "http_status": 403,
+    "response_time_ms": 2552
+  },
+  {
+    "timestamp": "2026-04-25T00:20:25Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "d6ea6acc2e399ef0fe9a3ca6f3ebdd91",
+    "http_status": 200,
+    "response_time_ms": 476,
+    "user_id": "usr-922e2a5667c1"
+  },
+  {
+    "timestamp": "2026-05-01T23:27:33Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Session démarrée",
+    "trace_id": "091a0d3798e0e1a504c201e1300aaaa6",
+    "http_status": 429,
+    "response_time_ms": 608
+  },
+  {
+    "timestamp": "2026-04-22T20:34:41Z",
+    "level": "WARN",
+    "service": "recommendation-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "b97cd27fd7eb4448ee439dc293c3e4e4",
+    "http_status": 200,
+    "response_time_ms": 419,
+    "user_id": "usr-276a62933f74"
+  },
+  {
+    "timestamp": "2026-04-16T10:07:28Z",
+    "level": "FATAL",
+    "service": "api-gateway",
+    "message": "Crash de l'application",
+    "trace_id": "1398979890c1d666c35cf9811a344611",
+    "http_status": 204,
+    "response_time_ms": 3086,
+    "user_id": "usr-381b0013c8f1"
+  },
+  {
+    "timestamp": "2026-04-15T15:04:52Z",
+    "level": "ERROR",
+    "service": "user-service",
+    "message": "Erreur de connexion à la base de données",
+    "trace_id": "1c4dd056bba559433f78c9e4c3452a15",
+    "http_status": 200,
+    "response_time_ms": 358
+  },
+  {
+    "timestamp": "2026-04-11T15:48:43Z",
+    "level": "ERROR",
+    "service": "search-service",
+    "message": "Erreur d'authentification",
+    "trace_id": "9a426a1ddd6f773034970262ca4c8d1b",
+    "http_status": 403,
+    "response_time_ms": 4333,
+    "user_id": "usr-97668d943e39"
+  },
+  {
+    "timestamp": "2026-05-01T12:48:55Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "94ab72d8314c48d66916e0746fced828",
+    "http_status": 503,
+    "response_time_ms": 2551
+  },
+  {
+    "timestamp": "2026-04-20T11:28:49Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "195838fb8f01cca4ea7732a1366cddf7",
+    "http_status": 404,
+    "response_time_ms": 4751
+  },
+  {
+    "timestamp": "2026-05-03T07:07:58Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "052f23b6c1f302c79cad2e66ba63f00f",
+    "http_status": 200,
+    "response_time_ms": 3752
+  },
+  {
+    "timestamp": "2026-04-30T22:48:06Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Produit ajouté au panier",
+    "trace_id": "3756f0623fe23b04876df6525a31e3bb",
+    "http_status": 404,
+    "response_time_ms": 285,
+    "user_id": "usr-fe7399278b02"
+  },
+  {
+    "timestamp": "2026-05-04T18:57:06Z",
+    "level": "WARN",
+    "service": "search-service",
+    "message": "Quota API presque atteint",
+    "trace_id": "2477c44f0f314b1c178d97051415ab9e",
+    "http_status": 500,
+    "response_time_ms": 1242
+  },
+  {
+    "timestamp": "2026-04-26T02:27:44Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "53a6594f1c84953db96bea5cc31119ab",
+    "http_status": 400,
+    "response_time_ms": 3292,
+    "user_id": "usr-d582d52ecdf2"
+  },
+  {
+    "timestamp": "2026-04-16T21:36:52Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Email de confirmation envoyé",
+    "trace_id": "e06b751a6bd8f042e7b846d304cd74f9",
+    "http_status": 403,
+    "response_time_ms": 1759,
+    "user_id": "usr-b57852f45937"
+  },
+  {
+    "timestamp": "2026-04-27T20:50:11Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Paiement validé",
+    "trace_id": "c5baafd9e831aec7782cc1137c1e14bc",
+    "http_status": 503,
+    "response_time_ms": 3290,
+    "user_id": "usr-a9816b5ece1a"
+  },
+  {
+    "timestamp": "2026-04-16T08:29:26Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "3ba2c81c7392d22c5b898c0a25bc75e9",
+    "http_status": 503,
+    "response_time_ms": 1516
+  },
+  {
+    "timestamp": "2026-04-08T06:14:57Z",
+    "level": "INFO",
+    "service": "product-service",
+    "message": "Commande créée",
+    "trace_id": "faf93a02cedc3aca3a37f667cc4a8c75",
+    "http_status": 200,
+    "response_time_ms": 4478,
+    "user_id": "usr-f9143d05c17e"
+  },
+  {
+    "timestamp": "2026-04-25T16:41:41Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Commande créée",
+    "trace_id": "f3cae8125c1c87c6e634c06810f9a2de",
+    "http_status": 404,
+    "response_time_ms": 2309,
+    "user_id": "usr-0516bbbbb117"
+  },
+  {
+    "timestamp": "2026-05-05T01:04:56Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Recherche effectuée",
+    "trace_id": "b99d868bc4600a1ca640a4a66009c0cf",
+    "http_status": 401,
+    "response_time_ms": 242,
+    "user_id": "usr-143ee1ca9448"
+  },
+  {
+    "timestamp": "2026-04-25T07:49:09Z",
+    "level": "INFO",
+    "service": "notification-service",
+    "message": "Stock mis à jour",
+    "trace_id": "5d00ebf8b513a3d3eb1f8d733d86b8eb",
+    "http_status": 200,
+    "response_time_ms": 4061
+  },
+  {
+    "timestamp": "2026-05-01T15:54:07Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Données synchronisées",
+    "trace_id": "638c48b39ee520601dc8354459953481",
+    "http_status": 401,
+    "response_time_ms": 4725,
+    "user_id": "usr-cd84af421542"
+  },
+  {
+    "timestamp": "2026-04-11T07:22:21Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Recherche effectuée",
+    "trace_id": "607cf40967077448148e3e9f5b468c82",
+    "http_status": 200,
+    "response_time_ms": 672,
+    "user_id": "usr-b5694db6ee52"
+  },
+  {
+    "timestamp": "2026-04-11T18:55:49Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Paiement validé",
+    "trace_id": "936a6d7ff42f4359e10a77a955480553",
+    "http_status": 502,
+    "response_time_ms": 2300,
+    "user_id": "usr-146bec8e838c"
+  },
+  {
+    "timestamp": "2026-04-10T10:58:37Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "4810f9654fb70a85f3f5f7052f189a21",
+    "http_status": 403,
+    "response_time_ms": 1615,
+    "user_id": "usr-6d9263468424"
+  },
+  {
+    "timestamp": "2026-04-29T10:04:59Z",
+    "level": "INFO",
+    "service": "user-service",
+    "message": "Cache actualisé",
+    "trace_id": "06695508c94dcd66931e0fcd2a79445d",
+    "http_status": 502,
+    "response_time_ms": 1446
+  },
+  {
+    "timestamp": "2026-04-30T10:01:29Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Session démarrée",
+    "trace_id": "5ed9671feb5222b849b01213cb1b4dc4",
+    "http_status": 500,
+    "response_time_ms": 4749
+  },
+  {
+    "timestamp": "2026-04-09T04:29:17Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "9f771973ba95a9a070815554710f5809",
+    "http_status": 201,
+    "response_time_ms": 763,
+    "user_id": "usr-1d391b9ad09d"
+  },
+  {
+    "timestamp": "2026-04-14T20:24:30Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "69d48f935109c08838b8c0752af2e0e9",
+    "http_status": 429,
+    "response_time_ms": 203
+  },
+  {
+    "timestamp": "2026-04-09T14:23:37Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Session démarrée",
+    "trace_id": "230f9a2be9ff9c4cf4111a400d6328e9",
+    "http_status": 429,
+    "response_time_ms": 2536,
+    "user_id": "usr-ded775a1856c"
+  },
+  {
+    "timestamp": "2026-04-15T19:26:38Z",
+    "level": "INFO",
+    "service": "inventory-service",
+    "message": "Cache actualisé",
+    "trace_id": "4a565d4bf95eb4ffe77e3109b7d6834c",
+    "http_status": 400,
+    "response_time_ms": 2202,
+    "user_id": "usr-09ff06e9f53c"
+  },
+  {
+    "timestamp": "2026-04-23T06:11:18Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recherche effectuée",
+    "trace_id": "19a2996310640736b1713f3f57b62002",
+    "http_status": 204,
+    "response_time_ms": 1511,
+    "user_id": "usr-1269b94ab9c8"
+  },
+  {
+    "timestamp": "2026-04-21T04:13:04Z",
+    "level": "WARN",
+    "service": "cart-service",
+    "message": "Certificat SSL bientôt expiré",
+    "trace_id": "270d1fcd284024023612265ada378544",
+    "http_status": 502,
+    "response_time_ms": 2522,
+    "user_id": "usr-5270222a1835"
+  },
+  {
+    "timestamp": "2026-04-06T21:53:46Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Données synchronisées",
+    "trace_id": "707ffdc3154b16815126574d741f201a",
+    "http_status": 201,
+    "response_time_ms": 650,
+    "user_id": "usr-f18767988dab"
+  },
+  {
+    "timestamp": "2026-05-05T18:08:51Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Session démarrée",
+    "trace_id": "6535cfc3b5d27e187e859869064584c1",
+    "http_status": 200,
+    "response_time_ms": 2174,
+    "user_id": "usr-e1584d4c7c85"
+  },
+  {
+    "timestamp": "2026-04-27T20:29:12Z",
+    "level": "DEBUG",
+    "service": "recommendation-service",
+    "message": "Appel SQL exécuté",
+    "trace_id": "85a267df17e350f91c44c3dd6b997a5f",
+    "user_id": "usr-3ea4603dd99d"
+  },
+  {
+    "timestamp": "2026-05-05T10:11:17Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Requête traitée avec succès",
+    "trace_id": "c5858ca0287bb5489be31b006ffcd7f3",
+    "http_status": 204,
+    "response_time_ms": 2873,
+    "user_id": "usr-608b48e2514c"
+  },
+  {
+    "timestamp": "2026-04-13T04:37:48Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "adcf61936bc0c4a49ec3789b5fd600d0",
+    "http_status": 200,
+    "response_time_ms": 3439,
+    "user_id": "usr-53237d1fcdfe"
+  },
+  {
+    "timestamp": "2026-04-10T17:22:47Z",
+    "level": "INFO",
+    "service": "search-service",
+    "message": "Session démarrée",
+    "trace_id": "66389205dedc21bb9a660e3fba99662e",
+    "http_status": 500,
+    "response_time_ms": 3041,
+    "user_id": "usr-bee78314db68"
+  },
+  {
+    "timestamp": "2026-04-06T02:17:39Z",
+    "level": "ERROR",
+    "service": "product-service",
+    "message": "Timeout de la requête",
+    "trace_id": "3cbc6747bed94058acd374acbd28ad69",
+    "http_status": 404,
+    "response_time_ms": 4068
+  },
+  {
+    "timestamp": "2026-04-24T19:06:16Z",
+    "level": "DEBUG",
+    "service": "api-gateway",
+    "message": "Résultat du cache",
+    "trace_id": "ee8e767abd5883bf4f463b911f68f17a",
+    "user_id": "usr-bbb0759525f1"
+  },
+  {
+    "timestamp": "2026-04-09T09:00:37Z",
+    "level": "INFO",
+    "service": "payment-service",
+    "message": "Recherche effectuée",
+    "trace_id": "ccdfb39fbefbd17ba568331132cde691",
+    "http_status": 429,
+    "response_time_ms": 3379,
+    "user_id": "usr-0f3c525f677f"
+  },
+  {
+    "timestamp": "2026-04-13T20:05:12Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "6266c294fcc546ac1494fb06858ef76d",
+    "http_status": 404,
+    "response_time_ms": 12
+  },
+  {
+    "timestamp": "2026-04-17T16:17:08Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Produit ajouté au panier",
+    "trace_id": "529a1be661989b262ea9a35e2567a6a6",
+    "http_status": 500,
+    "response_time_ms": 3004
+  },
+  {
+    "timestamp": "2026-05-04T22:01:58Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Utilisateur connecté",
+    "trace_id": "5a2429586ae96857f399219e611a7aa0",
+    "http_status": 201,
+    "response_time_ms": 676,
+    "user_id": "usr-ba816a049d6b"
+  },
+  {
+    "timestamp": "2026-05-04T20:24:15Z",
+    "level": "ERROR",
+    "service": "recommendation-service",
+    "message": "Paiement refusé",
+    "trace_id": "abe132ef7c536bc5637ee17563717ba9",
+    "http_status": 204,
+    "response_time_ms": 4434,
+    "user_id": "usr-19fdee1a573a"
+  },
+  {
+    "timestamp": "2026-04-23T14:31:23Z",
+    "level": "INFO",
+    "service": "recommendation-service",
+    "message": "Stock mis à jour",
+    "trace_id": "e59f7729b6a6c27b51d14cfce3b57ab0",
+    "http_status": 201,
+    "response_time_ms": 1604,
+    "user_id": "usr-34fdcc7bbcde"
+  },
+  {
+    "timestamp": "2026-04-27T10:45:30Z",
+    "level": "WARN",
+    "service": "payment-service",
+    "message": "Taux d'erreur en hausse",
+    "trace_id": "96a156ce586406f6319342fe4e587d7b",
+    "http_status": 403,
+    "response_time_ms": 3966,
+    "user_id": "usr-97a287b2a102"
+  },
+  {
+    "timestamp": "2026-04-15T01:02:30Z",
+    "level": "DEBUG",
+    "service": "product-service",
+    "message": "Appel SQL exécuté",
+    "trace_id": "65afe0da94f53672e347c6c9b22bcbaf"
+  },
+  {
+    "timestamp": "2026-04-16T08:41:43Z",
+    "level": "WARN",
+    "service": "product-service",
+    "message": "Temps de réponse élevé",
+    "trace_id": "96235c7f3029ed36ff8187799b8720d1",
+    "http_status": 201,
+    "response_time_ms": 3059,
+    "user_id": "usr-dde5d1c357a6"
+  },
+  {
+    "timestamp": "2026-04-11T23:41:45Z",
+    "level": "INFO",
+    "service": "cart-service",
+    "message": "Recommandations générées",
+    "trace_id": "018bb7e5b3f92ed065bcbc725a0006ac",
+    "http_status": 429,
+    "response_time_ms": 2608,
+    "user_id": "usr-afc74fdebcfe"
+  },
+  {
+    "timestamp": "2026-04-28T22:56:19Z",
+    "level": "INFO",
+    "service": "api-gateway",
+    "message": "Paiement validé",
+    "trace_id": "94bc4d878dd2ecae13d895580d2adb22",
+    "http_status": 200,
+    "response_time_ms": 2039,
+    "user_id": "usr-01c22b10bceb"
+  },
+  {
+    "timestamp": "2026-04-23T14:42:37Z",
+    "level": "ERROR",
+    "service": "inventory-service",
+    "message": "Timeout de la requête",
+    "trace_id": "2152dc7aa8f60fbf44c60e1bad61acc1",
+    "http_status": 500,
+    "response_time_ms": 3494,
+    "user_id": "usr-93d2d2fc0136"
+  }
+]

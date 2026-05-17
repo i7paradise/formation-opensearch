@@ -1,0 +1,97 @@
+version: "3.8"
+
+# =============================================================================
+# Docker Compose — Noeud unique OpenSearch (Jours 1 & 2)
+# Image : opensearchproject/opensearch:3.6.0
+# Si l'image 3.6.0 n'est pas encore disponible, remplacer par :
+#   image: opensearchproject/opensearch:latest
+# =============================================================================
+
+networks:
+  opensearch-net:
+    driver: bridge
+
+volumes:
+  opensearch-data:
+    driver: local
+
+services:
+  # ---------------------------------------------------------------------------
+  # Noeud OpenSearch unique
+  # ---------------------------------------------------------------------------
+  opensearch:
+    image: opensearchproject/opensearch:3.6.0
+    container_name: opensearch
+    environment:
+      # Mode découverte : noeud unique (pas de formation de cluster)
+      - discovery.type=single-node
+      # Verrouillage mémoire pour de meilleures performances
+      - bootstrap.memory_lock=true
+      # Options JVM — limité pour l'environnement de formation
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      # Désactivation du plugin de sécurité pour simplifier les TPs
+      - DISABLE_SECURITY_PLUGIN=true
+      # Mot de passe administrateur initial (requis même si la sécurité est désactivée)
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Formation@OpenSearch2024!
+    ulimits:
+      # Nécessaire pour le verrouillage mémoire
+      memlock:
+        soft: -1
+        hard: -1
+      # Nombre de fichiers ouverts
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      # API REST OpenSearch
+      - "9200:9200"
+      # Performance Analyzer
+      - "9600:9600"
+    volumes:
+      # Volume persistant pour les données OpenSearch
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - opensearch-net
+    healthcheck:
+      # Vérifie l'état du cluster toutes les 10s, timeout 5s, 12 essais max
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # OpenSearch Dashboards — Interface graphique
+  # ---------------------------------------------------------------------------
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.6.0
+    container_name: opensearch-dashboards
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    environment:
+      # URL du noeud OpenSearch
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      # Désactivation de la sécurité côté Dashboards
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    ports:
+      # Interface web Dashboards
+      - "5601:5601"
+    networks:
+      - opensearch-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:5601/api/status | grep -q '\"state\":\"green\"' || exit 1",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+      start_period: 60s
+    restart: unless-stopped

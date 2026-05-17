@@ -1,0 +1,132 @@
+# =============================================================================
+# Configuration OpenSearch — Kit de formation
+# Ce fichier est monté dans le conteneur via un volume Docker
+# Pour l'utiliser : décommenter la ligne volumes dans docker-compose.yml
+#   volumes:
+#     - ./opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Identité du cluster et du noeud
+# -----------------------------------------------------------------------------
+
+# Nom du cluster — doit être identique sur tous les noeuds d'un même cluster
+cluster.name: formation-opensearch
+
+# Nom unique du noeud dans le cluster
+node.name: node-1
+
+# -----------------------------------------------------------------------------
+# Réseau
+# -----------------------------------------------------------------------------
+
+# Écoute sur toutes les interfaces (nécessaire pour Docker)
+network.host: 0.0.0.0
+
+# Port HTTP pour l'API REST
+http.port: 9200
+
+# Port de transport (communication inter-noeuds)
+# transport.port: 9300
+
+# -----------------------------------------------------------------------------
+# Découverte du cluster (configuration cluster multi-noeuds)
+# Décommenter pour un cluster — remplacer par les noms/IPs réels
+# -----------------------------------------------------------------------------
+
+# Hôtes de découverte — liste des noeuds du cluster
+# discovery.seed_hosts:
+#   - opensearch-node1
+#   - opensearch-node2
+#   - opensearch-node3
+
+# Noeuds master initiaux — seulement pour le premier démarrage du cluster
+# cluster.initial_master_nodes:
+#   - opensearch-node1
+#   - opensearch-node2
+#   - opensearch-node3
+
+# Mode noeud unique (commenter pour passer en mode cluster)
+discovery.type: single-node
+
+# -----------------------------------------------------------------------------
+# Rôles du noeud
+# -----------------------------------------------------------------------------
+
+# En mode cluster, décommenter pour définir les rôles explicitement
+# node.roles:
+#   - master
+#   - data
+#   - ingest
+
+# -----------------------------------------------------------------------------
+# Chemins de données et de logs
+# -----------------------------------------------------------------------------
+
+# Répertoire de stockage des données (par défaut dans Docker : /usr/share/opensearch/data)
+# path.data: /usr/share/opensearch/data
+
+# Répertoire des logs (par défaut dans Docker : /usr/share/opensearch/logs)
+# path.logs: /usr/share/opensearch/logs
+
+# -----------------------------------------------------------------------------
+# Mémoire et performances
+# -----------------------------------------------------------------------------
+
+# Verrouillage de la mémoire pour éviter le swap
+bootstrap.memory_lock: true
+
+# -----------------------------------------------------------------------------
+# Sécurité
+# -----------------------------------------------------------------------------
+
+# Désactivation du plugin de sécurité (mode formation — noeuds 1 & 2)
+# ATTENTION : ne jamais désactiver en production !
+plugins.security.disabled: true
+
+# --- Configuration sécurité cluster (Jour 3) ---
+# Décommenter le bloc ci-dessous et commenter la ligne au-dessus pour activer la sécurité
+
+# plugins.security.disabled: false
+# plugins.security.ssl.transport.pemcert_filepath: esnode.pem
+# plugins.security.ssl.transport.pemkey_filepath: esnode-key.pem
+# plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
+# plugins.security.ssl.transport.enforce_hostname_verification: false
+# plugins.security.ssl.http.enabled: true
+# plugins.security.ssl.http.pemcert_filepath: esnode.pem
+# plugins.security.ssl.http.pemkey_filepath: esnode-key.pem
+# plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
+# plugins.security.allow_unsafe_democertificates: true
+# plugins.security.allow_default_init_securityindex: true
+# plugins.security.authcz.admin_dn: "CN=kirk,OU=client,O=client,L=test,C=de"
+# plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+
+# -----------------------------------------------------------------------------
+# Paramètres HTTP
+# -----------------------------------------------------------------------------
+
+# Compression des réponses HTTP
+http.compression: true
+
+# CORS — utile pour les outils de développement
+# http.cors.enabled: true
+# http.cors.allow-origin: "*"
+# http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
+# http.cors.allow-headers: X-Requested-With, X-Auth-Token, Content-Type, Content-Length, Authorization
+
+# -----------------------------------------------------------------------------
+# Paramètres d'indexation
+# -----------------------------------------------------------------------------
+
+# Nombre de shards primaires par défaut (OpenSearch 3.x : 1 par défaut)
+# index.number_of_shards: 1
+
+# Nombre de réplicas par défaut (0 pour noeud unique, 1+ pour cluster)
+# index.number_of_replicas: 0
+
+# -----------------------------------------------------------------------------
+# Performance Analyzer
+# -----------------------------------------------------------------------------
+
+# Activation du Performance Analyzer (port 9600)
+# performance_analyzer.enabled: true

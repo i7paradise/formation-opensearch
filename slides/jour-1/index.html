@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Formation OpenSearch 3.6 — Jour 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ===================== SLIDE 1 : TITRE ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h1 style="font-size:2.2em;color:#fff;">Formation OpenSearch 3.6</h1>
+  <h2 style="font-size:1.3em;color:#bfdbfe;font-weight:400;">Jour 1 — Fondamentaux &amp; Prise en main</h2>
+  <p style="margin-top:2em;color:#dbeafe;">9h00 – 17h00</p>
+  <aside class="notes">
+    Bienvenue ! Commencez par vous présenter : nom, expérience avec OpenSearch/Elasticsearch, vos projets récents avec la techno. Mentionnez que le cours est en présentiel/distanciel. Timing : 2 min. Transition : "Avant de commencer, faisons un tour de table."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 2 : TOUR DE TABLE ===================== -->
+<section class="slide-content">
+  <h2>Tour de table</h2>
+  <ul style="font-size:0.9em;">
+    <li>Votre prénom et votre rôle</li>
+    <li>Avez-vous déjà utilisé Elasticsearch ou OpenSearch ?</li>
+    <li>Votre stack technique actuelle</li>
+    <li>Ce que vous espérez apprendre cette semaine</li>
+  </ul>
+  <p style="margin-top:1.5em;color:#2563eb;font-style:italic;">~1 minute par personne</p>
+  <aside class="notes">
+    Demandez à chacun de se présenter en 1 min max. Notez les niveaux : certains ont peut-être déjà touché Elasticsearch. Repérez les fast learners (pour les diriger vers les bonus) et les débutants complets (leur accorder plus d'attention). Timing : 20-30 min selon le groupe. Transition : "Maintenant, avant toute théorie, je vais vous montrer ce que vous serez capables de faire à la fin de ces 3 jours."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 3 : PLAN DU JOUR ===================== -->
+<section class="slide-content">
+  <h2>Plan du Jour 1</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
+    <div style="background:#f8fafc;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+      <strong>Matin</strong><br>
+      🎯 Démo live (9h30)<br>
+      📖 CH1 : Introduction &amp; Installation<br>
+      🔧 TP1 : Installation (11h00)<br>
+      📖 Architecture distribuée &amp; Lucene
+    </div>
+    <div style="background:#f8fafc;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+      <strong>Après-midi</strong><br>
+      📖 Chapitre 3a : Fonctionnement<br>
+      🔧 TP2 : CRUD &amp; API (14h15)<br>
+      📖 Chapitre 3b : Query DSL<br>
+      🔧 TP3 : Requêtes (15h45)
+    </div>
+  </div>
+  <aside class="notes">
+    Donnez le plan de la journée. Insistez sur le ratio 40/60 théorie/pratique : "On fera plus de pratique que de cours". Pause déjeuner 12h15-13h30. Timing : 2 min. Transition : "On commence par une démo live — je veux que vous voyiez le résultat final avant la théorie."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 4 : DÉMO LIVE ===================== -->
+<section style="background:#16a34a;color:#fff;">
+  <h2 style="color:#fff;">🎯 Démo Live — Avant la théorie !</h2>
+  <p style="color:#bbf7d0;">Voyons le résultat final de ces 3 jours</p>
+  <pre style="font-size:0.65em;"><code class="language-bash"># Recherche dans 1000+ produits — résultat en < 5ms
+GET /demo-products/_search
+{
+  "query": {
+    "bool": {
+      "must": { "match": { "name": "ordinateur portable" } },
+      "filter": { "term": { "in_stock": true } }
+    }
+  }
+}</code></pre>
+  <p style="color:#d1fae5;font-size:0.8em;">En SQL : <code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px;">WHERE name LIKE '%ordinateur%' AND name LIKE '%portable%' AND in_stock = true</code></p>
+  <aside class="notes">
+    AVANT LA DÉMO : vérifier que le cluster est démarré (docker ps), que demo-products est chargé (seed-data.sh). Gardez des screenshots en fallback. Montrez la réponse JSON complète dans le terminal. Pointez : "_score" (pertinence), "took" (performance), les champs du document. Dites : "En SQL il faudrait un LIKE + JOIN + ORDER BY. Ici c'est une requête, 5 millisecondes, 1000 produits." Timing : 15 min. Transition : "Maintenant on comprend le 'quoi'. On va expliquer le 'comment'."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 5 : CHAPITRE 1 OPENER ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h2 style="color:#fff;">Chapitre 1</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Introduction &amp; Installation</h3>
+  <p style="color:#dbeafe;margin-top:1em;font-style:italic;">"Et si vous pouviez chercher dans des millions de documents en quelques millisecondes ?"</p>
+  <aside class="notes">
+    Diapo de transition. Posez la question rhétorique et laissez quelques secondes de silence. Timing : 30 secondes. Transition : "La réponse, c'est un moteur de recherche distribué. Découvrons OpenSearch, puis on le démarre ensemble."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 6 : CAS D'USAGE ===================== -->
+<section class="slide-content">
+  <h2>Cas d'usage d'OpenSearch</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.85em;">
+    <div style="background:#eff6ff;border-radius:8px;padding:1em;">
+      <strong style="color:#2563eb;">🛍️ E-commerce</strong><br>
+      Recherche produit, autocomplétion, suggestions, filtres facettes
+    </div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:1em;">
+      <strong style="color:#16a34a;">📊 Logs &amp; Observabilité</strong><br>
+      Agrégation de logs, alertes, dashboards ops
+    </div>
+    <div style="background:#faf5ff;border-radius:8px;padding:1em;">
+      <strong style="color:#9333ea;">🔐 SIEM / Sécurité</strong><br>
+      Détection d'anomalies, corrélation d'événements
+    </div>
+    <div style="background:#fff7ed;border-radius:8px;padding:1em;">
+      <strong style="color:#ea580c;">📈 Analytics</strong><br>
+      Rapports temps réel, BI sur données massives
+    </div>
+  </div>
+  <aside class="notes">
+    Donnez un exemple concret pour chaque cas. E-commerce : "Amazon, Cdiscount utilisent des moteurs de recherche similaires." Logs : "C'est l'équivalent de la stack ELK pour les logs." SIEM : "OpenSearch Security Analytics est une solution native." Demandez : "Lequel de ces cas d'usage ressemble à votre projet ?" Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 7 : HISTOIRE ===================== -->
+<section class="slide-content">
+  <h2>Histoire d'OpenSearch</h2>
+  <div style="font-size:0.85em;">
+    <table>
+      <thead><tr><th>Année</th><th>Événement</th></tr></thead>
+      <tbody>
+        <tr><td>2004</td><td>Lucene (Apache) — moteur d'index inversé</td></tr>
+        <tr><td>2010</td><td>Elasticsearch — distribué, REST API, JSON</td></tr>
+        <tr><td>2021</td><td>Elastic change la licence (SSPL) → AWS fork OpenSearch</td></tr>
+        <tr><td>2021</td><td>OpenSearch 1.0 — open source (Apache 2.0)</td></tr>
+        <tr><td>2023</td><td>OpenSearch 2.x — fonctionnalités avancées</td></tr>
+        <tr><td>2025</td><td>OpenSearch 3.x — Lucene 10, performances++</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    Expliquez le contexte : Elastic a changé sa licence en janvier 2021, ce qui a poussé AWS à créer un fork open source. Insistez sur le fait qu'OpenSearch est 100% Apache 2.0 — pas de piège de licence. Lucene 10 (dans OS 3.x) apporte des améliorations significatives sur les vecteurs et les recherches HNSW. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 9 : OPENSEARCH vs ELASTICSEARCH ===================== -->
+<section class="slide-content">
+  <h2>OpenSearch vs Elasticsearch</h2>
+  <div style="font-size:0.8em;">
+    <table>
+      <thead><tr><th>Aspect</th><th>OpenSearch 3.6</th><th>Elasticsearch 8.x</th></tr></thead>
+      <tbody>
+        <tr><td>Licence</td><td style="color:#16a34a;">Apache 2.0 ✓</td><td style="color:#ea580c;">SSPL / Elastic ✗</td></tr>
+        <tr><td>Gratuit</td><td style="color:#16a34a;">Oui (tout)</td><td>Fonctions avancées payantes</td></tr>
+        <tr><td>Security</td><td style="color:#16a34a;">Natif, gratuit</td><td>Payant (Gold+)</td></tr>
+        <tr><td>API</td><td>Compatible ES 7.10</td><td>ES 8.x API</td></tr>
+        <tr><td>Dashboards</td><td>OpenSearch Dashboards</td><td>Kibana (SSPL)</td></tr>
+        <tr><td>Community</td><td style="color:#16a34a;">AWS + communauté</td><td>Elastic Inc.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    Soyez factuel. OpenSearch est sorti du fork ES 7.10. L'API est largement compatible mais pas identique. La grande différence : Security est gratuit et natif dans OpenSearch. Attention : certains clients SDK Elasticsearch ne sont pas 100% compatibles avec OpenSearch — recommandez le SDK officiel OpenSearch. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE : ARCHITECTURE DISTRIBUÉE ===================== -->
+<section class="slide-content">
+  <h2>OpenSearch — Architecture Distribuée</h2>
+  <svg viewBox="0 0 620 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:210px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="arr-b" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#3b82f6"/></marker>
+      <marker id="arr-p" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#7c3aed"/></marker>
+    </defs>
+    <rect x="3" y="3" width="614" height="234" rx="10" fill="#f8fafc" stroke="#2563eb" stroke-width="2" stroke-dasharray="7,3"/>
+    <text x="310" y="22" text-anchor="middle" font-size="12" font-family="Inter,sans-serif" fill="#2563eb" font-weight="bold">Cluster OpenSearch</text>
+    <rect x="18" y="32" width="245" height="185" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="140" y="52" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#1e40af" font-weight="bold">Nœud 1 — Master + Data</text>
+    <rect x="30" y="60" width="220" height="50" rx="5" fill="#2563eb"/>
+    <text x="140" y="80" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">■ Shard P0 (Primary)</text>
+    <text x="140" y="97" text-anchor="middle" font-size="9" font-family="monospace" fill="#bfdbfe">MacBook, iPhone... docs 1–500</text>
+    <rect x="30" y="118" width="220" height="50" rx="5" fill="#7c3aed" opacity="0.8"/>
+    <text x="140" y="138" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">◆ Shard R1 (Replica)</text>
+    <text x="140" y="155" text-anchor="middle" font-size="9" font-family="monospace" fill="#ede9fe">copie de P1 — nœud 2</text>
+    <rect x="358" y="32" width="245" height="185" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+    <text x="480" y="52" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#15803d" font-weight="bold">Nœud 2 — Data</text>
+    <rect x="370" y="60" width="220" height="50" rx="5" fill="#16a34a"/>
+    <text x="480" y="80" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">■ Shard P1 (Primary)</text>
+    <text x="480" y="97" text-anchor="middle" font-size="9" font-family="monospace" fill="#bbf7d0">Dell, Lenovo... docs 501–1000</text>
+    <rect x="370" y="118" width="220" height="50" rx="5" fill="#3b82f6" opacity="0.75"/>
+    <text x="480" y="138" text-anchor="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">◆ Shard R0 (Replica)</text>
+    <text x="480" y="155" text-anchor="middle" font-size="9" font-family="monospace" fill="#dbeafe">copie de P0 — nœud 1</text>
+    <line x1="252" y1="85" x2="366" y2="143" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-b)"/>
+    <line x1="366" y1="85" x2="252" y2="143" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-p)"/>
+    <text x="310" y="232" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#64748b">⚡ Requête → coordinateur → shards P0+P1 en parallèle → agrégation → réponse client</text>
+  </svg>
+  <p style="text-align:center;font-size:0.72em;color:#475569;margin:0.2em 0 0;">
+    <strong style="color:#2563eb;">■ Primary</strong> = source de vérité &nbsp;|&nbsp; <strong style="color:#7c3aed;">◆ Replica</strong> = haute dispo &nbsp;|&nbsp; P et R du même shard ne coexistent <em>jamais</em> sur le même nœud
+  </p>
+  <aside class="notes">
+    Insistez sur deux points : 1) Distribution = scalabilité horizontale. 2) Réplication = haute disponibilité. Les flèches qui se croisent montrent que P0 est répliqué sur N2 et P1 sur N1 — jamais sur le même nœud. Si N1 tombe, N2 a R0 et peut le promouvoir en Primary. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE : PRICING OPENSEARCH ===================== -->
+<section class="slide-content">
+  <h2>OpenSearch — Exemples de Pricing</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7em;font-size:0.78em;">
+    <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:8px;padding:0.8em;">
+      <div style="text-align:center;font-weight:bold;color:#ea580c;margin-bottom:0.5em;">☁️ AWS OpenSearch Service</div>
+      <div style="background:#fed7aa;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>r6g.large</strong> (2 vCPU, 16 GB)<br>~0,17 $/h → <strong>~125 $/mois</strong>
+      </div>
+      <div style="background:#ffedd5;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Multi-AZ ×3 nœuds</strong><br>~375 $/mois + stockage EBS
+      </div>
+      <div style="color:#64748b;font-size:0.85em;">✓ Managé AWS · ✓ Snapshots auto<br>✗ Versions récentes en retard</div>
+    </div>
+    <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:8px;padding:0.8em;">
+      <div style="text-align:center;font-weight:bold;color:#16a34a;margin-bottom:0.5em;">🌿 Aiven for OpenSearch</div>
+      <div style="background:#bbf7d0;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Startup</strong> (2 vCPU, 8 GB)<br>~<strong>90 $/mois</strong> · 1 nœud
+      </div>
+      <div style="background:#dcfce7;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Business</strong> (4 vCPU, 16 GB ×3)<br>~<strong>400 $/mois</strong>
+      </div>
+      <div style="color:#64748b;font-size:0.85em;">✓ Multi-cloud · ✓ SLA 99,99 %<br>✓ OpenSearch natif (dernière version)</div>
+    </div>
+    <div style="background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:0.8em;">
+      <div style="text-align:center;font-weight:bold;color:#2563eb;margin-bottom:0.5em;">🏢 Self-Hosted (Entreprise)</div>
+      <div style="background:#bfdbfe;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Logiciel : GRATUIT</strong><br>Apache 2.0 — zéro licence
+      </div>
+      <div style="background:#dbeafe;border-radius:4px;padding:0.3em 0.5em;margin-bottom:0.3em;font-size:0.9em;">
+        <strong>Coût réel</strong><br>Infra + MCO + expertise ops
+      </div>
+      <div style="color:#64748b;font-size:0.85em;">✓ Contrôle total · ✓ RGPD on-prem<br>✗ Ingénierie ops requise</div>
+    </div>
+  </div>
+  <div style="margin-top:0.6em;background:#f8fafc;border-left:4px solid #475569;padding:0.4em 0.7em;font-size:0.72em;color:#475569;">
+    💡 Autres providers : <strong>Elastic Cloud</strong> (from ~65 $/mo), <strong>Bonsai</strong>, <strong>OpenSearch Service sur Azure</strong> — comparez via les pricing calculators avec votre workload réel
+  </div>
+  <aside class="notes">
+    Insistez : OpenSearch est GRATUIT en self-hosted (Apache 2.0). Le coût réel c'est l'infra + les ops. Pour une startup, un service managé peut coûter moins cher au total (pas d'ingé dédié). Pour une grande entreprise avec équipe ops existante, le self-hosted à grande échelle devient rentable. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE : CLOUD MANAGÉ vs SELF-HOSTED ===================== -->
+<section class="slide-content">
+  <h2>Cloud Managé vs Installation Entreprise</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.8em;">
+    <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:8px;padding:0.9em;">
+      <div style="text-align:center;font-weight:bold;color:#ea580c;font-size:1.05em;margin-bottom:0.5em;">☁️ Service Managé (Cloud)</div>
+      <div style="color:#15803d;font-size:0.9em;margin-bottom:0.3em;"><strong>Avantages</strong></div>
+      <ul style="margin:0 0 0.5em 1.2em;padding:0;color:#374151;">
+        <li>Démarrage en quelques minutes</li>
+        <li>Mises à jour &amp; patches automatiques</li>
+        <li>Haute dispo et sauvegardes incluses</li>
+        <li>Scaling simplifié (clic ou API)</li>
+      </ul>
+      <div style="color:#dc2626;font-size:0.9em;margin-bottom:0.3em;"><strong>Inconvénients</strong></div>
+      <ul style="margin:0 0 0 1.2em;padding:0;color:#374151;">
+        <li>Coût récurrent (abonnement)</li>
+        <li>Données hébergées chez un tiers</li>
+        <li>Moins de contrôle sur la config</li>
+      </ul>
+      <div style="margin-top:0.5em;font-size:0.8em;color:#64748b;">AWS · Aiven · Elastic Cloud · Bonsai</div>
+    </div>
+    <div style="background:#eff6ff;border:2px solid #2563eb;border-radius:8px;padding:0.9em;">
+      <div style="text-align:center;font-weight:bold;color:#2563eb;font-size:1.05em;margin-bottom:0.5em;">🏢 Self-Hosted (Entreprise)</div>
+      <div style="color:#15803d;font-size:0.9em;margin-bottom:0.3em;"><strong>Avantages</strong></div>
+      <ul style="margin:0 0 0.5em 1.2em;padding:0;color:#374151;">
+        <li>Contrôle total (config, réseau, tuning)</li>
+        <li>Données sur site (RGPD, compliance)</li>
+        <li>Logiciel gratuit (Apache 2.0)</li>
+        <li>Intégration réseau interne directe</li>
+      </ul>
+      <div style="color:#dc2626;font-size:0.9em;margin-bottom:0.3em;"><strong>Inconvénients</strong></div>
+      <ul style="margin:0 0 0 1.2em;padding:0;color:#374151;">
+        <li>MCO et ops à votre charge</li>
+        <li>Expertise technique requise</li>
+        <li>Mise en place plus longue</li>
+      </ul>
+      <div style="margin-top:0.5em;font-size:0.8em;color:#64748b;">VM · Bare-metal · Kubernetes (Helm chart)</div>
+    </div>
+  </div>
+  <aside class="notes">
+    Sondez la salle : "Qui est sur du cloud ? Qui est en self-hosted ?" Discutez les contraintes réglementaires (banque, santé, défense → souvent self-hosted ou cloud privé obligatoire). Pour cette formation, on utilisera Docker en local — équivalent d'un self-hosted simplifié. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 14 : PRÉREQUIS ===================== -->
+<section class="slide-content">
+  <h2>Prérequis &amp; vm.max_map_count</h2>
+  <div style="font-size:0.85em;">
+    <table>
+      <thead><tr><th>Prérequis</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>RAM minimum</td><td>4 GB (8 GB recommandé)</td></tr>
+        <tr><td>Docker</td><td>24.x ou supérieur</td></tr>
+        <tr><td>Docker Compose</td><td>v2.x</td></tr>
+        <tr><td>Disque</td><td>10 GB disponibles</td></tr>
+      </tbody>
+    </table>
+    <pre style="margin-top:0.8em;"><code class="language-bash"># Linux : obligatoire
+sudo sysctl -w vm.max_map_count=262144
+
+# Vérification
+sysctl vm.max_map_count</code></pre>
+    <p style="color:#ea580c;font-size:0.8em;">⚠️ Sans vm.max_map_count, OpenSearch refuse de démarrer</p>
+  </div>
+  <aside class="notes">
+    Expliquez vm.max_map_count : c'est la limite du nombre de zones mémoire qu'un processus peut créer. OpenSearch (Lucene) en crée beaucoup. Sur macOS, Docker gère ça dans la VM Linux interne — pas besoin de le configurer. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 15 : DOCKER COMPOSE ===================== -->
+<section class="slide-content">
+  <h2>Installation via Docker Compose</h2>
+  <pre style="font-size:0.6em;"><code class="language-yaml">services:
+  opensearch:
+    image: opensearchproject/opensearch:3.6.0
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@1234!
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:3.6.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - opensearch</code></pre>
+  <pre style="font-size:0.75em;"><code class="language-bash">docker compose up -d
+curl http://localhost:9200/_cluster/health?pretty</code></pre>
+  <aside class="notes">
+    Montrez le fichier infrastructure/docker-compose.yml. Expliquez `discovery.type=single-node` : mode développement, pas de découverte de pairs. DISABLE_SECURITY_PLUGIN=true : simplifie la formation jours 1 et 2 (on activera la sécurité au jour 3). OPENSEARCH_INITIAL_ADMIN_PASSWORD requis depuis OS 2.12+. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 16 : VÉRIFICATION ===================== -->
+<section class="slide-content">
+  <h2>Vérification de l'installation</h2>
+  <pre style="font-size:0.7em;"><code class="language-bash"># Santé du cluster
+curl http://localhost:9200/_cluster/health?pretty
+
+# Liste des nœuds
+curl http://localhost:9200/_cat/nodes?v
+
+# Version OpenSearch
+curl http://localhost:9200/</code></pre>
+  <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;font-size:0.8em;margin-top:0.5em;">
+    ✅ <strong>Cluster "green"</strong> = toutes les shards primaires ET replicas assignées<br>
+    ✅ <strong>Cluster "yellow"</strong> = OK en single-node (replicas non assignées)
+  </div>
+  <aside class="notes">
+    Exécutez les commandes en live. Expliquez les couleurs : green (prod), yellow (acceptable en single-node, toutes les primaires sont là), red (urgence : au moins une primaire manquante). L'URL de Dashboards : http://localhost:5601. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 17 : TP1 ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>🔧 TP1 — Installation en local</h2>
+  <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
+  <div style="font-size:0.85em;">
+    <ol>
+      <li>Démarrer le cluster avec <code>docker compose up -d</code></li>
+      <li>Vérifier la santé : <code>GET /_cluster/health</code> → green/yellow</li>
+      <li>Explorer les Cat APIs : <code>_cat/nodes</code>, <code>_cat/indices</code>, <code>_cat/shards</code></li>
+      <li>Naviguer dans Dashboards UI (<a href="http://localhost:5601">localhost:5601</a>)</li>
+      <li>Modifier <code>cluster.name</code>, redémarrer, vérifier</li>
+    </ol>
+    <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
+      <strong>⭐ Bonus :</strong> Installer OpenSearch sans Docker (tar.gz)
+    </div>
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp1-installation/README.md</code></p>
+  <aside class="notes">
+    Distribuez le lien vers labs/tp1-installation/README.md. Circulez pour aider. Problèmes courants : port 9200 déjà utilisé (lsof -i :9200), vm.max_map_count trop bas, manque de RAM. Rappel : "Signez la feuille de présence de la matinée !" Timing : 45 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 8 : ARCHITECTURE ===================== -->
+<section class="slide-content">
+  <h2>Architecture : les concepts clés</h2>
+  <div style="font-size:0.85em;">
+    <pre style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;padding:1em;font-size:0.85em;"><code>Cluster "formation-opensearch"
+├── Nœud 1 (master + data)
+│   ├── Index "products"
+│   │   ├── Shard P0 ← Document { "name": "MacBook" }
+│   │   └── Shard P1 ← Document { "name": "iPhone" }
+│   └── Index "stores"
+│       └── Shard P0
+└── Nœud 2 (data)
+    └── Index "products"
+        ├── Shard R0 (réplique de P0)
+        └── Shard R1 (réplique de P1)</code></pre>
+    <p style="font-size:0.8em;color:#475569;margin:0.5em 0 0;">Cluster → Nœuds → Index → Shards → Documents</p>
+  </div>
+  <aside class="notes">
+    Expliquez chaque niveau. "Un cluster, c'est l'ensemble du système. Les nœuds, ce sont les serveurs. Les index sont comme des tables en SQL. Les shards sont les partitions physiques — chaque shard est un index Lucene complet." Insistez sur la réplication : P0 et R0 ne peuvent pas être sur le même nœud. Timing : 7 min. Question fréquente : "C'est quoi la différence entre un index et une base de données SQL ?" → Réponse : "L'index OpenSearch correspond à une table, pas à une base. Le cluster est l'équivalent de la base."
+  </aside>
+</section>
+
+<!-- ===================== MINI TP : EXPLORER LE CLUSTER ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>💡 Mini-Exercice — Explorer le Cluster</h2>
+  <p style="color:#2563eb;font-style:italic;font-size:0.9em;margin:0.2em 0 0.8em;">~10 minutes · à faire dans Dev Tools (localhost:5601) ou terminal</p>
+  <div style="font-size:0.85em;">
+    <ol>
+      <li>Vérifiez la santé du cluster : <code>GET /_cluster/health?pretty</code></li>
+      <li>Listez les nœuds et leurs rôles : <code>GET /_cat/nodes?v</code></li>
+      <li>Listez les index et leur taille : <code>GET /_cat/indices?v</code></li>
+      <li>Inspectez les shards : <code>GET /_cat/shards?v&amp;index=products</code></li>
+      <li>Identifiez : <em>quel nœud héberge P0 ? Où est R0 ? Pourquoi "yellow" ?</em></li>
+    </ol>
+    <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.6em;">
+      <strong>Attendu :</strong> status <span style="color:#ea580c;font-weight:bold;">yellow</span> (normal en single-node) — identifiez <code>cluster_name</code>, <code>node.roles</code>, colonnes <code>pri</code>/<code>rep</code>
+    </div>
+  </div>
+  <aside class="notes">
+    Laissez les participants explorer par eux-mêmes pendant 10 min. Circulez pour aider. Points à valider : cluster_name, status yellow attendu, node.roles (dm = data+master), pri=1 rep=1 pour chaque index. "Le status 'yellow' en single-node est NORMAL — les replicas ne peuvent pas être placées sur le seul nœud existant." Timing : 10 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10b : LUCENE — LA BIBLIOTHÈQUE ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Le moteur sous le capot</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;margin-top:0.5em;">
+    <div style="background:#eff6ff;border-radius:8px;padding:1em;">
+      <strong style="color:#2563eb;">Apache Lucene</strong>
+      <ul style="margin-top:0.5em;">
+        <li>Bibliothèque Java open source (Apache)</li>
+        <li>Créée en 1999 par Doug Cutting</li>
+        <li>Gère : index inversé, analyse, scoring BM25</li>
+        <li>Bas niveau — API Java uniquement</li>
+      </ul>
+    </div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:1em;">
+      <strong style="color:#16a34a;">OpenSearch</strong>
+      <ul style="margin-top:0.5em;">
+        <li>Couche distribuée <em>au-dessus</em> de Lucene</li>
+        <li>Ajoute : cluster, REST API, réplication, JSON</li>
+        <li>Chaque <strong>shard</strong> = 1 index Lucene</li>
+        <li>OS 3.x embarque Lucene 10</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:1em;text-align:center;font-size:0.85em;color:#475569;">
+    💡 OpenSearch est à Lucene ce que MySQL est à InnoDB
+  </p>
+  <aside class="notes">
+    Analogie clé : "Lucene, c'est le moteur de votre voiture — puissant mais sans carrosserie ni volant. OpenSearch, c'est la voiture complète." Lucene ne sait pas distribuer des données sur plusieurs machines, gérer des pannes réseau ou exposer une API REST. C'est exactement ce qu'OpenSearch apporte. Lucene 10 (dans OS 3.x) a introduit des améliorations importantes sur les index vectoriels (HNSW pour la recherche sémantique). Timing : 5 min. Transition : "Voyons concrètement ce que Lucene fait à l'intérieur de chaque shard."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10c-1 : LUCENE — SEGMENTS ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Segments <span style="font-size:0.6em;color:#64748b;font-weight:400;">(1/3)</span></h2>
+  <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:182px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="seg-blue" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#2563eb"/></marker>
+      <marker id="seg-red" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#dc2626"/></marker>
+      <marker id="seg-purple" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#9333ea"/></marker>
+    </defs>
+    <!-- PUT _doc boxes -->
+    <rect x="8" y="18" width="118" height="30" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="67" y="37" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af">PUT _doc/1 {…}</text>
+    <rect x="8" y="58" width="118" height="30" rx="5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="67" y="77" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af">PUT _doc/2 {…}</text>
+    <rect x="8" y="98" width="118" height="30" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+    <text x="67" y="117" text-anchor="middle" font-size="10" font-family="monospace" fill="#dc2626">DELETE _doc/5</text>
+    <!-- Arrows to buffer -->
+    <line x1="126" y1="33" x2="178" y2="68" stroke="#2563eb" stroke-width="1.5" marker-end="url(#seg-blue)"/>
+    <line x1="126" y1="73" x2="178" y2="79" stroke="#2563eb" stroke-width="1.5" marker-end="url(#seg-blue)"/>
+    <line x1="126" y1="113" x2="178" y2="91" stroke="#dc2626" stroke-width="1.5" marker-end="url(#seg-red)"/>
+    <!-- Buffer box -->
+    <rect x="182" y="52" width="122" height="65" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+    <text x="243" y="72" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#92400e" font-weight="bold">Write Buffer</text>
+    <text x="243" y="88" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#a16207">(mémoire RAM)</text>
+    <text x="243" y="104" text-anchor="middle" font-size="9" font-family="monospace" fill="#a16207">doc1, doc2, 🗑️doc5</text>
+    <!-- flush arrow -->
+    <line x1="304" y1="84" x2="358" y2="84" stroke="#9333ea" stroke-width="2" marker-end="url(#seg-purple)"/>
+    <text x="331" y="76" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#9333ea" font-weight="bold">flush</text>
+    <!-- Vertical branch from flush tip to each segment -->
+    <line x1="362" y1="38" x2="362" y2="162" stroke="#9333ea" stroke-width="1.2"/>
+    <line x1="362" y1="38" x2="382" y2="38" stroke="#9333ea" stroke-width="1.2"/>
+    <line x1="362" y1="100" x2="382" y2="100" stroke="#9333ea" stroke-width="1.2"/>
+    <line x1="362" y1="162" x2="382" y2="162" stroke="#9333ea" stroke-width="1.2"/>
+    <!-- Segment 1 -->
+    <rect x="382" y="12" width="120" height="52" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="442" y="32" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#15803d" font-weight="bold">Segment 1  🔒</text>
+    <text x="442" y="52" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc1 ✓  doc2 ✓</text>
+    <!-- Segment 2 -->
+    <rect x="382" y="74" width="120" height="52" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="442" y="94" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#15803d" font-weight="bold">Segment 2  🔒</text>
+    <text x="442" y="114" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc3 ✓  doc4 ✓</text>
+    <!-- Segment 3 (deletion marker) -->
+    <rect x="382" y="136" width="120" height="52" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <text x="442" y="156" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#dc2626" font-weight="bold">Segment 3  🔒</text>
+    <text x="442" y="176" text-anchor="middle" font-size="9" font-family="monospace" fill="#dc2626">doc5 🗑️  ← tombstone</text>
+    <!-- Explanation box -->
+    <rect x="516" y="88" width="158" height="78" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+    <text x="595" y="107" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#ea580c" font-weight="bold">⚠️ DELETE ≠ effacement physique</text>
+    <text x="595" y="125" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#92400e">→ Marqueur "deleted" ajouté</text>
+    <text x="595" y="142" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#92400e">→ Nettoyage réel au prochain merge</text>
+    <text x="595" y="159" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">doc toujours lisible jusqu'au merge</text>
+    <!-- Bottom label -->
+    <text x="442" y="198" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#64748b">Shard = collection de segments Lucene (sur disque)</text>
+  </svg>
+  <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:0.4em 0.8em;font-size:0.78em;margin-top:0.1em;">
+    <strong>Segment</strong> = mini-index inversé <em>immuable</em>. Chaque écriture crée un nouveau segment. Un UPDATE = nouveau segment + tombstone sur l'ancien. <strong>Un shard = plusieurs segments.</strong>
+  </div>
+  <aside class="notes">
+    Points clés : 1) Un segment est un index Lucene complet en miniature, immuable une fois écrit sur disque. On ne modifie jamais un segment existant. 2) Un UPDATE = écriture d'un nouveau segment + marqueur "deleted" sur l'ancien document. 3) Un DELETE ne supprime pas physiquement le document — il pose un tombstone. Le doc est nettoyé seulement lors du prochain merge. Conséquence directe : beaucoup de petits segments ralentissent les lectures car chaque segment doit être interrogé séparément. C'est précisément pourquoi le merge existe. Timing : 4 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10c-2 : LUCENE — REFRESH ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Refresh <span style="font-size:0.6em;color:#64748b;font-weight:400;">(2/3)</span></h2>
+  <svg viewBox="0 0 680 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:168px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="ref-gray" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#94a3b8"/></marker>
+      <marker id="ref-purple" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#9333ea"/></marker>
+      <marker id="ref-green" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#16a34a"/></marker>
+    </defs>
+    <!-- Timeline axis -->
+    <line x1="28" y1="88" x2="648" y2="88" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#ref-gray)"/>
+    <text x="658" y="93" font-size="10" font-family="Inter,sans-serif" fill="#94a3b8">t</text>
+    <!-- === Phase 1 : indexation === -->
+    <circle cx="72" cy="88" r="7" fill="#2563eb"/>
+    <text x="72" y="73" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#2563eb" font-weight="bold">t = 0s</text>
+    <rect x="12" y="100" width="128" height="78" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="76" y="118" text-anchor="middle" font-size="10.5" font-family="Inter,sans-serif" fill="#334155" font-weight="bold">Indexation</text>
+    <text x="76" y="136" text-anchor="middle" font-size="9" font-family="monospace" fill="#475569">PUT _doc → buffer</text>
+    <text x="76" y="153" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#dc2626">✗ non searchable</text>
+    <text x="76" y="170" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">doc en RAM uniquement</text>
+    <!-- connector 1→2 -->
+    <line x1="142" y1="140" x2="238" y2="140" stroke="#9333ea" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ref-purple)"/>
+    <text x="190" y="131" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#9333ea">~1 seconde</text>
+    <!-- === Phase 2 : Refresh === -->
+    <circle cx="305" cy="88" r="9" fill="#9333ea"/>
+    <text x="305" y="68" text-anchor="middle" font-size="15">⏱️</text>
+    <text x="305" y="56" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#9333ea" font-weight="bold">REFRESH</text>
+    <rect x="242" y="100" width="128" height="78" rx="6" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
+    <text x="306" y="118" text-anchor="middle" font-size="10.5" font-family="Inter,sans-serif" fill="#7c3aed" font-weight="bold">Refresh (auto)</text>
+    <text x="306" y="136" text-anchor="middle" font-size="9" font-family="monospace" fill="#7c3aed">buffer → segment</text>
+    <text x="306" y="153" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#7c3aed">flush sur disque</text>
+    <text x="306" y="170" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#9333ea">refresh_interval = 1s</text>
+    <!-- connector 2→3 -->
+    <line x1="372" y1="140" x2="444" y2="140" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ref-green)"/>
+    <!-- === Phase 3 : Searchable === -->
+    <circle cx="512" cy="88" r="7" fill="#16a34a"/>
+    <text x="512" y="73" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#16a34a" font-weight="bold">visible</text>
+    <rect x="448" y="100" width="148" height="78" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+    <text x="522" y="118" text-anchor="middle" font-size="10.5" font-family="Inter,sans-serif" fill="#15803d" font-weight="bold">Segment visible</text>
+    <text x="522" y="136" text-anchor="middle" font-size="9" font-family="monospace" fill="#15803d">_search → doc ✓</text>
+    <text x="522" y="153" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" fill="#16a34a">✓ searchable</text>
+    <text x="522" y="170" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#15803d">Near Real-Time (NRT)</text>
+  </svg>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5em;font-size:0.78em;margin-top:0.2em;">
+    <div style="background:#faf5ff;border-radius:6px;padding:0.4em 0.7em;border:1px solid #e9d5ff;">
+      <code>POST /products/_refresh</code><br>
+      <span style="color:#64748b;font-size:0.9em;">Refresh immédiat (tests uniquement)</span>
+    </div>
+    <div style="background:#fff7ed;border-radius:6px;padding:0.4em 0.7em;border:1px solid #fed7aa;">
+      <code>"refresh_interval": "-1"</code><br>
+      <span style="color:#64748b;font-size:0.9em;">Désactiver pendant un bulk load (×3 à ×5)</span>
+    </div>
+  </div>
+  <aside class="notes">
+    Concept fondamental : OpenSearch est "Near Real-Time" (NRT) — il y a un délai de 1 seconde maximum entre l'indexation d'un document et sa visibilité dans les recherches. Ce n'est pas du temps réel immédiat. Le refresh est coûteux car il crée un nouveau segment (flush du buffer RAM vers disque), donc Lucene ne le fait pas à chaque document individuellement. En bulk load : désactiver avec "refresh_interval": "-1" peut multiplier les perfs d'indexation par 3 à 5. Remettre à "1s" impérativement après le chargement. POST /_refresh est réservé aux tests d'intégration — ne jamais appeler manuellement en prod. Timing : 4 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10c-3 : LUCENE — MERGE ===================== -->
+<section class="slide-content">
+  <h2>Lucene — Merge <span style="font-size:0.6em;color:#64748b;font-weight:400;">(3/3)</span></h2>
+  <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:192px;display:block;margin:0.3em auto;">
+    <defs>
+      <marker id="mrg-purple" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#9333ea"/></marker>
+      <marker id="mrg-green" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><polygon points="0,0 7,2.5 0,5" fill="#16a34a"/></marker>
+    </defs>
+    <!-- AVANT label -->
+    <text x="110" y="14" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#475569" font-weight="bold">AVANT le merge</text>
+    <text x="110" y="27" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">4 petits segments (fragmentation)</text>
+    <!-- Seg 1 — clean -->
+    <rect x="8" y="34" width="200" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="108" y="52" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af" font-weight="bold">Seg 1</text>
+    <text x="108" y="67" text-anchor="middle" font-size="9" font-family="monospace" fill="#1e40af">doc1 ✓   doc2 ✓</text>
+    <!-- Seg 2 — tombstone -->
+    <rect x="8" y="80" width="200" height="38" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="108" y="98" text-anchor="middle" font-size="10" font-family="monospace" fill="#dc2626" font-weight="bold">Seg 2</text>
+    <text x="108" y="113" text-anchor="middle" font-size="9" font-family="monospace" fill="#dc2626">doc3 🗑️   doc4 ✓</text>
+    <!-- Seg 3 — clean -->
+    <rect x="8" y="126" width="200" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="108" y="144" text-anchor="middle" font-size="10" font-family="monospace" fill="#1e40af" font-weight="bold">Seg 3</text>
+    <text x="108" y="159" text-anchor="middle" font-size="9" font-family="monospace" fill="#1e40af">doc5 ✓</text>
+    <!-- Seg 4 — tombstone -->
+    <rect x="8" y="172" width="200" height="38" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/>
+    <text x="108" y="190" text-anchor="middle" font-size="10" font-family="monospace" fill="#dc2626" font-weight="bold">Seg 4</text>
+    <text x="108" y="205" text-anchor="middle" font-size="9" font-family="monospace" fill="#dc2626">doc6 🗑️   doc7 ✓</text>
+    <!-- Converging arrows to MERGE box -->
+    <line x1="210" y1="53" x2="268" y2="105" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <line x1="210" y1="99" x2="268" y2="111" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <line x1="210" y1="145" x2="268" y2="117" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <line x1="210" y1="191" x2="268" y2="123" stroke="#9333ea" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#mrg-purple)"/>
+    <!-- MERGE box -->
+    <rect x="271" y="82" width="108" height="68" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="2.5"/>
+    <text x="325" y="108" text-anchor="middle" font-size="20">⚙️</text>
+    <text x="325" y="128" text-anchor="middle" font-size="12" font-family="Inter,sans-serif" fill="#7c3aed" font-weight="bold">MERGE</text>
+    <text x="325" y="142" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#9333ea">background auto</text>
+    <!-- Output arrow -->
+    <line x1="379" y1="116" x2="422" y2="116" stroke="#16a34a" stroke-width="2.5" marker-end="url(#mrg-green)"/>
+    <!-- APRÈS label -->
+    <text x="563" y="14" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="#475569" font-weight="bold">APRÈS le merge</text>
+    <text x="563" y="27" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#94a3b8">1 segment consolidé</text>
+    <!-- Merged segment box -->
+    <rect x="426" y="48" width="248" height="128" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5"/>
+    <text x="550" y="72" text-anchor="middle" font-size="11" font-family="monospace" fill="#15803d" font-weight="bold">Segment Fusionné  🔒</text>
+    <text x="550" y="92" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc1 ✓  doc2 ✓  doc4 ✓</text>
+    <text x="550" y="109" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#15803d">doc5 ✓  doc7 ✓</text>
+    <line x1="440" y1="120" x2="660" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="550" y="137" text-anchor="middle" font-size="9" font-family="Inter,sans-serif" fill="#dc2626">doc3 🗑️ doc6 🗑️ → supprimés définitivement</text>
+    <text x="550" y="153" text-anchor="middle" font-size="8.5" font-family="Inter,sans-serif" fill="#64748b">espace disque libéré</text>
+    <!-- Benefits note -->
+    <rect x="426" y="184" width="248" height="24" rx="5" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+    <text x="550" y="200" text-anchor="middle" font-size="9.5" font-family="Inter,sans-serif" fill="#15803d">✓ Moins de segments = lectures plus rapides</text>
+  </svg>
+  <div style="background:#faf5ff;border-left:4px solid #9333ea;padding:0.4em 0.8em;font-size:0.78em;margin-top:0.1em;">
+    Merge <strong>automatique</strong> en arrière-plan (heuristiques Lucene). Après un bulk load massif : <code>POST /products/_forcemerge?max_num_segments=1</code>
+  </div>
+  <aside class="notes">
+    Le merge est déclenché automatiquement par Lucene selon des heuristiques : taille des segments, nombre total de segments, proportion de docs supprimés. Avantages : 1) Moins de segments = lecture plus rapide — une recherche interroge chaque segment séparément en parallèle, moins il y en a mieux c'est. 2) Tombstones définitivement nettoyés = espace disque libéré. 3) Meilleure efficacité du cache OS. En prod : évitez forcemerge pendant les heures de trafic (I/O intensif). Après gros rechargement bulk (avec refresh_interval=-1), forcemerge max_num_segments=1 consolide tout. Récap du trio : Segment = unité immuable → Refresh = rendre searchable → Merge = consolider et nettoyer. Timing : 4 min. Transition : "Voyons maintenant qui fait quoi entre Lucene et OpenSearch."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 10d : LUCENE — RÔLES CONCRETS ===================== -->
+<section class="slide-content">
+  <h2>Lucene vs OpenSearch — Qui fait quoi ?</h2>
+  <div style="font-size:0.82em;">
+    <table>
+      <thead>
+        <tr><th>Responsabilité</th><th>Lucene</th><th>OpenSearch</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Index inversé</td><td style="color:#16a34a;">✓</td><td></td></tr>
+        <tr><td>Tokenisation &amp; analyse</td><td style="color:#16a34a;">✓</td><td></td></tr>
+        <tr><td>Scoring BM25 / vecteurs</td><td style="color:#16a34a;">✓</td><td></td></tr>
+        <tr><td>Gestion des segments</td><td style="color:#16a34a;">✓</td><td></td></tr>
+        <tr><td>REST API JSON</td><td></td><td style="color:#16a34a;">✓</td></tr>
+        <tr><td>Distribution des shards</td><td></td><td style="color:#16a34a;">✓</td></tr>
+        <tr><td>Réplication &amp; failover</td><td></td><td style="color:#16a34a;">✓</td></tr>
+        <tr><td>Clustering &amp; élection master</td><td></td><td style="color:#16a34a;">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    Cette table est utile pour ancrer la compréhension. Le message clé : "Quand tu fais un GET _search, OpenSearch reçoit la requête, la répartit sur les shards pertinents, chaque shard demande à Lucene de faire la recherche, et OpenSearch agrège les résultats." Lucene ne connaît pas le réseau — c'est OpenSearch qui orchestre tout. Question fréquente : "Peut-on utiliser Lucene sans OpenSearch ?" → Oui, mais tu dois coder la distribution toi-même, comme l'a fait Elastic au départ. Timing : 4 min. Transition : "On va maintenant tester votre compréhension avec le quiz du Chapitre 1."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 11 : QUIZ CH1 ===================== -->
+<section class="slide-content">
+  <h2>⚡ Quiz — Chapitre 1</h2>
+  <ol style="font-size:0.83em;">
+    <li>Quelle est la différence entre un <strong>index</strong> et un <strong>shard</strong> ?</li>
+    <li>Qu'est-ce que Lucene par rapport à OpenSearch ?</li>
+    <li>Pourquoi OpenSearch est-il préféré à Elasticsearch dans un contexte open source ?</li>
+    <li>Que signifie un cluster en statut <strong>"yellow"</strong> ? Est-ce problématique en single-node ?</li>
+    <li>Citez un avantage du <strong>cloud managé</strong> et un avantage du <strong>self-hosted</strong>.</li>
+  </ol>
+  <aside class="notes">
+    Posez les questions oralement. Laissez 30s par question. Réponses : 1) Index = logique (table), shard = physique (index Lucene). 2) Lucene est la bibliothèque Java d'indexation sur laquelle OpenSearch est construit. 3) Licence Apache 2.0, security gratuit, communauté. 4) Yellow = primaires OK, replicas non assignées = normal en single-node, pas critique. 5) Cloud = démarrage rapide, ops incluses ; Self-hosted = contrôle total, RGPD, logiciel gratuit. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 12 : RECAP CH1 ===================== -->
+<section class="slide-content">
+  <h2>📋 Récap CH1 — Introduction &amp; Installation</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;">
+    <div style="background:#eff6ff;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">🌐</div>
+      <strong>Architecture distribuée</strong><br>Cluster → Nœuds → Index → Shards (P + R) → Documents
+    </div>
+    <div style="background:#f0fdf4;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">🔧</div>
+      <strong>Installation</strong><br>Docker (local) · DEB/RPM (serveur) · Cloud managé (AWS, Aiven)
+    </div>
+    <div style="background:#faf5ff;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">📄</div>
+      <strong>Document = JSON</strong><br>Index inversé → recherche O(1) vs SQL O(n)
+    </div>
+    <div style="background:#fff7ed;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">⚖️</div>
+      <strong>Choix de déploiement</strong><br>Cloud managé = ops inclus · Self-hosted = contrôle + RGPD
+    </div>
+  </div>
+  <p style="margin-top:0.8em;text-align:center;font-size:0.82em;color:#475569;">
+    <strong>Cluster → Nœuds → Index → Shards (primary + replica) → Documents</strong>
+  </p>
+  <aside class="notes">
+    Résumez les 4 blocs. Vérifiez que tout le monde a compris la hiérarchie et les options de déploiement. Timing : 2 min. Transition : "L'après-midi, on plonge dans le fonctionnement interne d'OpenSearch."
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 18 : CH3a OPENER ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h2 style="color:#fff;">Chapitre 3a</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Fonctionnement d'OpenSearch</h3>
+  <p style="color:#dbeafe;font-style:italic;">"Comment OpenSearch trouve-t-il vos documents en quelques millisecondes ?"</p>
+  <aside class="notes">Après la pause déjeuner. Faites une petite récap en 2 min. Transition : "L'index inversé, c'est le secret d'OpenSearch."</aside>
+</section>
+
+<!-- ===================== SLIDE 19 : INDEX INVERSÉ ===================== -->
+<section class="slide-content">
+  <h2>L'index inversé — le secret de la rapidité</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5em;font-size:0.72em;align-items:start;">
+
+    <!-- SQL SIDE -->
+    <div style="background:#fef2f2;border:2px solid #fca5a5;border-radius:8px;padding:0.8em;">
+      <p style="margin:0 0 0.5em;font-weight:700;color:#dc2626;text-align:center;">🐢 SQL — LIKE '%ordinateur%'</p>
+      <div style="font-family:monospace;font-size:0.85em;line-height:1.8;">
+        <div style="display:flex;align-items:center;gap:0.5em;">
+          <span style="color:#dc2626;">▶</span>
+          <span style="background:#fff;border:1px solid #fca5a5;border-radius:4px;padding:2px 6px;">ligne 1 : "ordinateur portable léger"</span>
+          <span style="color:#dc2626;font-size:0.8em;">compute ✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5em;margin-top:4px;">
+          <span style="color:#dc2626;">▶</span>
+          <span style="background:#fff;border:1px solid #fca5a5;border-radius:4px;padding:2px 6px;">ligne 2 : "ordinateur de bureau"</span>
+          <span style="color:#dc2626;font-size:0.8em;">compute ✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5em;margin-top:4px;">
+          <span style="color:#94a3b8;">▶</span>
+          <span style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:2px 6px;color:#94a3b8;">ligne 3 : "tablette tactile légère"</span>
+          <span style="color:#94a3b8;font-size:0.8em;">compute ✗</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5em;margin-top:4px;">
+          <span style="color:#94a3b8;">▶</span>
+          <span style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:2px 6px;color:#94a3b8;">ligne 4 : "souris sans fil"</span>
+          <span style="color:#94a3b8;font-size:0.8em;">compute ✗</span>
+        </div>
+        <div style="text-align:center;margin-top:6px;color:#94a3b8;font-size:0.8em;">… 1 000 000 lignes …</div>
+      </div>
+      <p style="margin:0.6em 0 0;font-size:0.85em;color:#dc2626;text-align:center;">
+        <strong>O(n)</strong> — chaque ligne est lue &amp; évaluée
+      </p>
+    </div>
+
+    <!-- OPENSEARCH SIDE -->
+    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:8px;padding:0.8em;">
+      <p style="margin:0 0 0.5em;font-weight:700;color:#16a34a;text-align:center;">⚡ OpenSearch — index inversé</p>
+      <div style="font-family:monospace;font-size:0.85em;line-height:1.8;">
+        <div style="background:#fff;border:1px solid #86efac;border-radius:4px;padding:4px 8px;">
+          <span style="color:#16a34a;font-weight:700;">"ordinateur"</span>
+          <span style="color:#475569;"> → </span>
+          <span style="background:#dcfce7;border-radius:3px;padding:1px 5px;">Doc1</span>
+          <span style="background:#dcfce7;border-radius:3px;padding:1px 5px;margin-left:4px;">Doc2</span>
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;margin-top:4px;color:#94a3b8;">
+          "portable" → Doc1
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;margin-top:4px;color:#94a3b8;">
+          "léger" → Doc1, Doc3
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;margin-top:4px;color:#94a3b8;">
+          "tablette" → Doc3
+        </div>
+      </div>
+      <div style="margin-top:0.6em;display:flex;align-items:center;justify-content:center;gap:0.4em;font-size:0.9em;">
+        <span style="background:#2563eb;color:#fff;border-radius:4px;padding:2px 8px;">query: "ordinateur"</span>
+        <span style="color:#16a34a;font-weight:700;">→</span>
+        <span style="background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:2px 8px;color:#16a34a;font-weight:700;">Doc1, Doc2 ✓</span>
+      </div>
+      <p style="margin:0.5em 0 0;font-size:0.85em;color:#16a34a;text-align:center;">
+        <strong>O(1)</strong> — lookup direct, aucun calcul sur les données
+      </p>
+    </div>
+
+  </div>
+  <aside class="notes">
+    C'est la slide la plus importante du jour 1. Prenez le temps de bien l'expliquer. "Imaginez un annuaire téléphonique : chercher un nom par ordre alphabétique est instantané, chercher un numéro pour trouver le nom serait lent. L'index inversé, c'est l'annuaire optimisé pour la recherche textuelle." Lucene crée et gère ces index inversés. OpenSearch distribue les shards (chaque shard = un index Lucene). Insister sur le point clé : SQL *calcule* l'expression LIKE sur chaque ligne — OpenSearch *consulte* un dictionnaire pré-construit. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 20 : MAPPING ===================== -->
+<section class="slide-content">
+  <h2>Mappings — Types de champs</h2>
+  <pre style="font-size:0.65em;"><code class="language-json">PUT /products
+{
+  "mappings": {
+    "properties": {
+      "name":           { "type": "text",    "analyzer": "standard" },
+      "category":       { "type": "keyword" },
+      "price":          { "type": "float" },
+      "in_stock":       { "type": "boolean" },
+      "created_at":     { "type": "date" },
+      "stock_quantity": { "type": "integer" },
+      "location":       { "type": "geo_point" },
+      "tags":           { "type": "keyword" },
+      "description": {
+        "type": "text",
+        "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
+      }
+    }
+  }
+}</code></pre>
+  <div style="font-size:0.75em;color:#475569;margin-top:0.5em;">
+    <strong>text</strong> = full-text analysé | <strong>keyword</strong> = valeur exacte (filtre, tri, agrégation)
+  </div>
+  <aside class="notes">
+    La distinction text/keyword est CRITIQUE. text : tokenisé, analysé, utilisé pour la recherche full-text ("match"). keyword : valeur exacte, utilisé pour filter (term), tri (sort), agrégation (terms). On peut avoir les deux avec multi-fields. Erreur commune : utiliser "text" sur un champ category et essayer de faire une agrégation dessus → erreur "Fielddata is disabled". Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 21 : CRUD API ===================== -->
+<section class="slide-content">
+  <h2>API CRUD</h2>
+  <pre style="font-size:0.65em;"><code class="language-bash"># CREATE — PUT avec ID ou POST sans ID
+PUT /products/_doc/1
+{ "name": "MacBook Pro", "price": 2499.99, "category": "Électronique" }
+
+# READ
+GET /products/_doc/1
+
+# UPDATE — partiel avec _update
+POST /products/_update/1
+{ "doc": { "price": 2299.99 } }
+
+# DELETE
+DELETE /products/_doc/1
+
+# BULK — indexation en masse (action + source par paire)
+POST /products/_bulk
+{ "index": { "_id": "2" } }
+{ "name": "iPhone 15", "price": 999.99 }
+{ "index": { "_id": "3" } }
+{ "name": "iPad Pro", "price": 1099.99 }</code></pre>
+  <aside class="notes">
+    Montrez que PUT avec ID est idempotent (remplace). POST sans ID génère un ID automatique. Le Bulk API est crucial pour la performance : indexer 1 document à la fois est 10-100x plus lent qu'en bulk. Règle : toujours utiliser le Bulk API pour plus de 100 documents. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 22 : TP2 ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>🔧 TP2 — CRUD &amp; API</h2>
+  <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
+  <ol style="font-size:0.85em;">
+    <li>Créer l'index <code>products</code> avec mapping explicite complet</li>
+    <li>Indexer 5 produits manuellement avec <code>PUT /_doc/{id}</code></li>
+    <li>Lire, mettre à jour, supprimer des documents</li>
+    <li>Charger <code>products-bulk.ndjson</code> via Bulk API</li>
+    <li>Vérifier : <code>_cat/indices</code> et <code>_search match_all</code></li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
+    <strong>⭐ Bonus :</strong> Script Python pour générer 5000 produits aléatoires
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp2-crud-api/README.md</code></p>
+  <aside class="notes">
+    Le Bulk API nécessite le format NDJSON exact. Une erreur de format et toute la requête échoue. La réponse du bulk contient les erreurs par ligne. Timing : 45 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 23 : CH3b OPENER ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h2 style="color:#fff;">Chapitre 3b</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Query DSL &amp; Agrégations</h3>
+  <p style="color:#dbeafe;font-style:italic;">"Comment exprimer des recherches complexes et analyser vos données ?"</p>
+  <aside class="notes">Après la pause de 15h. Timing : 30 secondes.</aside>
+</section>
+
+<!-- ===================== SLIDE 24 : QUERY DSL ===================== -->
+<section class="slide-content">
+  <h2>Query DSL — Les requêtes de base</h2>
+  <pre style="font-size:0.62em;"><code class="language-json">// match : full-text avec analyse
+{ "query": { "match": { "name": "ordinateur portable" } } }
+
+// term : valeur exacte (keyword uniquement)
+{ "query": { "term": { "category": "Électronique" } } }
+
+// range : intervalle numérique ou date
+{ "query": { "range": { "price": { "gte": 100, "lte": 500 } } } }
+
+// multi_match : chercher dans plusieurs champs à la fois
+{ "query": { "multi_match": { "query": "laptop", "fields": ["name", "description"] } } }
+
+// match_all : tous les documents
+{ "query": { "match_all": {} } }</code></pre>
+  <aside class="notes">
+    La différence match vs term est fondamentale : match analyse la requête (tokenise, lowercase, etc.) avant de chercher. term cherche la valeur exacte. Erreur classique : `{ "term": { "name": "Ordinateur Portable" } }` — ça ne trouve rien car "name" est text donc les tokens sont en minuscules. Pour un champ text, utilisez match. Pour keyword, utilisez term. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 25 : BOOL QUERY ===================== -->
+<section class="slide-content">
+  <h2>Bool Query — Combiner les conditions</h2>
+  <pre style="font-size:0.65em;"><code class="language-json">POST /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "name": "ordinateur" } }
+      ],
+      "filter": [
+        { "term": { "in_stock": true } },
+        { "range": { "price": { "lte": 1500 } } }
+      ],
+      "must_not": [
+        { "term": { "category": "Jouets" } }
+      ],
+      "should": [
+        { "term": { "brand": "Apple" } }
+      ]
+    }
+  }
+}</code></pre>
+  <div style="font-size:0.75em;color:#475569;">
+    <strong>must</strong> = obligatoire + score | <strong>filter</strong> = obligatoire sans score (cacheable) | <strong>should</strong> = bonus score | <strong>must_not</strong> = exclusion
+  </div>
+  <aside class="notes">
+    CRITIQUE : filter est BIEN plus performant que must pour les conditions non-textuelles (boolean, term, range). Pourquoi ? Pas de calcul de score + mise en cache automatique des résultats du filtre. Règle d'or : "Si la condition ne nécessite pas de score, mettez-la dans filter." Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 26 : AGRÉGATIONS ===================== -->
+<section class="slide-content">
+  <h2>Agrégations — Analyser les données</h2>
+  <pre style="font-size:0.62em;"><code class="language-json">POST /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "par_categorie": {
+      "terms": { "field": "category", "size": 10 }
+    },
+    "prix_moyen": {
+      "avg": { "field": "price" }
+    },
+    "histogramme_prix": {
+      "histogram": { "field": "price", "interval": 100 }
+    }
+  }
+}</code></pre>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5em;font-size:0.75em;margin-top:0.5em;">
+    <div><strong>Métriques :</strong> avg, sum, min, max, stats, cardinality</div>
+    <div><strong>Buckets :</strong> terms, histogram, date_histogram, range</div>
+  </div>
+  <aside class="notes">
+    size: 0 évite de retourner des documents (on veut juste les aggs). Les agrégations peuvent être imbriquées : "Pour chaque catégorie, donne-moi le prix moyen" → terms agg avec avg sub-agg. Le champ doit être de type keyword pour une terms aggregation. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 27 : SCORING ===================== -->
+<section class="slide-content">
+  <h2>Scoring BM25 — Pourquoi ce résultat en premier ?</h2>
+  <pre style="font-size:0.7em;"><code class="language-bash"># Comprendre le score d'un document
+GET /products/_explain/1
+{
+  "query": { "match": { "name": "ordinateur portable" } }
+}</code></pre>
+  <div style="font-size:0.8em;margin-top:0.8em;">
+    <p><strong>BM25 tient compte de :</strong></p>
+    <ul>
+      <li><strong>TF</strong> (Term Frequency) : plus le terme apparaît dans le champ, mieux c'est</li>
+      <li><strong>IDF</strong> (Inverse Doc Frequency) : les termes rares = plus discriminants</li>
+      <li><strong>Longueur du champ</strong> : même terme dans un titre court &gt; dans un texte long</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    L'API _explain est un outil de debugging essentiel. Elle décompose exactement comment le score a été calculé. Utile quand un document "devrait" apparaître mais n'apparaît pas, ou apparaît trop bas. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 28 : PAGINATION ===================== -->
+<section class="slide-content">
+  <h2>Pagination — from/size et search_after</h2>
+  <pre style="font-size:0.7em;"><code class="language-json">// Pagination classique (limité à 10 000 résultats)
+POST /products/_search
+{ "from": 0, "size": 20, "query": { "match_all": {} } }
+
+// search_after pour pagination profonde (cursor-based)
+POST /products/_search
+{
+  "size": 20,
+  "sort": [{ "price": "desc" }, { "_id": "asc" }],
+  "search_after": [999.99, "abc123"]
+}</code></pre>
+  <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:0.8em;font-size:0.75em;margin-top:0.5em;">
+    ⚠️ <code>from + size > 10 000</code> → erreur. Utilisez <code>search_after</code> pour la pagination profonde.
+  </div>
+  <aside class="notes">
+    La limite de 10 000 résultats par défaut (index.max_result_window) est une protection contre les requêtes coûteuses. search_after utilise le dernier résultat de la page précédente comme curseur — plus efficace que from/size. Timing : 4 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 29 : DEMO LIVE CH3 ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>🖥️ Démo Live — Query DSL &amp; Aggs</h2>
+  <div style="font-size:0.8em;">
+    <p><strong>Séquence :</strong></p>
+    <ol>
+      <li>match_all pour voir les données</li>
+      <li>match sur <code>name: "ordinateur"</code></li>
+      <li>bool avec filter <code>in_stock: true</code> + range prix</li>
+      <li>terms aggregation sur <code>category</code></li>
+      <li><code>_explain</code> sur le premier résultat</li>
+    </ol>
+  </div>
+  <aside class="notes">
+    Montrez la différence de score entre un résultat dans must vs filter. Timing : 8 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 30 : TP3 ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>🔧 TP3 — Requêtes &amp; Agrégations</h2>
+  <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
+  <ol style="font-size:0.85em;">
+    <li>Recherche full-text dans les noms de produits</li>
+    <li>Filtres : en stock, prix entre X et Y, catégorie spécifique</li>
+    <li>Bool query : match + filter + must_not</li>
+    <li>Agrégation : prix moyen par catégorie</li>
+    <li>Histogramme de prix par tranches de 100€</li>
+    <li><code>_explain</code> sur un résultat</li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
+    <strong>⭐ Bonus :</strong> Agrégation imbriquée — top 5 catégories → produit le plus cher
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp3-requetes-agregations/README.md</code></p>
+  <aside class="notes">
+    Attention : pour les agrégations sur le champ category, il faut que ce soit un champ keyword (pas text). Si quelqu'un a un problème, vérifiez le mapping : GET /products/_mapping. Timing : 45 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 31 : QUIZ FINAL J1 ===================== -->
+<section class="slide-content">
+  <h2>⚡ Quiz — Récap Jour 1</h2>
+  <ol style="font-size:0.8em;">
+    <li>Quelle est la différence entre <code>text</code> et <code>keyword</code> ?</li>
+    <li>Pourquoi utiliser <code>filter</code> plutôt que <code>must</code> pour une condition booléenne ?</li>
+    <li>Quelle commande permet d'indexer 1000 documents rapidement ?</li>
+    <li>Quelle agrégation donne les 10 catégories les plus fréquentes ?</li>
+  </ol>
+  <aside class="notes">
+    Réponses : 1) text = analysé/full-text, keyword = valeur exacte. 2) filter = pas de score + cache = plus rapide. 3) Bulk API. 4) terms aggregation sur un champ keyword. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 32 : RÉCAP JOUR 1 ===================== -->
+<section style="background:#0f172a;color:#fff;">
+  <h2 style="color:#86efac;">Récap Jour 1 — Ce que vous savez maintenant</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;margin-top:1em;">
+    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
+      <strong>Architecture</strong><br>Cluster, Nœuds, Index, Shards, Documents
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
+      <strong>CRUD &amp; Mapping</strong><br>API REST, Bulk, Types de champs
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
+      <strong>Recherche</strong><br>Query DSL, Bool, Scoring BM25, Aggs
+    </div>
+  </div>
+  <p style="margin-top:1.5em;color:#86efac;">Demain : Pipelines, Analyseurs Français, Géo, Dashboards, Split-brain &amp; Quorum</p>
+  <p style="font-size:0.8em;color:#94a3b8;margin-top:0.5em;">N'oubliez pas de signer la feuille de présence ! 📋</p>
+  <aside class="notes">
+    Remerciez le groupe pour leur participation. Donnez un aperçu du jour 2. Rappelez la feuille de présence de l'après-midi. Demandez si des participants ont besoin de temps supplémentaire pour finir les TPs (ils peuvent le faire le soir). Timing : 10 min pour ce récap + Q&A.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    progress: true,
+    center: true,
+    transition: 'slide',
+    plugins: [ RevealHighlight, RevealNotes ]
+  });
+</script>
+</body>
+</html>
