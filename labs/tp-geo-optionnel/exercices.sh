@@ -6,7 +6,7 @@ BASE_URL="http://localhost:9200"
 echo "=== Créer index stores ==="
 curl -s -X DELETE "$BASE_URL/stores" 2>/dev/null
 curl -s -X PUT "$BASE_URL/stores" -H 'Content-Type: application/json' \
-  -d '{"settings":{"number_of_shards":1,"number_of_replicas":0},"mappings":{"properties":{"name":{"type":"text","fields":{"keyword":{"type":"keyword"}}},"city":{"type":"keyword"},"location":{"type":"geo_point"},"stock":{"type":"integer"}}}}' | python3 -m json.tool
+  -d '{"settings":{"number_of_shards":1,"number_of_replicas":0},"mappings":{"properties":{"name":{"type":"text","fields":{"keyword":{"type":"keyword"}}},"city":{"type":"keyword"},"location":{"type":"geo_point"},"stock":{"type":"integer"}}}}'
 
 echo ""
 echo "=== TODO : Indexer 5 magasins avec leurs coordonnées ==="

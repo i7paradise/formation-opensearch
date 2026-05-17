@@ -42,7 +42,7 @@ curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-produits" \
       }
     }
   ]
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "--- Test du pipeline avec _simulate ---"
@@ -60,7 +60,7 @@ curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-produits/_simulate" \
       }
     }
   ]
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "--- Indexation d un produit avec le pipeline ---"
@@ -73,7 +73,7 @@ curl -s -X PUT "$BASE_URL/products/_doc/test-pipeline-001?pipeline=pipeline-prod
   "description": "   VTT électrique 27.5 pouces, moteur 250W, autonomie 80km.   ",
   "price": 1299.00,
   "in_stock": true
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "--- Vérification : category doit être en minuscules et indexed_at présent ---"
@@ -156,7 +156,7 @@ curl -s -X PUT "$BASE_URL/products-v2" \
       "color": { "type": "keyword" }
     }
   }
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "--- Test de l analyseur : 'Vélos électriques d entrée de gamme' ---"
@@ -166,7 +166,7 @@ curl -s -X POST "$BASE_URL/products-v2/_analyze" \
   -d '{
   "analyzer": "french_custom",
   "text": "Vélos électriques d'\''entrée de gamme"
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 
 # ============================================
@@ -186,21 +186,21 @@ curl -s -X POST "$BASE_URL/_reindex?wait_for_completion=true" \
   "dest": {
     "index": "products-v2"
   }
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "--- Vérification des counts ---"
 echo -n "products count: "
-curl -s "$BASE_URL/products/_count" | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])" 2>/dev/null
+curl -s "$BASE_URL/products/_count" | jq -r '.count' 2>/dev/null
 echo -n "products-v2 count: "
-curl -s "$BASE_URL/products-v2/_count" | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])" 2>/dev/null
+curl -s "$BASE_URL/products-v2/_count" | jq -r '.count' 2>/dev/null
 
 echo ""
 echo "--- Comparaison : chercher 'velo' dans products vs products-v2 ---"
 echo -n "Résultats dans products (sans analyseur français): "
-curl -s "$BASE_URL/products/_search?q=name:velo&size=0" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['hits']['total']['value'])" 2>/dev/null
+curl -s "$BASE_URL/products/_search?q=name:velo&size=0" | jq -r '.hits.total.value' 2>/dev/null
 echo -n "Résultats dans products-v2 (avec analyseur français): "
-curl -s "$BASE_URL/products-v2/_search?q=name:velo&size=0" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['hits']['total']['value'])" 2>/dev/null
+curl -s "$BASE_URL/products-v2/_search?q=name:velo&size=0" | jq -r '.hits.total.value' 2>/dev/null
 
 
 # ============================================
@@ -245,7 +245,7 @@ curl -s -X PUT "$BASE_URL/products-v3" \
       "rating": { "type": "float" }
     }
   }
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "--- Réindexation avec script pour copier name vers name_suggest ---"
@@ -257,7 +257,7 @@ curl -s -X POST "$BASE_URL/_reindex?wait_for_completion=true" \
   "script": {
     "source": "ctx._source.name_suggest = ctx._source.name"
   }
-}' | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'Réindexé: {d.get(\"created\",0)} docs')" 2>/dev/null
+}' | jq -r '"Réindexé: \(.created // 0) docs"' 2>/dev/null
 
 echo ""
 echo "--- Test autocomplétion pour le préfixe 'ordi' ---"
@@ -275,7 +275,7 @@ curl -s -X POST "$BASE_URL/products-v3/_search" \
       }
     }
   }
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 
 # ============================================
@@ -309,7 +309,7 @@ curl -s -X POST "$BASE_URL/products-v2/_search" \
     }
   },
   "size": 3
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 
 # ============================================
@@ -348,7 +348,7 @@ curl -s -X POST "$BASE_URL/stores/_search" \
   ],
   "_source": ["name", "city", "address", "type"],
   "size": 10
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 
 # ============================================
@@ -375,7 +375,7 @@ curl -s -X POST "$BASE_URL/products-v2/_search" \
       }
     }
   }
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 
 # ============================================
@@ -399,7 +399,7 @@ curl -s -X POST "$BASE_URL/stores/_search" \
   },
   "_source": ["name", "city", "location"],
   "size": 20
-}' | python3 -m json.tool 2>/dev/null
+}'
 
 echo ""
 echo "================================================"

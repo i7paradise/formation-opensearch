@@ -71,20 +71,19 @@ Observez :
 
 Cherchez "bluetooth" dans `name` et `description` simultanément :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "multi_match": {
-        "query": "bluetooth",
-        "fields": ["name^2", "description"],
-        "type": "best_fields"
-      }
-    },
-    "size": 5,
-    "_source": ["name", "description", "price"]
-  }' | python3 -m json.tool
+```
+GET /products/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "bluetooth",
+      "fields": ["name^2", "description"],
+      "type": "best_fields"
+    }
+  },
+  "size": 5,
+  "_source": ["name", "description", "price"]
+}
 ```
 
 > **Boosting** : `name^2` signifie que le champ `name` compte double dans le calcul du score. Un match dans le nom d'un produit est plus pertinent qu'un match dans la description.
@@ -93,19 +92,18 @@ curl -s -X GET "http://localhost:9200/products/_search" \
 
 Par défaut, `match` utilise l'opérateur OR (un terme suffit). Essayez avec AND :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "match": {
-        "name": {
-          "query": "casque bluetooth",
-          "operator": "and"
-        }
+```
+GET /products/_search
+{
+  "query": {
+    "match": {
+      "name": {
+        "query": "casque bluetooth",
+        "operator": "and"
       }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 Comparez le nombre de résultats avec l'opérateur OR (défaut).
@@ -140,45 +138,43 @@ Structure avec `bool` + `filter` + `range` :
 
 Ajoutez un filtre sur la catégorie "Électronique" :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "bool": {
-        "filter": [
-          { "term": { "category": "Électronique" } },
-          { "term": { "in_stock": true } }
-        ]
-      }
-    },
-    "size": 5,
-    "_source": ["name", "category", "price", "in_stock"]
-  }' | python3 -m json.tool
+```
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        { "term": { "category": "Électronique" } },
+        { "term": { "in_stock": true } }
+      ]
+    }
+  },
+  "size": 5,
+  "_source": ["name", "category", "price", "in_stock"]
+}
 ```
 
 ### 2.3 Filtrer avec `terms` (plusieurs valeurs)
 
 Cherchez les produits dans plusieurs catégories à la fois :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "bool": {
-        "filter": [
-          {
-            "terms": {
-              "category": ["Électronique", "Livres"]
-            }
+```
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "category": ["Électronique", "Livres"]
           }
-        ]
-      }
-    },
-    "size": 5,
-    "_source": ["name", "category", "price"]
-  }' | python3 -m json.tool
+        }
+      ]
+    }
+  },
+  "size": 5,
+  "_source": ["name", "category", "price"]
+}
 ```
 
 ---
@@ -224,31 +220,30 @@ Structure :
 
 Boostez les produits avec une note supérieure à 4.5 :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "bool": {
-        "must": [
-          { "match": { "name": "ordinateur" } }
-        ],
-        "filter": [
-          { "term": { "in_stock": true } }
-        ],
-        "should": [
-          { "range": { "rating": { "gte": 4.5 } } },
-          { "range": { "reviews_count": { "gte": 1000 } } }
-        ],
-        "minimum_should_match": 0
-      }
-    },
-    "size": 10,
-    "_source": ["name", "price", "rating", "reviews_count"],
-    "sort": [
-      { "_score": "desc" }
-    ]
-  }' | python3 -m json.tool
+```
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "name": "ordinateur" } }
+      ],
+      "filter": [
+        { "term": { "in_stock": true } }
+      ],
+      "should": [
+        { "range": { "rating": { "gte": 4.5 } } },
+        { "range": { "reviews_count": { "gte": 1000 } } }
+      ],
+      "minimum_should_match": 0
+    }
+  },
+  "size": 10,
+  "_source": ["name", "price", "rating", "reviews_count"],
+  "sort": [
+    { "_score": "desc" }
+  ]
+}
 ```
 
 ---
@@ -257,35 +252,33 @@ curl -s -X GET "http://localhost:9200/products/_search" \
 
 L'API `_explain` vous permet de comprendre pourquoi un document a reçu un certain score de pertinence.
 
-### 4.1 Exécuter une recherche et récupérer l'ID du premier résultat
+### 4.1 Exécuter une recherche et noter l'ID du premier résultat
 
-```bash
-RESULT=$(curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "match": { "name": "ordinateur" }
-    },
-    "size": 1
-  }')
+Exécutez cette requête dans le Dev Console :
 
-echo "$RESULT" | python3 -m json.tool
-
-# Extraire l'ID du premier résultat
-DOC_ID=$(echo "$RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['hits']['hits'][0]['_id'])")
-echo "ID du premier document : $DOC_ID"
 ```
+GET /products/_search
+{
+  "query": {
+    "match": { "name": "ordinateur" }
+  },
+  "size": 1
+}
+```
+
+> Notez la valeur du champ `_id` du premier résultat (par exemple `"42"`).
 
 ### 4.2 Appeler `_explain` sur ce document
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_explain/$DOC_ID" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "match": { "name": "ordinateur" }
-    }
-  }' | python3 -m json.tool
+Remplacez `{id}` par l'ID relevé à l'étape précédente :
+
+```
+GET /products/_explain/{id}
+{
+  "query": {
+    "match": { "name": "ordinateur" }
+  }
+}
 ```
 
 ### 4.3 Analyser l'explication
@@ -306,29 +299,28 @@ Les facteurs du score BM25 :
 
 Boostez les produits bien notés dans les résultats de recherche :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "function_score": {
-        "query": { "match": { "name": "ordinateur" } },
-        "functions": [
-          {
-            "field_value_factor": {
-              "field": "rating",
-              "factor": 1.5,
-              "modifier": "sqrt",
-              "missing": 1
-            }
+```
+GET /products/_search
+{
+  "query": {
+    "function_score": {
+      "query": { "match": { "name": "ordinateur" } },
+      "functions": [
+        {
+          "field_value_factor": {
+            "field": "rating",
+            "factor": 1.5,
+            "modifier": "sqrt",
+            "missing": 1
           }
-        ],
-        "boost_mode": "multiply"
-      }
-    },
-    "size": 5,
-    "_source": ["name", "price", "rating"]
-  }' | python3 -m json.tool
+        }
+      ],
+      "boost_mode": "multiply"
+    }
+  },
+  "size": 5,
+  "_source": ["name", "price", "rating"]
+}
 ```
 
 ---

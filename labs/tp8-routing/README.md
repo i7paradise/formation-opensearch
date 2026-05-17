@@ -23,13 +23,11 @@ Sur notre cluster 3 nœuds, les 1000+ produits doivent être distribués équita
 
 ### 1.1 Créer un index avec 3 shards
 
-```bash
-curl -s -X PUT "https://localhost:9200/routing-demo-auto" \
-  -k -u admin:admin \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "settings": { "number_of_shards": 3, "number_of_replicas": 1 }
-  }' | python3 -m json.tool
+```
+PUT /routing-demo-auto
+{
+  "settings": { "number_of_shards": 3, "number_of_replicas": 1 }
+}
 ```
 
 ### 1.2 Indexer 300 documents avec ID automatique
@@ -62,13 +60,11 @@ curl -s "https://localhost:9200/_cat/shards/routing-demo-auto?v&h=index,shard,pr
 
 ### 2.1 Créer un index avec routing forcé
 
-```bash
-curl -s -X PUT "https://localhost:9200/routing-demo-forced" \
-  -k -u admin:admin \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "settings": { "number_of_shards": 3, "number_of_replicas": 1 }
-  }' | python3 -m json.tool
+```
+PUT /routing-demo-forced
+{
+  "settings": { "number_of_shards": 3, "number_of_replicas": 1 }
+}
 ```
 
 ### 2.2 Indexer des documents avec routing par catégorie
@@ -105,7 +101,7 @@ time curl -s -X GET "https://localhost:9200/routing-demo-forced/_search?explain=
   -k -u admin:admin \
   -H 'Content-Type: application/json' \
   -d '{ "query": { "term": { "category": "Électronique" } }, "size": 5 }' \
-  | python3 -c "import json,sys; r=json.load(sys.stdin); print('Total:', r['hits']['total']['value'], '| Shards interrogés:', r['_shards']['total'])"
+  | jq -r '"Total: \(.hits.total.value) | Shards interrogés: \(._shards.total)"' 2>/dev/null
 ```
 
 ### 3.2 Avec routing (shard ciblé uniquement)
@@ -115,7 +111,7 @@ time curl -s -X GET "https://localhost:9200/routing-demo-forced/_search?routing=
   -k -u admin:admin \
   -H 'Content-Type: application/json' \
   -d '{ "query": { "term": { "category": "Électronique" } }, "size": 5 }' \
-  | python3 -c "import json,sys; r=json.load(sys.stdin); print('Total:', r['hits']['total']['value'], '| Shards interrogés:', r['_shards']['total'])"
+  | jq -r '"Total: \(.hits.total.value) | Shards interrogés: \(._shards.total)"' 2>/dev/null
 ```
 
 **Observation** : Avec `?routing=Électronique`, seul 1 shard est interrogé au lieu de 3. Les résultats sont identiques mais la requête est plus ciblée.
@@ -124,19 +120,16 @@ time curl -s -X GET "https://localhost:9200/routing-demo-forced/_search?routing=
 
 ## Exercice 4 — Simuler un shard chaud
 
-```bash
-# Compter les documents par catégorie pour visualiser le déséquilibre
-curl -s -X GET "https://localhost:9200/routing-demo-forced/_search" \
-  -k -u admin:admin \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "size": 0,
-    "aggs": {
-      "par_categorie": {
-        "terms": { "field": "category", "size": 10 }
-      }
+```
+GET /routing-demo-forced/_search
+{
+  "size": 0,
+  "aggs": {
+    "par_categorie": {
+      "terms": { "field": "category", "size": 10 }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 > **Impact en production** : Un shard qui reçoit 60% des requêtes devient un goulot d'étranglement. Le nœud qui héberge ce shard est surchargé pendant que les autres sont sous-utilisés.
@@ -145,12 +138,13 @@ curl -s -X GET "https://localhost:9200/routing-demo-forced/_search" \
 
 ## TP Bonus — Diagnostiquer un shard non assigné
 
-```bash
-# Forcer un shard non assigné (simulé en cherchant des infos)
-curl -s -X GET "https://localhost:9200/_cluster/allocation/explain?pretty" \
-  -k -u admin:admin \
-  -H 'Content-Type: application/json' \
-  -d '{ "index": "routing-demo-forced", "shard": 0, "primary": true }'
+```
+GET /_cluster/allocation/explain
+{
+  "index": "routing-demo-forced",
+  "shard": 0,
+  "primary": true
+}
 ```
 
 ---

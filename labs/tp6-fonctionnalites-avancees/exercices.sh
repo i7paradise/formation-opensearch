@@ -63,7 +63,7 @@ curl -s -X POST "$BASE_URL/_reindex" \
 
 # Vérification du count
 echo "Count products-v2:"
-curl -s "$BASE_URL/products-v2/_count" | python3 -m json.tool 2>/dev/null || curl -s "$BASE_URL/products-v2/_count"
+curl -s "$BASE_URL/products-v2/_count"
 
 echo ""
 echo "=== Exercice 4 : Completion Suggester ==="

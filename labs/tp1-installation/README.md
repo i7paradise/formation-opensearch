@@ -92,8 +92,8 @@ docker compose logs opensearch-dashboards
 
 Ouvrez un nouveau terminal et interrogez l'API de santé du cluster :
 
-```bash
-curl -s http://localhost:9200/_cluster/health | python3 -m json.tool
+```
+GET /_cluster/health
 ```
 
 Attendez que `"status"` soit `"green"` avant de continuer. Si l'état est `"yellow"`, c'est normal sur un nœud unique (les réplicas ne peuvent pas être alloués). Dans notre configuration de formation, le statut sera vert car nous avons désactivé les réplicas.
@@ -236,8 +236,8 @@ docker compose up -d
 
 Attendez que le cluster soit prêt, puis vérifiez :
 
-```bash
-curl -s http://localhost:9200/ | python3 -m json.tool
+```
+GET /
 ```
 
 Le champ `cluster_name` doit maintenant afficher `ecommerce-search`.
@@ -252,26 +252,24 @@ curl -s "http://localhost:9200/_cat/nodes?v&h=name,ip,heap.percent,ram.percent,c
 
 Certains paramètres peuvent être modifiés sans redémarrage via l'API :
 
-```bash
-curl -s -X PUT "http://localhost:9200/_cluster/settings" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "persistent": {
-      "action.auto_create_index": "false"
-    }
-  }' | python3 -m json.tool
+```
+PUT /_cluster/settings
+{
+  "persistent": {
+    "action.auto_create_index": "false"
+  }
+}
 ```
 
 > **Important** : Remettez ce paramètre à sa valeur par défaut après le test, sinon les TPs suivants échoueront !
 
-```bash
-curl -s -X PUT "http://localhost:9200/_cluster/settings" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "persistent": {
-      "action.auto_create_index": null
-    }
-  }' | python3 -m json.tool
+```
+PUT /_cluster/settings
+{
+  "persistent": {
+    "action.auto_create_index": null
+  }
+}
 ```
 
 ---

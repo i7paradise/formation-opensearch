@@ -500,7 +500,7 @@ curl -s "http://localhost:9200/_cluster/pending_tasks?pretty"
 
 ```bash
 # État initial - tous les nœuds green
-curl -s "http://localhost:9200/_cluster/health" | python3 -m json.tool
+curl -s "http://localhost:9200/_cluster/health?pretty"
 
 # Identifier le cluster manager
 curl -s "http://localhost:9200/_cat/nodes?v&h=name,master&pretty"

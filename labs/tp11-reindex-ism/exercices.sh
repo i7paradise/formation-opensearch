@@ -6,7 +6,7 @@ BASE_URL="http://localhost:9200"
 echo "=== Exercice 1 : Créer un alias ==="
 curl -s -X POST "$BASE_URL/_aliases" \
   -H 'Content-Type: application/json' \
-  -d '{"actions":[{"add":{"index":"products","alias":"products-current","is_write_index":true}}]}' | python3 -m json.tool
+  -d '{"actions":[{"add":{"index":"products","alias":"products-current","is_write_index":true}}]}'
 
 echo ""
 echo "=== TODO : Créer products-v2 avec mapping amélioré ==="

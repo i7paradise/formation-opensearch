@@ -115,11 +115,11 @@ curl -s -X PUT "$BASE_URL/$INDEX" \
         }
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Vérification du mapping créé :"
-curl -s "$BASE_URL/$INDEX/_mapping" | python3 -m json.tool | head -30
+curl -s "$BASE_URL/$INDEX/_mapping" | head -30
 echo "..."
 
 # =============================================================================
@@ -135,7 +135,7 @@ echo_step "EXERCICE 2 — Indexation manuelle de produits"
 # Exemple de structure de la requête curl :
 # curl -s -X PUT "$BASE_URL/$INDEX/_doc/1" \
 #   -H 'Content-Type: application/json' \
-#   -d '{ ... votre document JSON ici ... }' | python3 -m json.tool
+#   -d '{ ... votre document JSON ici ... }'
 #
 # COMPLÉTEZ ICI :
 echo_todo "Indexer le smartphone (produit ID 1) — complétez ci-dessous"
@@ -143,7 +143,7 @@ echo_todo "Indexer le smartphone (produit ID 1) — complétez ci-dessous"
 #   -H 'Content-Type: application/json' \
 #   -d '{
 #     ...
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -153,7 +153,7 @@ echo_todo "Indexer l'ordinateur portable (produit ID 2)"
 #   -H 'Content-Type: application/json' \
 #   -d '{
 #     ...
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -163,7 +163,7 @@ echo_todo "Indexer le casque audio (produit ID 3)"
 #   -H 'Content-Type: application/json' \
 #   -d '{
 #     ...
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -173,7 +173,7 @@ echo_todo "Indexer le livre (produit ID 4)"
 #   -H 'Content-Type: application/json' \
 #   -d '{
 #     ...
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -183,12 +183,12 @@ echo_todo "Indexer la montre connectée (produit ID 5, in_stock: false)"
 #   -H 'Content-Type: application/json' \
 #   -d '{
 #     ...
-#   }' | python3 -m json.tool
+#   }'
 
 # Forcer le rafraîchissement de l'index pour rendre les documents visibles immédiatement
 echo ""
 echo "Rafraîchissement de l'index..."
-curl -s -X POST "$BASE_URL/$INDEX/_refresh" | python3 -m json.tool
+curl -s -X POST "$BASE_URL/$INDEX/_refresh"
 
 # =============================================================================
 # EXERCICE 3 — Lire, mettre à jour, supprimer
@@ -199,7 +199,7 @@ echo_step "EXERCICE 3 — CRUD : Lire, Mettre à jour, Supprimer"
 # TODO: Récupérer le produit par son ID
 # Utilisez : GET /products/_doc/{id}
 echo_todo "Récupérer le smartphone par son ID (1)"
-# curl -s "$BASE_URL/$INDEX/_doc/1" | python3 -m json.tool
+# curl -s "$BASE_URL/$INDEX/_doc/1"
 
 echo ""
 
@@ -217,7 +217,7 @@ echo_todo "Mettre à jour le prix du smartphone à 799.99€"
 #   -H 'Content-Type: application/json' \
 #   -d '{
 #     ...
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -233,24 +233,24 @@ curl -s -X POST "$BASE_URL/$INDEX/_update/3" \
         "now": "2024-04-01T00:00:00Z"
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Vérification du nouveau prix du casque (ID 3) :"
-curl -s "$BASE_URL/$INDEX/_doc/3" | python3 -m json.tool | grep -E '"price"|"updated_at"'
+curl -s "$BASE_URL/$INDEX/_doc/3" | jq '._source | {price, updated_at}' 2>/dev/null
 
 echo ""
 
 # TODO: Supprimer le produit ID 5 (montre connectée - en rupture de stock)
 # Utilisez : DELETE /products/_doc/{id}
 echo_todo "Supprimer la montre connectée (produit ID 5 — en rupture de stock)"
-# curl -s -X DELETE "$BASE_URL/$INDEX/_doc/5" | python3 -m json.tool
+# curl -s -X DELETE "$BASE_URL/$INDEX/_doc/5"
 
 echo ""
 
 # Vérifier que le document supprimé n'existe plus
 echo "Vérification que le document ID 5 n'existe plus :"
-curl -s "$BASE_URL/$INDEX/_doc/5" | python3 -m json.tool
+curl -s "$BASE_URL/$INDEX/_doc/5"
 
 # =============================================================================
 # EXERCICE 4 — Charger le catalogue via Bulk API
@@ -279,19 +279,12 @@ else
     --data-binary @"$BULK_FILE")
 
   # Vérification des erreurs
-  ERRORS=$(echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['errors'])")
+  ERRORS=$(echo "$RESPONSE" | jq -r '.errors' 2>/dev/null || echo "false")
   echo "Errors dans la réponse Bulk : $ERRORS"
 
-  if [ "$ERRORS" = "True" ]; then
-    echo -e "${RED}Des erreurs ont été détectées. Affichage des 3 premières :${NC}"
-    echo "$RESPONSE" | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-errors = [item for item in resp['items'] if list(item.values())[0].get('status', 200) >= 400]
-print(f'Total erreurs: {len(errors)}')
-for e in errors[:3]:
-    print(json.dumps(e, indent=2, ensure_ascii=False))
-"
+  if [ "$ERRORS" = "true" ]; then
+    echo -e "${RED}Des erreurs ont été détectées. Affichage des items en erreur :${NC}"
+    echo "$RESPONSE" | jq '.items[] | select((.index.status // .create.status // .update.status // .delete.status) >= 400)' 2>/dev/null | head -20
   else
     echo_ok "Bulk API terminé sans erreur !"
   fi
@@ -300,7 +293,7 @@ fi
 # Forcer le rafraîchissement
 echo ""
 echo "Rafraîchissement de l'index après le chargement bulk..."
-curl -s -X POST "$BASE_URL/$INDEX/_refresh" | python3 -m json.tool
+curl -s -X POST "$BASE_URL/$INDEX/_refresh"
 
 # =============================================================================
 # EXERCICE 5 — Vérifier le chargement
@@ -314,7 +307,7 @@ curl -s "$BASE_URL/_cat/indices/$INDEX?v"
 
 echo ""
 echo "Nombre exact de documents :"
-curl -s "$BASE_URL/$INDEX/_count" | python3 -m json.tool
+curl -s "$BASE_URL/$INDEX/_count"
 
 echo ""
 echo "Recherche de vérification (5 premiers documents) :"
@@ -324,7 +317,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     "query": { "match_all": {} },
     "size": 5,
     "_source": ["name", "category", "price", "in_stock"]
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Distribution des catégories :"
@@ -340,7 +333,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo_ok "TP2 terminé ! Vérifiez que docs.count > 1000 avant de passer au TP3."

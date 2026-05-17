@@ -8,7 +8,7 @@ echo "=== Exercice 1 : Créer index avec routing automatique ==="
 curl -s -X DELETE "$BASE_URL/routing-demo-auto" $AUTH 2>/dev/null
 curl -s -X PUT "$BASE_URL/routing-demo-auto" $AUTH \
   -H 'Content-Type: application/json' \
-  -d '{"settings": {"number_of_shards": 3, "number_of_replicas": 1}}' | python3 -m json.tool
+  -d '{"settings": {"number_of_shards": 3, "number_of_replicas": 1}}'
 
 echo ""
 echo "=== Indexer 300 docs en bulk avec ID auto ==="
@@ -23,7 +23,7 @@ for i in $(seq 1 300); do
 done
 curl -s -X POST "$BASE_URL/_bulk" $AUTH \
   -H 'Content-Type: application/x-ndjson' \
-  --data-binary @"$BULK_FILE" | python3 -c "import json,sys; r=json.load(sys.stdin); print('Errors:', r['errors'], '| Items:', len(r['items']))"
+  --data-binary @"$BULK_FILE" | jq -r '"Errors: \(.errors) | Items: \(.items | length)"' 2>/dev/null
 
 echo ""
 echo "=== Observer la distribution ==="

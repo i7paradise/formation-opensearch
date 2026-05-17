@@ -6,7 +6,7 @@ BASE_URL="http://localhost:9200"
 echo "=== Exercice 1 : Statistiques de base ==="
 curl -s -X GET "$BASE_URL/products/_search" \
   -H 'Content-Type: application/json' \
-  -d '{"size": 0, "aggs": {"prix_stats": {"stats": {"field": "price"}}}}' | python3 -m json.tool
+  -d '{"size": 0, "aggs": {"prix_stats": {"stats": {"field": "price"}}}}'
 
 echo ""
 echo "=== TODO : Exercice 2 — Agrégations bucket ==="

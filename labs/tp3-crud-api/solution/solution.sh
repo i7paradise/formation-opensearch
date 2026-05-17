@@ -114,7 +114,7 @@ curl -s -X PUT "$BASE_URL/$INDEX" \
         }
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo_ok "Index $INDEX créé avec mapping explicite"
 
@@ -149,7 +149,7 @@ curl -s -X PUT "$BASE_URL/$INDEX/_doc/1" \
     "seller": "TechShop",
     "weight_kg": 0.195,
     "color": "Noir"
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Indexation du produit 2 (Ordinateur portable)..."
@@ -174,7 +174,7 @@ curl -s -X PUT "$BASE_URL/$INDEX/_doc/2" \
     "seller": "InfoStore",
     "weight_kg": 1.8,
     "color": "Argent"
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Indexation du produit 3 (Casque audio)..."
@@ -199,7 +199,7 @@ curl -s -X PUT "$BASE_URL/$INDEX/_doc/3" \
     "seller": "AudioWorld",
     "weight_kg": 0.285,
     "color": "Blanc"
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Indexation du produit 4 (Livre)..."
@@ -224,7 +224,7 @@ curl -s -X PUT "$BASE_URL/$INDEX/_doc/4" \
     "seller": "LibraireNet",
     "weight_kg": 0.95,
     "color": "N/A"
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Indexation du produit 5 (Montre connectée — en rupture)..."
@@ -249,7 +249,7 @@ curl -s -X PUT "$BASE_URL/$INDEX/_doc/5" \
     "seller": "SportElec",
     "weight_kg": 0.042,
     "color": "Bleu"
-  }' | python3 -m json.tool
+  }'
 
 # Rafraîchissement pour rendre les docs immédiatement visibles
 curl -s -X POST "$BASE_URL/$INDEX/_refresh" > /dev/null
@@ -269,7 +269,7 @@ echo_step "EXERCICE 3 — CRUD"
 # - _source : les données du document
 # - found  : true si le document existe
 echo "Solution : Récupération du smartphone (ID 1)"
-curl -s "$BASE_URL/$INDEX/_doc/1" | python3 -m json.tool
+curl -s "$BASE_URL/$INDEX/_doc/1"
 
 echo ""
 
@@ -285,11 +285,11 @@ curl -s -X POST "$BASE_URL/$INDEX/_update/1" \
       "price": 799.99,
       "updated_at": "2024-04-01T00:00:00Z"
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Vérification du nouveau prix :"
-curl -s "$BASE_URL/$INDEX/_doc/1" | python3 -m json.tool | grep -E '"price"|"updated_at"|"_version"'
+curl -s "$BASE_URL/$INDEX/_doc/1" | grep -E '"price"|"updated_at"|"_version"'
 
 echo ""
 
@@ -305,11 +305,11 @@ curl -s -X POST "$BASE_URL/$INDEX/_update/3" \
         "now": "2024-04-01T00:00:00Z"
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Prix après remise (199.99 * 0.9 = 179.99€) :"
-curl -s "$BASE_URL/$INDEX/_doc/3" | python3 -m json.tool | grep '"price"'
+curl -s "$BASE_URL/$INDEX/_doc/3" | grep '"price"'
 
 echo ""
 
@@ -318,11 +318,11 @@ echo ""
 # La réponse contient "result": "deleted" si le document existait,
 # ou "result": "not_found" s'il n'existait pas.
 echo "Solution : Suppression de la montre connectée (ID 5 — en rupture)"
-curl -s -X DELETE "$BASE_URL/$INDEX/_doc/5" | python3 -m json.tool
+curl -s -X DELETE "$BASE_URL/$INDEX/_doc/5"
 
 echo ""
 echo "Vérification : le document ID 5 ne doit plus exister (found: false)"
-curl -s "$BASE_URL/$INDEX/_doc/5" | python3 -m json.tool
+curl -s "$BASE_URL/$INDEX/_doc/5"
 
 # =============================================================================
 # EXERCICE 4 — Bulk API
@@ -354,20 +354,7 @@ fi
 echo "Chargement du catalogue via Bulk API..."
 curl -s -X POST "$BASE_URL/_bulk" \
   -H 'Content-Type: application/x-ndjson' \
-  --data-binary @"$BULK_FILE" | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-total = len(resp['items'])
-errors = [item for item in resp['items'] if list(item.values())[0].get('status', 200) >= 400]
-print(f'Documents traités : {total}')
-print(f'Erreurs           : {len(errors)}')
-print(f'Succès            : {total - len(errors)}')
-print(f'Temps (ms)        : {resp.get(\"took\", \"N/A\")}')
-if errors:
-    print('Premiers erreurs :')
-    for e in errors[:2]:
-        print(json.dumps(e, indent=2, ensure_ascii=False))
-"
+  --data-binary @"$BULK_FILE" | jq '{total: (.items | length), errors: .errors, took: .took}' 2>/dev/null
 
 # Rafraîchir après le bulk
 curl -s -X POST "$BASE_URL/$INDEX/_refresh" > /dev/null
@@ -383,7 +370,7 @@ curl -s "$BASE_URL/_cat/indices/$INDEX?v"
 
 echo ""
 echo "Nombre total de documents :"
-curl -s "$BASE_URL/$INDEX/_count" | python3 -m json.tool
+curl -s "$BASE_URL/$INDEX/_count"
 
 echo ""
 echo "Échantillon de documents (5 premiers) :"
@@ -393,7 +380,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     "query": { "match_all": {} },
     "size": 5,
     "_source": ["name", "category", "price", "in_stock", "brand"]
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "Distribution des catégories :"
@@ -409,17 +396,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['par_categorie']['buckets']
-print(f'Nombre de catégories : {len(buckets)}')
-print('')
-print(f'{'Catégorie':<30} {'Nb produits':>12}')
-print('-' * 44)
-for b in buckets:
-    print(f'{b[\"key\"]:<30} {b[\"doc_count\"]:>12}')
-"
+  }' | jq '.aggregations.par_categorie.buckets[] | {key, doc_count}' 2>/dev/null
 
 echo ""
 echo_ok "TP2 Solution complète exécutée !"

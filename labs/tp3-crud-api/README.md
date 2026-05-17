@@ -72,39 +72,38 @@ Avant de créer le mapping, comprenez les types utilisés :
 
 ### 1.2 Créer le mapping
 
-Utilisez le script `exercices.sh` pour créer l'index, ou exécutez directement :
+Utilisez le script `exercices.sh` pour créer l'index, ou exécutez directement depuis le Dev Console :
 
-```bash
-curl -s -X PUT "http://localhost:9200/products" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 0
-    },
-    "mappings": {
-      "properties": {
-        "name": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
-        "description": { "type": "text" },
-        "category": { "type": "keyword" },
-        "sub_category": { "type": "keyword" },
-        "brand": { "type": "keyword" },
-        "price": { "type": "float" },
-        "original_price": { "type": "float" },
-        "currency": { "type": "keyword" },
-        "in_stock": { "type": "boolean" },
-        "stock_quantity": { "type": "integer" },
-        "rating": { "type": "float" },
-        "reviews_count": { "type": "integer" },
-        "tags": { "type": "keyword" },
-        "created_at": { "type": "date" },
-        "updated_at": { "type": "date" },
-        "seller": { "type": "keyword" },
-        "weight_kg": { "type": "float" },
-        "color": { "type": "keyword" }
-      }
+```
+PUT /products
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "name": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+      "description": { "type": "text" },
+      "category": { "type": "keyword" },
+      "sub_category": { "type": "keyword" },
+      "brand": { "type": "keyword" },
+      "price": { "type": "float" },
+      "original_price": { "type": "float" },
+      "currency": { "type": "keyword" },
+      "in_stock": { "type": "boolean" },
+      "stock_quantity": { "type": "integer" },
+      "rating": { "type": "float" },
+      "reviews_count": { "type": "integer" },
+      "tags": { "type": "keyword" },
+      "created_at": { "type": "date" },
+      "updated_at": { "type": "date" },
+      "seller": { "type": "keyword" },
+      "weight_kg": { "type": "float" },
+      "color": { "type": "keyword" }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 **Réponse attendue :**
@@ -118,8 +117,8 @@ curl -s -X PUT "http://localhost:9200/products" \
 
 ### 1.3 Vérifier le mapping créé
 
-```bash
-curl -s "http://localhost:9200/products/_mapping" | python3 -m json.tool
+```
+GET /products/_mapping
 ```
 
 > **Pourquoi `name.keyword` en plus de `name` ?** Le champ `name` est de type `text` (analysé, pour la recherche full-text). Le sous-champ `name.keyword` est de type `keyword` (non analysé, pour les tris et agrégations exactes). Cette combinaison est très courante.
@@ -263,8 +262,8 @@ Indexez les 5 produits suivants (un par un, avec des IDs de 1 à 5) :
 
 Après les indexations, forcez le rafraîchissement pour que les documents soient immédiatement visibles :
 
-```bash
-curl -s -X POST "http://localhost:9200/products/_refresh"
+```
+POST /products/_refresh
 ```
 
 ---
@@ -310,15 +309,14 @@ POST /products/_update/{id}
 
 OpenSearch permet des mises à jour scriptées. Appliquez une remise de 10% sur le prix :
 
-```bash
-curl -s -X POST "http://localhost:9200/products/_update/1" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "script": {
-      "source": "ctx._source.price = Math.round(ctx._source.price * 0.9 * 100) / 100.0",
-      "lang": "painless"
-    }
-  }' | python3 -m json.tool
+```
+POST /products/_update/1
+{
+  "script": {
+    "source": "ctx._source.price = Math.round(ctx._source.price * 0.9 * 100) / 100.0",
+    "lang": "painless"
+  }
+}
 ```
 
 ### 3.5 Supprimer un document
@@ -331,8 +329,8 @@ DELETE /products/_doc/{id}
 ```
 
 Vérifiez qu'il n'existe plus :
-```bash
-curl -s "http://localhost:9200/products/_doc/5"
+```
+GET /products/_doc/5
 ```
 
 ---
@@ -357,32 +355,21 @@ Chaque document est précédé d'une ligne d'action. Les paires de lignes (actio
 
 Le fichier `data/products-bulk.ndjson` contient plus de 1000 produits. Chargez-les :
 
+> **Note** : Le chargement de fichiers NDJSON se fait via curl, pas depuis le Dev Console.
+
 ```bash
 curl -s -X POST "http://localhost:9200/_bulk" \
   -H 'Content-Type: application/x-ndjson' \
-  --data-binary @../../data/products-bulk.ndjson | python3 -m json.tool | tail -5
+  --data-binary @../../data/products-bulk.ndjson
 ```
 
 > **Note** : `--data-binary` est crucial (à la place de `-d`) pour préserver les retours à la ligne dans le fichier NDJSON.
 
 ### 4.3 Vérifier la réponse Bulk
 
-La réponse contient le champ `errors` (true/false) et `items` (résultat pour chaque document). En cas d'erreur, filtrez :
+La réponse contient le champ `errors` (true/false) et `items` (résultat pour chaque document).
 
-```bash
-curl -s -X POST "http://localhost:9200/_bulk" \
-  -H 'Content-Type: application/x-ndjson' \
-  --data-binary @../../data/products-bulk.ndjson \
-  | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-print('Errors:', resp['errors'])
-errors = [item for item in resp['items'] if list(item.values())[0].get('status') >= 400]
-print('Documents en erreur:', len(errors))
-if errors:
-    print('Premier erreur:', json.dumps(errors[0], indent=2))
-"
-```
+Vérifiez que `errors` est `false` dans la réponse.
 
 ---
 
@@ -392,16 +379,15 @@ if errors:
 
 Dans OpenSearch, supprimer un document individuel ne libère pas immédiatement l'espace disque. Le document est marqué comme supprimé ("tombstone") et l'espace n'est récupéré qu'après un merge de segment Lucene.
 
-```bash
+```
 # À ÉVITER en production pour de gros volumes :
 DELETE /products/_doc/1
 
 # PRÉFÉRER pour supprimer plusieurs documents selon un critère :
-curl -s -X POST "http://localhost:9200/products/_delete_by_query" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": { "term": { "in_stock": false } }
-  }' | python3 -m json.tool
+POST /products/_delete_by_query
+{
+  "query": { "term": { "in_stock": false } }
+}
 ```
 
 **Règle** : Pour supprimer un index entier (ex. rotation de logs), supprimez l'index, pas les documents un par un.
@@ -410,33 +396,31 @@ curl -s -X POST "http://localhost:9200/products/_delete_by_query" \
 
 Évitez les wildcards au début d'un terme — ils forcent un scan complet de l'index inversé :
 
-```bash
+```
 # MAUVAISE pratique — scan complet, très lent :
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": { "wildcard": { "name": { "value": "*phone" } } }
-  }' | python3 -m json.tool
+GET /products/_search
+{
+  "query": { "wildcard": { "name": { "value": "*phone" } } }
+}
+```
 
+```
 # BONNE pratique — prefix query ou n-grams à l'indexation :
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": { "prefix": { "name.keyword": { "value": "Smart" } } }
-  }' | python3 -m json.tool
+GET /products/_search
+{
+  "query": { "prefix": { "name.keyword": { "value": "Smart" } } }
+}
 ```
 
 ### 5.3 Bonne pratique : `_source` filtering pour réduire la bande passante
 
-```bash
-# Retourner seulement les champs nécessaires :
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "_source": ["name", "price", "category", "in_stock"],
-    "query": { "match_all": {} },
-    "size": 5
-  }' | python3 -m json.tool
+```
+GET /products/_search
+{
+  "_source": ["name", "price", "category", "in_stock"],
+  "query": { "match_all": {} },
+  "size": 5
+}
 ```
 
 > **Règle** : En production, ne retournez jamais les grands champs (`description`, `images`...) si vous n'en avez pas besoin dans l'affichage.
@@ -445,21 +429,29 @@ curl -s -X GET "http://localhost:9200/products/_search" \
 
 Pour un chargement massif de données, désactivez le refresh automatique pendant l'import :
 
-```bash
+```
 # Désactiver le refresh pendant le chargement
-curl -s -X PUT "http://localhost:9200/products/_settings" \
-  -H 'Content-Type: application/json' \
-  -d '{ "index": { "refresh_interval": "-1", "number_of_replicas": 0 } }'
+PUT /products/_settings
+{
+  "index": { "refresh_interval": "-1", "number_of_replicas": 0 }
+}
+```
 
+> **Note** : Le chargement de fichiers NDJSON se fait via curl, pas depuis le Dev Console.
+
+```bash
 # Charger les données via Bulk API
 curl -s -X POST "http://localhost:9200/_bulk" \
   -H 'Content-Type: application/x-ndjson' \
-  --data-binary @../../data/products-bulk.ndjson | python3 -m json.tool | tail -3
+  --data-binary @../../data/products-bulk.ndjson
+```
 
+```
 # Réactiver le refresh
-curl -s -X PUT "http://localhost:9200/products/_settings" \
-  -H 'Content-Type: application/json' \
-  -d '{ "index": { "refresh_interval": "1s", "number_of_replicas": 1 } }'
+PUT /products/_settings
+{
+  "index": { "refresh_interval": "1s", "number_of_replicas": 1 }
+}
 ```
 
 > **Règle** : Toujours utiliser Bulk API pour > 100 documents. Avec `refresh_interval=-1` et `replicas=0` pendant le chargement, vous pouvez multiplier la vitesse d'indexation par 5 à 10.
@@ -478,131 +470,41 @@ Vérifiez la colonne `docs.count` : vous devriez avoir 1004 documents (4 manuels
 
 ### 5.2 Recherche de vérification
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": { "match_all": {} },
-    "size": 5
-  }' | python3 -m json.tool
+```
+GET /products/_search
+{
+  "query": { "match_all": {} },
+  "size": 5
+}
 ```
 
 ### 5.3 Statistiques de l'index
 
-```bash
-curl -s "http://localhost:9200/products/_stats" | python3 -m json.tool | grep -A 3 '"docs"'
+```
+GET /products/_stats
 ```
 
 ### 5.4 Récapitulatif du catalogue
 
 Vérifiez rapidement la distribution des catégories :
 
-```bash
-curl -s -X GET "http://localhost:9200/products/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "size": 0,
-    "aggs": {
-      "categories": {
-        "terms": { "field": "category", "size": 20 }
-      }
+```
+GET /products/_search
+{
+  "size": 0,
+  "aggs": {
+    "categories": {
+      "terms": { "field": "category", "size": 20 }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 ---
 
 ## TP Bonus — Générer 5000 produits aléatoires
 
-### Option 1 : Script Python
-
-```python
-#!/usr/bin/env python3
-"""Générateur de produits e-commerce pour OpenSearch."""
-
-import json
-import random
-import uuid
-from datetime import datetime, timedelta
-
-CATEGORIES = {
-    "Électronique": ["Smartphones", "Ordinateurs portables", "Tablettes", "Audio", "TV & Vidéo"],
-    "Vêtements": ["Hommes", "Femmes", "Enfants", "Sport", "Accessoires"],
-    "Maison & Jardin": ["Mobilier", "Décoration", "Jardinage", "Cuisine", "Bricolage"],
-    "Livres": ["Informatique", "Sciences", "Roman", "Histoire", "Développement personnel"],
-    "Sports": ["Fitness", "Cyclisme", "Natation", "Running", "Sports collectifs"],
-    "Beauté": ["Soins visage", "Maquillage", "Parfums", "Soins cheveux", "Bien-être"],
-}
-
-BRANDS = ["TechBrand", "CompuPro", "SoundMax", "FitTech", "StyleCo", "HomeDesign",
-          "SportPro", "BeautyLux", "GardenLife", "KidsFun", "AutoParts", "PetCare"]
-
-COLORS = ["Noir", "Blanc", "Rouge", "Bleu", "Vert", "Gris", "Or", "Argent", "Rose", "N/A"]
-
-SELLERS = ["TechShop", "MegaStore", "FastDeal", "PremiumShop", "QuickBuy",
-           "BestPrice", "TopSeller", "DirectShop", "EasyBuy", "ProStore"]
-
-def random_date(start_year=2022, end_year=2024):
-    start = datetime(start_year, 1, 1)
-    end = datetime(end_year, 12, 31)
-    delta = end - start
-    random_days = random.randint(0, delta.days)
-    return (start + timedelta(days=random_days)).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-def generate_product(product_id):
-    category = random.choice(list(CATEGORIES.keys()))
-    sub_category = random.choice(CATEGORIES[category])
-    brand = random.choice(BRANDS)
-    original_price = round(random.uniform(5, 2000), 2)
-    discount = random.uniform(0, 0.4)
-    price = round(original_price * (1 - discount), 2)
-    created = random_date(2022, 2023)
-
-    return {
-        "name": f"{sub_category} {brand} Modèle {random.randint(100, 999)}",
-        "description": f"Excellent {sub_category.lower()} de la marque {brand}. "
-                       f"Qualité supérieure, livraison rapide. Référence {uuid.uuid4().hex[:8].upper()}.",
-        "category": category,
-        "sub_category": sub_category,
-        "brand": brand,
-        "price": price,
-        "original_price": original_price,
-        "currency": "EUR",
-        "in_stock": random.random() > 0.15,
-        "stock_quantity": random.randint(0, 500),
-        "rating": round(random.uniform(1.0, 5.0), 1),
-        "reviews_count": random.randint(0, 10000),
-        "tags": [sub_category.lower().replace(" ", "-"), brand.lower(), category.lower()],
-        "created_at": created,
-        "updated_at": random_date(2023, 2024),
-        "seller": random.choice(SELLERS),
-        "weight_kg": round(random.uniform(0.01, 50.0), 3),
-        "color": random.choice(COLORS),
-    }
-
-def main():
-    output_file = "products-generated-5000.ndjson"
-    count = 5000
-    start_id = 2000  # Commencer après les 1000 produits du bulk initial
-
-    with open(output_file, "w", encoding="utf-8") as f:
-        for i in range(count):
-            product_id = start_id + i
-            action = json.dumps({"index": {"_index": "products", "_id": str(product_id)}})
-            document = json.dumps(generate_product(product_id), ensure_ascii=False)
-            f.write(action + "\n")
-            f.write(document + "\n")
-
-    print(f"{count} produits générés dans {output_file}")
-    print(f"Pour charger : curl -s -X POST 'http://localhost:9200/_bulk' \\")
-    print(f"  -H 'Content-Type: application/x-ndjson' \\")
-    print(f"  --data-binary @{output_file}")
-
-if __name__ == "__main__":
-    main()
-```
-
-### Option 2 : Script Bash (simplifié)
+### Script Bash (simplifié)
 
 ```bash
 #!/bin/bash

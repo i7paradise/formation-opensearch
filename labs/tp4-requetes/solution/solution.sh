@@ -46,18 +46,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     "size": 5,
     "_source": ["name", "category", "price"],
     "track_total_hits": true
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-total = resp['hits']['total']['value']
-hits = resp['hits']['hits']
-print(f'Total de résultats : {total}')
-print()
-print(f'{'Score':>8} | {'Nom':<45} | {'Prix':>8}')
-print('-' * 70)
-for h in hits:
-    print(f'{h[\"_score\"]:>8.4f} | {h[\"_source\"][\"name\"]:<45} | {h[\"_source\"].get(\"price\", 0):>8.2f}€')
-"
+  }'
 
 echo_ok "La match query retourne les documents correspondants triés par pertinence"
 
@@ -91,19 +80,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     "sort": [
       { "price": { "order": "asc" } }
     ]
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-total = resp['hits']['total']['value']
-hits = resp['hits']['hits']
-print(f'Produits en stock entre 100€ et 500€ : {total}')
-print()
-print(f'{'Prix':>8} | {'En stock':<10} | Nom')
-print('-' * 70)
-for h in hits:
-    s = h['_source']
-    print(f'{s[\"price\"]:>8.2f}€ | {str(s[\"in_stock\"]):<10} | {s[\"name\"]}')
-"
+  }'
 
 # REMARQUE : Les filtres utilisent "term" (pas "match") pour les champs keyword.
 # "term" effectue une comparaison exacte — parfait pour les booléens, keywords, IDs.
@@ -145,21 +122,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     },
     "size": 5,
     "_source": ["name", "brand", "price", "in_stock", "rating"]
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-total = resp['hits']['total']['value']
-hits = resp['hits']['hits']
-print(f'Smartphones en stock (hors TechBrand) : {total}')
-print()
-for h in hits:
-    s = h['_source']
-    print(f'  Score: {h[\"_score\"]:.3f} | {s[\"name\"]} | Marque: {s.get(\"brand\",\"?\")} | {s[\"price\"]}€')
-    assert s.get('brand') != 'TechBrand', 'ERREUR: TechBrand ne devrait pas apparaître!'
-    assert s.get('in_stock') == True, 'ERREUR: Produit hors stock dans les résultats!'
-print()
-print('Vérification : aucune marque TechBrand, tous en stock.')
-"
+  }'
 
 echo_ok "Bool query : must (score) + filter (rapide) + must_not (exclusion)"
 
@@ -200,17 +163,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['par_categorie']['buckets']
-print(f'Prix moyen par catégorie (trié par prix décroissant) :')
-print()
-print(f'{'Catégorie':<35} {'Nb produits':>12} {'Prix moyen':>12}')
-print('=' * 62)
-for b in buckets:
-    print(f'{b[\"key\"]:<35} {b[\"doc_count\"]:>12} {b[\"prix_moyen\"][\"value\"]:>11.2f}€')
-"
+  }'
 
 echo_ok "Agrégation terms + avg : prix moyen calculé pour chaque catégorie"
 
@@ -243,23 +196,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['tranches_prix']['buckets']
-total_docs = sum(b['doc_count'] for b in buckets)
-max_count = max(b['doc_count'] for b in buckets) if buckets else 1
-print(f'Distribution des prix (catalogue complet — {total_docs} produits) :')
-print()
-print(f'{'Tranche':>14} | {'Produits':>8} | {'%':>5} | Distribution')
-print('-' * 70)
-for b in buckets:
-    bar_len = int(b['doc_count'] / max_count * 35)
-    bar = '█' * bar_len
-    pct = b['doc_count'] / total_docs * 100
-    tranche = f'{int(b[\"key\"])}€-{int(b[\"key\"])+100}€'
-    print(f'{tranche:>14} | {b[\"doc_count\"]:>8} | {pct:>4.1f}% | {bar}')
-"
+  }'
 
 echo_ok "Histogramme : chaque bucket = une tranche de 100€ avec son nombre de produits"
 
@@ -274,14 +211,13 @@ RESULT=$(curl -s -X GET "$BASE_URL/$INDEX/_search" \
   -H 'Content-Type: application/json' \
   -d '{"query":{"match":{"name":"ordinateur"}},"size":1}')
 
-TOTAL=$(echo "$RESULT" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['hits']['total']['value'])")
+TOTAL=$(echo "$RESULT" | jq -r '.hits.total.value' 2>/dev/null || echo "0")
 
 if [ "$TOTAL" -gt 0 ]; then
-  DOC_ID=$(echo "$RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['hits']['hits'][0]['_id'])")
-  DOC_NAME=$(echo "$RESULT" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['hits']['hits'][0]['_source'].get('name','?'))")
-  DOC_SCORE=$(echo "$RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['hits']['hits'][0]['_score'])")
+  DOC_ID=$(echo "$RESULT" | jq -r '.hits.hits[0]._id' 2>/dev/null)
+  DOC_SCORE=$(echo "$RESULT" | jq -r '.hits.hits[0]._score' 2>/dev/null)
 
-  echo "Document analysé : '$DOC_NAME' (ID: $DOC_ID, score: $DOC_SCORE)"
+  echo "Document analysé — ID: $DOC_ID, score: $DOC_SCORE"
   echo ""
 
   # POURQUOI _explain est utile :
@@ -301,27 +237,7 @@ if [ "$TOTAL" -gt 0 ]; then
       "query": {
         "match": { "name": "ordinateur" }
       }
-    }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-explain = resp.get('explanation', {})
-
-def print_tree(node, indent=0):
-    prefix = '  ' * indent
-    desc = node.get('description', '')
-    value = node.get('value', 0)
-    # Tronquer les descriptions trop longues pour la lisibilité
-    if len(desc) > 70:
-        desc = desc[:67] + '...'
-    print(f'{prefix}{value:.4f}  {desc}')
-    for detail in node.get('details', []):
-        print_tree(detail, indent + 1)
-
-print(f'Score total : {resp.get(\"_explanation\", explain).get(\"value\", explain.get(\"value\", \"?\"))}')
-print()
-print('Arbre de calcul BM25 :')
-print_tree(explain)
-"
+    }'
 
   echo ""
   echo "Lecture du score BM25 :"
@@ -340,17 +256,7 @@ curl -s -X POST "$BASE_URL/$INDEX/_analyze" \
   -d '{
     "field": "name",
     "text": "Ordinateur Portable Ultra-Rapide"
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-tokens = resp.get('tokens', [])
-print('Tokens produits (ce qui est indexé) :')
-for t in tokens:
-    print(f'  position {t[\"position\"]:>2} → \"{t[\"token\"]}\"')
-print()
-print('Conclusion : la recherche \"ordinateur\" trouvera ce document car')
-print('l analyseur a produit le token \"ordinateur\" (minuscule).')
-"
+  }'
 
 # =============================================================================
 # BONUS — Agrégation imbriquée avancée
@@ -394,33 +300,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['top_5_categories']['buckets']
-print('Top 5 catégories — Analyse des prix :')
-print()
-for b in buckets:
-    cat = b['key']
-    count = b['doc_count']
-    moy = b['prix_moyen']['value']
-    mini = b['prix_min']['value']
-    maxi = b['prix_max']['value']
-
-    cher = b['produit_le_plus_cher']['hits']['hits']
-    pas_cher = b['produit_le_moins_cher']['hits']['hits']
-
-    print(f'{'='*60}')
-    print(f'Catégorie : {cat} ({count} produits)')
-    print(f'  Prix : min={mini:.2f}€ | moy={moy:.2f}€ | max={maxi:.2f}€')
-    if cher:
-        s = cher[0]['_source']
-        print(f'  Le plus cher  : {s[\"name\"]} — {s[\"price\"]}€')
-    if pas_cher:
-        s = pas_cher[0]['_source']
-        print(f'  Le moins cher : {s[\"name\"]} — {s[\"price\"]}€')
-    print()
-"
+  }'
 
 echo ""
 echo_ok "TP3 Solution complète exécutée !"

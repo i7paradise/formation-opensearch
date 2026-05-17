@@ -27,7 +27,7 @@ echo_todo() {
 
 # Vérification préalable
 echo "Vérification de l'index products..."
-COUNT=$(curl -s "$BASE_URL/$INDEX/_count" | python3 -c "import json,sys; print(json.load(sys.stdin).get('count', 0))")
+COUNT=$(curl -s "$BASE_URL/$INDEX/_count" | jq -r '.count // 0' 2>/dev/null || echo "0")
 echo "Nombre de documents dans $INDEX : $COUNT"
 if [ "$COUNT" -lt 100 ]; then
   echo "ATTENTION : Moins de 100 documents trouvés. Avez-vous bien terminé le TP2 ?"
@@ -45,7 +45,7 @@ echo_step "EXERCICE 1 — Recherche full-text (match query)"
 # Les résultats sont triés par score de pertinence (_score) décroissant.
 
 # TODO: Chercher les produits contenant "ordinateur" dans le nom
-# La match query analyse "ordinateur" avant de le chercher dans le champ "name"
+# La match query analyse "ordinateur" avant de le chercher dans l'index "name"
 # Conseil : affichez aussi le _score et le nombre total de résultats (hits.total.value)
 echo_todo "Chercher les produits contenant 'ordinateur' dans le champ name"
 # curl -s -X GET "$BASE_URL/$INDEX/_search" \
@@ -56,7 +56,7 @@ echo_todo "Chercher les produits contenant 'ordinateur' dans le champ name"
 #     },
 #     "size": 5,
 #     "_source": ["name", "category", "price"]
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -74,7 +74,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     },
     "size": 5,
     "_source": ["name", "price", "_score"]
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 
@@ -84,13 +84,13 @@ echo "--- Avec opérateur OR (défaut) ---"
 curl -s -X GET "$BASE_URL/$INDEX/_search" \
   -H 'Content-Type: application/json' \
   -d '{"query":{"match":{"name":"casque bluetooth"}},"size":0}' \
-  | python3 -c "import json,sys; r=json.load(sys.stdin); print(f'Résultats OR: {r[\"hits\"][\"total\"][\"value\"]}')"
+  | jq -r '"Résultats OR: \(.hits.total.value)"' 2>/dev/null
 
 echo "--- Avec opérateur AND ---"
 curl -s -X GET "$BASE_URL/$INDEX/_search" \
   -H 'Content-Type: application/json' \
   -d '{"query":{"match":{"name":{"query":"casque bluetooth","operator":"and"}}},"size":0}' \
-  | python3 -c "import json,sys; r=json.load(sys.stdin); print(f'Résultats AND: {r[\"hits\"][\"total\"][\"value\"]}')"
+  | jq -r '"Résultats AND: \(.hits.total.value)"' 2>/dev/null
 
 # =============================================================================
 # EXERCICE 2 — Filtres (filter context)
@@ -120,7 +120,7 @@ echo_todo "Filtrer les produits en stock avec prix entre 100€ et 500€"
 #     "size": 5,
 #     "_source": ["name", "price", "in_stock"],
 #     "sort": [{"price": "asc"}]
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -139,7 +139,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     },
     "size": 3,
     "_source": ["name", "category", "price"]
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 
@@ -156,7 +156,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         ]
       }
     }
-  }' | python3 -c "import json,sys; r=json.load(sys.stdin); print(f'Produits Électronique + Livres : {r[\"hits\"][\"total\"][\"value\"]}')"
+  }' | jq -r '"Produits Électronique + Livres : \(.hits.total.value)"' 2>/dev/null
 
 # =============================================================================
 # EXERCICE 3 — Bool query combinée
@@ -187,7 +187,7 @@ echo_todo "Bool query : Smartphones en stock, pas de la marque TechBrand"
 #     },
 #     "size": 5,
 #     "_source": ["name", "brand", "price", "in_stock"]
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -212,7 +212,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
     },
     "size": 5,
     "_source": ["name", "price", "rating", "reviews_count"]
-  }' | python3 -m json.tool
+  }'
 
 # =============================================================================
 # EXERCICE 4 — Agrégation : prix moyen par catégorie
@@ -244,7 +244,7 @@ echo_todo "Calculer le prix moyen par catégorie (terms + avg imbriquées)"
 #         }
 #       }
 #     }
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -269,16 +269,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['par_categorie']['buckets']
-print(f'{'Catégorie':<30} {'Min':>8} {'Moy':>8} {'Max':>8} {'σ':>8}')
-print('-' * 66)
-for b in buckets:
-    s = b['stats_prix']
-    print(f'{b[\"key\"]:<30} {s[\"min\"]:>8.2f} {s[\"avg\"]:>8.2f} {s[\"max\"]:>8.2f} {s[\"std_deviation\"]:>8.2f}')
-"
+  }'
 
 # =============================================================================
 # EXERCICE 5 — Histogramme de prix par tranches de 100€
@@ -305,7 +296,7 @@ echo_todo "Créer un histogramme de prix avec des tranches de 100€"
 #         ...
 #       }
 #     }
-#   }' | python3 -m json.tool
+#   }'
 
 echo ""
 
@@ -332,18 +323,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['tranches_prix']['buckets']
-print('Distribution des prix (Électronique en stock):')
-print(f'{'Tranche':>12} | {'Nb produits':>12} | Barre')
-print('-' * 50)
-max_count = max(b['doc_count'] for b in buckets) if buckets else 1
-for b in buckets:
-    bar = '#' * int(b['doc_count'] / max_count * 30)
-    print(f'{int(b[\"key\"]):>8}€-{int(b[\"key\"]+100):>3}€ | {b[\"doc_count\"]:>12} | {bar}')
-"
+  }'
 
 echo ""
 
@@ -367,15 +347,7 @@ curl -s -X GET "$BASE_URL/$INDEX/_search" \
         }
       }
     }
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-buckets = resp['aggregations']['gammes_prix']['buckets']
-print(f'{'Gamme de prix':<20} {'Nb produits':>12}')
-print('-' * 34)
-for b in buckets:
-    print(f'{b[\"key\"]:<20} {b[\"doc_count\"]:>12}')
-"
+  }'
 
 # =============================================================================
 # EXERCICE 6 — Comprendre le score avec _explain
@@ -397,12 +369,12 @@ RESULT=$(curl -s -X GET "$BASE_URL/$INDEX/_search" \
     "size": 1
   }')
 
-TOTAL=$(echo "$RESULT" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['hits']['total']['value'])")
+TOTAL=$(echo "$RESULT" | jq -r '.hits.total.value' 2>/dev/null || echo "0")
 echo "Total de résultats pour 'ordinateur' : $TOTAL"
 
 if [ "$TOTAL" -gt 0 ]; then
-  DOC_ID=$(echo "$RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['hits']['hits'][0]['_id'])")
-  DOC_SCORE=$(echo "$RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin)['hits']['hits'][0]['_score'])")
+  DOC_ID=$(echo "$RESULT" | jq -r '.hits.hits[0]._id' 2>/dev/null)
+  DOC_SCORE=$(echo "$RESULT" | jq -r '.hits.hits[0]._score' 2>/dev/null)
   echo "Meilleur résultat — ID: $DOC_ID | Score: $DOC_SCORE"
   echo ""
 
@@ -415,7 +387,7 @@ if [ "$TOTAL" -gt 0 ]; then
   #     "query": {
   #       "match": { "name": "ordinateur" }
   #     }
-  #   }' | python3 -m json.tool
+  #   }'
 
   echo ""
   echo "--- Pour aller plus loin : analyse _explain complète ---"
@@ -439,14 +411,7 @@ curl -s -X POST "$BASE_URL/$INDEX/_analyze" \
   -d '{
     "field": "name",
     "text": "Ordinateur Portable Ultra-Rapide"
-  }' | python3 -c "
-import json, sys
-resp = json.load(sys.stdin)
-tokens = resp.get('tokens', [])
-print('Tokens générés par l analyseur standard :')
-for t in tokens:
-    print(f'  [{t[\"position\"]}] \"{t[\"token\"]}\" (offset {t[\"start_offset\"]}-{t[\"end_offset\"]})')
-"
+  }'
 
 echo ""
 echo "Fin du TP3 — Récapitulatif :"

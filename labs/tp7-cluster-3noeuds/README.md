@@ -198,7 +198,7 @@ docker stop opensearch-node3
 
 ```bash
 # Suivre l'état du cluster en temps réel (toutes les 2 secondes)
-watch -n 2 'curl -s http://localhost:9200/_cluster/health | python3 -m json.tool'
+watch -n 2 'curl -s http://localhost:9200/_cluster/health?pretty'
 ```
 
 Observations attendues :

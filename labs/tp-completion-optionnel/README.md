@@ -17,31 +17,32 @@ Implémenter une barre de recherche avec autocomplétion en temps réel sur les 
 
 ## Exercice 1 — Créer un index avec champ `completion`
 
-```bash
-curl -s -X PUT "http://localhost:9200/products-suggest" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
-    "mappings": {
-      "properties": {
-        "name":     { "type": "text" },
-        "category": { "type": "keyword" },
-        "price":    { "type": "float" },
-        "suggest": {
-          "type": "completion",
-          "analyzer": "simple",
-          "preserve_separators": true,
-          "preserve_position_increments": true,
-          "max_input_length": 50
-        }
+```
+PUT /products-suggest
+{
+  "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+  "mappings": {
+    "properties": {
+      "name":     { "type": "text" },
+      "category": { "type": "keyword" },
+      "price":    { "type": "float" },
+      "suggest": {
+        "type": "completion",
+        "analyzer": "simple",
+        "preserve_separators": true,
+        "preserve_position_increments": true,
+        "max_input_length": 50
       }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 ---
 
 ## Exercice 2 — Indexer des produits avec suggestions
+
+> **Note** : Le chargement de fichiers NDJSON se fait via curl, pas depuis le Dev Console.
 
 ```bash
 curl -s -X POST "http://localhost:9200/_bulk" \
@@ -56,27 +57,26 @@ curl -s -X POST "http://localhost:9200/_bulk" \
 {"name":"Montre Connectée Sport GPS","category":"Montres","price":349.0,"suggest":{"input":["Montre Connectée","Smartwatch","montre GPS","montre sport"],"weight":7}}
 {"index":{"_index":"products-suggest","_id":"5"}}
 {"name":"Tablette Graphique Creative Pro","category":"Informatique","price":249.0,"suggest":{"input":["Tablette Graphique","tablette créative","tablette dessin"],"weight":6}}
-' | python3 -m json.tool
+'
 ```
 
 ---
 
 ## Exercice 3 — Requête de complétion basique
 
-```bash
-curl -s -X GET "http://localhost:9200/products-suggest/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "suggest": {
-      "product-suggest": {
-        "prefix": "smart",
-        "completion": {
-          "field": "suggest",
-          "size": 5
-        }
+```
+GET /products-suggest/_search
+{
+  "suggest": {
+    "product-suggest": {
+      "prefix": "smart",
+      "completion": {
+        "field": "suggest",
+        "size": 5
       }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 Essayez d'autres préfixes : `"cas"`, `"ord"`, `"mon"`.
@@ -85,25 +85,24 @@ Essayez d'autres préfixes : `"cas"`, `"ord"`, `"mon"`.
 
 ## Exercice 4 — Completion avec fuzzy (tolérance aux fautes de frappe)
 
-```bash
-curl -s -X GET "http://localhost:9200/products-suggest/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "suggest": {
-      "product-suggest-fuzzy": {
-        "prefix": "smartphne",
-        "completion": {
-          "field": "suggest",
-          "size": 5,
-          "fuzzy": {
-            "fuzziness": 1,
-            "min_length": 4,
-            "prefix_length": 2
-          }
+```
+GET /products-suggest/_search
+{
+  "suggest": {
+    "product-suggest-fuzzy": {
+      "prefix": "smartphne",
+      "completion": {
+        "field": "suggest",
+        "size": 5,
+        "fuzzy": {
+          "fuzziness": 1,
+          "min_length": 4,
+          "prefix_length": 2
         }
       }
     }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 > Notez que "smartphne" (avec une faute) trouve quand même "Smartphone" grâce à `fuzziness: 1`.
@@ -112,51 +111,49 @@ curl -s -X GET "http://localhost:9200/products-suggest/_search" \
 
 ## Exercice 5 — Complétion avec contexte (filtrage par catégorie)
 
-```bash
-# D'abord, créer un index avec contexte de catégorie
-curl -s -X PUT "http://localhost:9200/products-suggest-ctx" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "mappings": {
-      "properties": {
-        "name": { "type": "text" },
-        "suggest": {
-          "type": "completion",
-          "contexts": [
-            { "name": "category", "type": "category", "path": "category_ctx" }
-          ]
-        },
-        "category_ctx": { "type": "keyword" }
+```
+PUT /products-suggest-ctx
+{
+  "mappings": {
+    "properties": {
+      "name": { "type": "text" },
+      "suggest": {
+        "type": "completion",
+        "contexts": [
+          { "name": "category", "type": "category", "path": "category_ctx" }
+        ]
+      },
+      "category_ctx": { "type": "keyword" }
+    }
+  }
+}
+```
+
+```
+PUT /products-suggest-ctx/_doc/1
+{
+  "name": "Smartphone Pro",
+  "category_ctx": "Électronique",
+  "suggest": {
+    "input": ["Smartphone", "téléphone"],
+    "contexts": { "category": "Électronique" }
+  }
+}
+```
+
+```
+GET /products-suggest-ctx/_search
+{
+  "suggest": {
+    "product-ctx": {
+      "prefix": "smart",
+      "completion": {
+        "field": "suggest",
+        "contexts": { "category": "Électronique" }
       }
     }
-  }' | python3 -m json.tool
-
-# Indexer un produit avec contexte
-curl -s -X PUT "http://localhost:9200/products-suggest-ctx/_doc/1" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "name": "Smartphone Pro",
-    "category_ctx": "Électronique",
-    "suggest": {
-      "input": ["Smartphone", "téléphone"],
-      "contexts": { "category": "Électronique" }
-    }
-  }' | python3 -m json.tool
-
-# Chercher uniquement dans la catégorie Électronique
-curl -s -X GET "http://localhost:9200/products-suggest-ctx/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "suggest": {
-      "product-ctx": {
-        "prefix": "smart",
-        "completion": {
-          "field": "suggest",
-          "contexts": { "category": "Électronique" }
-        }
-      }
-    }
-  }' | python3 -m json.tool
+  }
+}
 ```
 
 ---

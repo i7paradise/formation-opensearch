@@ -26,7 +26,7 @@ curl -s -X PUT "$BASE_URL/produits_complet" \
         "tags": { "type": "keyword" }
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "=== Indexer document 1 ==="
@@ -43,19 +43,19 @@ curl -s -X PUT "$BASE_URL/produits_complet/_doc/1" \
     "location": { "lat": 48.8566, "lon": 2.3522 },
     "attributes": [{ "key": "couleur", "value": "Noir" }, { "key": "stockage", "value": "256Go" }],
     "tags": ["smartphone", "5G", "AMOLED"]
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "=== Analyser text vs keyword ==="
 echo "--- Champ text (name) ---"
 curl -s -X POST "$BASE_URL/produits_complet/_analyze" \
   -H 'Content-Type: application/json' \
-  -d '{ "field": "name", "text": "Smartphone Pro Max 256Go" }' | python3 -m json.tool
+  -d '{ "field": "name", "text": "Smartphone Pro Max 256Go" }'
 
 echo "--- Champ keyword (name.keyword) ---"
 curl -s -X POST "$BASE_URL/produits_complet/_analyze" \
   -H 'Content-Type: application/json' \
-  -d '{ "field": "name.keyword", "text": "Smartphone Pro Max 256Go" }' | python3 -m json.tool
+  -d '{ "field": "name.keyword", "text": "Smartphone Pro Max 256Go" }'
 
 echo ""
 echo "=== Tester dynamic strict ==="
@@ -69,4 +69,4 @@ curl -s -X PUT "$BASE_URL/produits_complet/_doc/99" \
     "in_stock": true,
     "created_at": "2024-01-01T00:00:00Z",
     "champ_inconnu": "doit échouer"
-  }' | python3 -m json.tool
+  }'

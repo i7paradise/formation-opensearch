@@ -34,8 +34,8 @@ opensearch-dashboards    opensearchproject/opensearch-dashboards:3.6.0  "./opens
 
 ### 2.1 Résultat de `GET _cluster/health`
 
-```bash
-curl -s http://localhost:9200/_cluster/health | python3 -m json.tool
+```
+GET /_cluster/health
 ```
 
 **Sortie attendue :**
@@ -206,8 +206,8 @@ services:
 
 ### 5.2 Vérification après redémarrage
 
-```bash
-curl -s http://localhost:9200/ | python3 -m json.tool
+```
+GET /
 ```
 
 **Sortie attendue (extrait) :**
@@ -244,8 +244,8 @@ curl -s -X PUT "http://localhost:9200/_cluster/settings" \
 ```
 
 **Vérifier les paramètres actifs :**
-```bash
-curl -s "http://localhost:9200/_cluster/settings?include_defaults=true" | python3 -m json.tool | grep auto_create
+```
+GET /_cluster/settings?include_defaults=true
 ```
 
 ---

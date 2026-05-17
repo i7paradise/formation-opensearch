@@ -26,11 +26,11 @@ curl -s -X PUT "$BASE_URL/produits_complet" \
         "tags": { "type": "keyword" }
       }
     }
-  }' | python3 -m json.tool
+  }'
 
 echo ""
 echo "=== Vérifier le mapping ==="
-curl -s "$BASE_URL/produits_complet/_mapping" | python3 -m json.tool
+curl -s "$BASE_URL/produits_complet/_mapping"
 
 echo ""
 echo "=== Exercice 2 : Indexer des documents ==="
