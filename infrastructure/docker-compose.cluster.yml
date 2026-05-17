@@ -2,8 +2,8 @@ version: "3.8"
 
 # =============================================================================
 # Docker Compose — Cluster OpenSearch 3 noeuds (Jour 3)
-# Sécurité ACTIVÉE avec certificats de démonstration
-# Tous les noeuds : rôles master + data
+# Sécurité DÉSACTIVÉE — même approche que le noeud unique (Jours 1 & 2)
+# Tous les noeuds : rôles master + data + ingest
 # =============================================================================
 
 networks:
@@ -11,7 +11,6 @@ networks:
     driver: bridge
 
 volumes:
-  # Un volume persistant par noeud
   opensearch-node1-data:
     driver: local
   opensearch-node2-data:
@@ -36,38 +35,13 @@ x-opensearch-common: &opensearch-common
   restart: unless-stopped
 
 x-opensearch-env-common: &opensearch-env-common
-  # Options JVM pour la formation (augmenter en production)
   OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
-  # Noeuds master initiaux pour le bootstrap du cluster
-  cluster.initial_master_nodes: "opensearch-node1,opensearch-node2,opensearch-node3"
-  # Hôtes de découverte — tous les noeuds du cluster
-  discovery.seed_hosts: "opensearch-node1,opensearch-node2,opensearch-node3"
-  # Nom du cluster
   cluster.name: "formation-opensearch-cluster"
-  # Rôles : master + data pour tous les noeuds
+  cluster.initial_master_nodes: "opensearch-node1,opensearch-node2,opensearch-node3"
+  discovery.seed_hosts: "opensearch-node1,opensearch-node2,opensearch-node3"
   node.roles: "master,data,ingest,remote_cluster_client"
-  # Activation du verrouillage mémoire
   bootstrap.memory_lock: "true"
-  # Mot de passe administrateur initial
-  OPENSEARCH_INITIAL_ADMIN_PASSWORD: "Formation@OpenSearch2024!"
-  # Sécurité ACTIVÉE — certificats de démonstration
-  DISABLE_SECURITY_PLUGIN: "false"
-  # Chemins des certificats de démonstration (générés par le plugin de sécurité)
-  plugins.security.ssl.transport.pemcert_filepath: "esnode.pem"
-  plugins.security.ssl.transport.pemkey_filepath: "esnode-key.pem"
-  plugins.security.ssl.transport.pemtrustedcas_filepath: "root-ca.pem"
-  plugins.security.ssl.transport.enforce_hostname_verification: "false"
-  plugins.security.ssl.http.enabled: "true"
-  plugins.security.ssl.http.pemcert_filepath: "esnode.pem"
-  plugins.security.ssl.http.pemkey_filepath: "esnode-key.pem"
-  plugins.security.ssl.http.pemtrustedcas_filepath: "root-ca.pem"
-  plugins.security.allow_unsafe_democertificates: "true"
-  plugins.security.allow_default_init_securityindex: "true"
-  plugins.security.authcz.admin_dn: "CN=kirk,OU=client,O=client,L=test,C=de"
-  plugins.security.audit.type: "internal_opensearch"
-  plugins.security.enable_snapshot_restore_privilege: "true"
-  plugins.security.check_snapshot_restore_write_privileges: "true"
-  plugins.security.restapi.roles_enabled: "all_access,security_rest_api_access"
+  DISABLE_SECURITY_PLUGIN: "true"
 
 services:
   # ---------------------------------------------------------------------------
@@ -78,15 +52,11 @@ services:
     container_name: opensearch-node1
     environment:
       <<: *opensearch-env-common
-      # Nom unique du noeud
       node.name: "opensearch-node1"
-      # Adresse réseau d'écoute
       network.host: "0.0.0.0"
       network.publish_host: "opensearch-node1"
     ports:
-      # API REST (noeud 1 uniquement exposé sur l'hôte pour les TPs)
       - "9200:9200"
-      # Performance Analyzer
       - "9600:9600"
     volumes:
       - opensearch-node1-data:/usr/share/opensearch/data
@@ -94,7 +64,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -sk https://localhost:9200/_cluster/health -u admin:Formation@OpenSearch2024! | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
+          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
         ]
       interval: 15s
       timeout: 10s
@@ -113,7 +83,6 @@ services:
       network.host: "0.0.0.0"
       network.publish_host: "opensearch-node2"
     ports:
-      # Port API secondaire exposé pour les TPs multi-noeuds
       - "9201:9200"
     volumes:
       - opensearch-node2-data:/usr/share/opensearch/data
@@ -121,7 +90,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -sk https://localhost:9200/_cluster/health -u admin:Formation@OpenSearch2024! | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
+          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
         ]
       interval: 15s
       timeout: 10s
@@ -140,7 +109,6 @@ services:
       network.host: "0.0.0.0"
       network.publish_host: "opensearch-node3"
     ports:
-      # Port API tertiaire exposé pour les TPs multi-noeuds
       - "9202:9200"
     volumes:
       - opensearch-node3-data:/usr/share/opensearch/data
@@ -148,7 +116,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -sk https://localhost:9200/_cluster/health -u admin:Formation@OpenSearch2024! | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
+          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
         ]
       interval: 15s
       timeout: 10s
@@ -169,14 +137,9 @@ services:
       opensearch-node3:
         condition: service_healthy
     environment:
-      # Liste des 3 noeuds pour la haute disponibilité
-      - OPENSEARCH_HOSTS=["https://opensearch-node1:9200","https://opensearch-node2:9200","https://opensearch-node3:9200"]
-      # Sécurité activée — utilisation des certificats de démonstration
-      - OPENSEARCH_USERNAME=admin
-      - OPENSEARCH_PASSWORD=Formation@OpenSearch2024!
-      - OPENSEARCH_SSL_VERIFICATIONMODE=none
+      - OPENSEARCH_HOSTS=["http://opensearch-node1:9200","http://opensearch-node2:9200","http://opensearch-node3:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
     ports:
-      # Interface web Dashboards
       - "5601:5601"
     networks:
       - opensearch-cluster-net

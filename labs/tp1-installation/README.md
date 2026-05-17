@@ -52,7 +52,7 @@ Bienvenue dans ce cours de formation OpenSearch ! Au fil de ces trois jours, vou
 Assurez-vous d'être dans le répertoire racine du projet :
 
 ```bash
-cd /chemin/vers/formation-opensearch/opensearch-formation
+cd /chemin/vers/formation-opensearch
 ```
 
 ### 1.2 Lancer les conteneurs
