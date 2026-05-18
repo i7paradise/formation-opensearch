@@ -47,14 +47,15 @@
       🎯 Démo live (9h30)<br>
       📖 CH1 : Introduction &amp; Installation<br>
       🔧 TP1 : Installation (11h00)<br>
-      📖 Architecture distribuée &amp; Lucene
+      📖 CH2 : Mappings &amp; Types de champs<br>
+      🔧 TP2 : Index complet (12h00)
     </div>
     <div style="background:#f8fafc;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
       <strong>Après-midi</strong><br>
-      📖 Chapitre 3a : Fonctionnement<br>
-      🔧 TP2 : CRUD &amp; API (14h15)<br>
-      📖 Chapitre 3b : Query DSL<br>
-      🔧 TP3 : Requêtes (15h45)
+      📖 CH3a : Fonctionnement d'OpenSearch<br>
+      📖 CH3b : Query DSL<br>
+      🔧 TP3 : CRUD &amp; API (14h15)<br>
+      🔧 TP4 : Requêtes (15h45)
     </div>
   </div>
   <aside class="notes">
@@ -375,9 +376,9 @@ curl http://localhost:9200/</code></pre>
       <strong>⭐ Bonus :</strong> Installer OpenSearch sans Docker (tar.gz)
     </div>
   </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp1-installation/README.md</code></p>
+  <p style="font-size:0.8em;color:#475569;">📁 <a href="https://github.com/i7paradise/formation-opensearch/blob/master/labs/tp1-installation/README.md" target="_blank">labs/tp1-installation/README.md</a></p>
   <aside class="notes">
-    Distribuez le lien vers labs/tp1-installation/README.md. Circulez pour aider. Problèmes courants : port 9200 déjà utilisé (lsof -i :9200), vm.max_map_count trop bas, manque de RAM. Rappel : "Signez la feuille de présence de la matinée !" Timing : 45 min.
+    Distribuez le lien vers https://github.com/i7paradise/formation-opensearch/blob/master/labs/tp1-installation/README.md. Circulez pour aider. Problèmes courants : port 9200 déjà utilisé (lsof -i :9200), vm.max_map_count trop bas, manque de RAM. Rappel : "Signez la feuille de présence de la matinée !" Timing : 45 min.
   </aside>
 </section>
 
@@ -662,58 +663,6 @@ curl http://localhost:9200/</code></pre>
   </aside>
 </section>
 
-<!-- ===================== SLIDE 11 : QUIZ CH1 ===================== -->
-<section class="slide-content">
-  <h2>⚡ Quiz — Chapitre 1</h2>
-  <ol style="font-size:0.83em;">
-    <li>Quelle est la différence entre un <strong>index</strong> et un <strong>shard</strong> ?</li>
-    <li>Qu'est-ce que Lucene par rapport à OpenSearch ?</li>
-    <li>Pourquoi OpenSearch est-il préféré à Elasticsearch dans un contexte open source ?</li>
-    <li>Que signifie un cluster en statut <strong>"yellow"</strong> ? Est-ce problématique en single-node ?</li>
-    <li>Citez un avantage du <strong>cloud managé</strong> et un avantage du <strong>self-hosted</strong>.</li>
-  </ol>
-  <aside class="notes">
-    Posez les questions oralement. Laissez 30s par question. Réponses : 1) Index = logique (table), shard = physique (index Lucene). 2) Lucene est la bibliothèque Java d'indexation sur laquelle OpenSearch est construit. 3) Licence Apache 2.0, security gratuit, communauté. 4) Yellow = primaires OK, replicas non assignées = normal en single-node, pas critique. 5) Cloud = démarrage rapide, ops incluses ; Self-hosted = contrôle total, RGPD, logiciel gratuit. Timing : 5 min.
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 12 : RECAP CH1 ===================== -->
-<section class="slide-content">
-  <h2>📋 Récap CH1 — Introduction &amp; Installation</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;">
-    <div style="background:#eff6ff;padding:0.9em;border-radius:8px;">
-      <div style="font-size:1.4em;">🌐</div>
-      <strong>Architecture distribuée</strong><br>Cluster → Nœuds → Index → Shards (P + R) → Documents
-    </div>
-    <div style="background:#f0fdf4;padding:0.9em;border-radius:8px;">
-      <div style="font-size:1.4em;">🔧</div>
-      <strong>Installation</strong><br>Docker (local) · DEB/RPM (serveur) · Cloud managé (AWS, Aiven)
-    </div>
-    <div style="background:#faf5ff;padding:0.9em;border-radius:8px;">
-      <div style="font-size:1.4em;">📄</div>
-      <strong>Document = JSON</strong><br>Index inversé → recherche O(1) vs SQL O(n)
-    </div>
-    <div style="background:#fff7ed;padding:0.9em;border-radius:8px;">
-      <div style="font-size:1.4em;">⚖️</div>
-      <strong>Choix de déploiement</strong><br>Cloud managé = ops inclus · Self-hosted = contrôle + RGPD
-    </div>
-  </div>
-  <p style="margin-top:0.8em;text-align:center;font-size:0.82em;color:#475569;">
-    <strong>Cluster → Nœuds → Index → Shards (primary + replica) → Documents</strong>
-  </p>
-  <aside class="notes">
-    Résumez les 4 blocs. Vérifiez que tout le monde a compris la hiérarchie et les options de déploiement. Timing : 2 min. Transition : "L'après-midi, on plonge dans le fonctionnement interne d'OpenSearch."
-  </aside>
-</section>
-
-<!-- ===================== SLIDE 18 : CH3a OPENER ===================== -->
-<section style="background:#2563eb;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 3a</h2>
-  <h3 style="color:#bfdbfe;font-weight:400;">Fonctionnement d'OpenSearch</h3>
-  <p style="color:#dbeafe;font-style:italic;">"Comment OpenSearch trouve-t-il vos documents en quelques millisecondes ?"</p>
-  <aside class="notes">Après la pause déjeuner. Faites une petite récap en 2 min. Transition : "L'index inversé, c'est le secret d'OpenSearch."</aside>
-</section>
-
 <!-- ===================== SLIDE 19 : INDEX INVERSÉ ===================== -->
 <section class="slide-content">
   <h2>L'index inversé — le secret de la rapidité</h2>
@@ -786,7 +735,91 @@ curl http://localhost:9200/</code></pre>
   </aside>
 </section>
 
-<!-- ===================== SLIDE 20 : MAPPING ===================== -->
+<!-- ===================== SLIDE 11 : QUIZ CH1 ===================== -->
+<section class="slide-content">
+  <h2>⚡ Quiz — Chapitre 1</h2>
+  <ol style="font-size:0.83em;">
+    <li>Quelle est la différence entre un <strong>index</strong> et un <strong>shard</strong> ?</li>
+    <li>Qu'est-ce que Lucene par rapport à OpenSearch ?</li>
+    <li>Pourquoi OpenSearch est-il préféré à Elasticsearch dans un contexte open source ?</li>
+    <li>Que signifie un cluster en statut <strong>"yellow"</strong> ? Est-ce problématique en single-node ?</li>
+    <li>Citez un avantage du <strong>cloud managé</strong> et un avantage du <strong>self-hosted</strong>.</li>
+  </ol>
+  <aside class="notes">
+    Posez les questions oralement. Laissez 30s par question. Réponses : 1) Index = logique (table), shard = physique (index Lucene). 2) Lucene est la bibliothèque Java d'indexation sur laquelle OpenSearch est construit. 3) Licence Apache 2.0, security gratuit, communauté. 4) Yellow = primaires OK, replicas non assignées = normal en single-node, pas critique. 5) Cloud = démarrage rapide, ops incluses ; Self-hosted = contrôle total, RGPD, logiciel gratuit. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 12 : RECAP CH1 ===================== -->
+<section class="slide-content">
+  <h2>📋 Récap CH1 — Introduction &amp; Installation</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;">
+    <div style="background:#eff6ff;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">🌐</div>
+      <strong>Architecture distribuée</strong><br>Cluster → Nœuds → Index → Shards (P + R) → Documents
+    </div>
+    <div style="background:#f0fdf4;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">🔧</div>
+      <strong>Installation</strong><br>Docker (local) · DEB/RPM (serveur) · Cloud managé (AWS, Aiven)
+    </div>
+    <div style="background:#faf5ff;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">📄</div>
+      <strong>Document = JSON</strong><br>Index inversé → recherche O(1) vs SQL O(n)
+    </div>
+    <div style="background:#fff7ed;padding:0.9em;border-radius:8px;">
+      <div style="font-size:1.4em;">⚖️</div>
+      <strong>Choix de déploiement</strong><br>Cloud managé = ops inclus · Self-hosted = contrôle + RGPD
+    </div>
+  </div>
+  <p style="margin-top:0.8em;text-align:center;font-size:0.82em;color:#475569;">
+    <strong>Cluster → Nœuds → Index → Shards (primary + replica) → Documents</strong>
+  </p>
+  <aside class="notes">
+    Résumez les 4 blocs. Vérifiez que tout le monde a compris la hiérarchie et les options de déploiement. Timing : 2 min. Transition : "Avant le déjeuner, un chapitre court mais fondamental : comment OpenSearch comprend-il la structure de vos données ?"
+  </aside>
+</section>
+
+<!-- ===================== CH2 OPENER ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h2 style="color:#fff;">Chapitre 2</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Mappings &amp; Types de champs</h3>
+  <p style="color:#dbeafe;font-style:italic;">"Comment OpenSearch sait-il que ce champ est un prix et non du texte ?"</p>
+  <aside class="notes">Enchaînez directement après TP1. La question "comment OpenSearch comprend-il la structure de vos données ?" est la transition naturelle. Timing : 30 secondes.</aside>
+</section>
+
+<!-- ===================== CH2 : MAPPING DYNAMIQUE vs EXPLICITE ===================== -->
+<section class="slide-content">
+  <h2>Mapping — Dynamique vs Explicite</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.82em;">
+    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:1em;border-radius:6px;">
+      <strong style="color:#ea580c;">🤖 Mapping dynamique</strong>
+      <ul style="margin-top:0.5em;">
+        <li>OpenSearch devine le type au premier document indexé</li>
+        <li><code>"price": 29.99</code> → inféré <code>float</code></li>
+        <li><code>"name": "Laptop"</code> → inféré <code>text</code> + <code>keyword</code></li>
+        <li>Pratique pour démarrer vite</li>
+        <li>⚠️ Type figé dès le 1er doc — mauvaise inférence = re-indexation</li>
+      </ul>
+    </div>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:1em;border-radius:6px;">
+      <strong style="color:#16a34a;">✍️ Mapping explicite</strong>
+      <ul style="margin-top:0.5em;">
+        <li>Vous déclarez chaque champ et son type dans <code>PUT /{index}</code></li>
+        <li>Contrôle total : analyzer, <code>ignore_above</code>, <code>dynamic: strict</code></li>
+        <li>Recommandé en production</li>
+        <li>✅ Pas de surprise, performances optimisées</li>
+      </ul>
+    </div>
+  </div>
+  <div style="background:#fef2f2;border-radius:4px;padding:0.6em;margin-top:0.8em;font-size:0.78em;">
+    ⚠️ <strong>Règle d'or :</strong> le type d'un champ ne peut pas être modifié après le premier document — il faut re-créer l'index et re-indexer.
+  </div>
+  <aside class="notes">
+    Point clé : le mapping est "figé" dès le premier document. Si vous indexez { "price": "vingt euros" } par accident, le champ price devient text et vous ne pourrez plus faire de range query dessus sans re-indexer. C'est pourquoi on préfère toujours un mapping explicite en production. Timing : 5 min.
+  </aside>
+</section>
+
+<!-- ===================== CH2 : TYPES DE CHAMPS ===================== -->
 <section class="slide-content">
   <h2>Mappings — Types de champs</h2>
   <pre style="font-size:0.65em;"><code class="language-json">PUT /products
@@ -816,7 +849,35 @@ curl http://localhost:9200/</code></pre>
   </aside>
 </section>
 
-<!-- ===================== SLIDE 21 : CRUD API ===================== -->
+<!-- ===================== CH2 : TP2 ===================== -->
+<section class="slide-content" style="background:#f8fafc;">
+  <h2>🔧 TP2 — Index complet</h2>
+  <p style="color:#2563eb;font-weight:600;">Durée : 30 minutes</p>
+  <ol style="font-size:0.85em;">
+    <li>Créer l'index <code>produits_complet</code> avec un mapping couvrant tous les types de champs</li>
+    <li>Indexer 3 documents de test représentatifs</li>
+    <li>Observer la différence <code>text</code> vs <code>keyword</code> avec <code>_analyze</code></li>
+    <li>Tester <code>dynamic: strict</code> — qu'arrive-t-il avec un champ inconnu ?</li>
+    <li>Inspecter le mapping créé : <code>GET /produits_complet/_mapping</code></li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
+    <strong>⭐ Bonus :</strong> Multi-fields — indexer <code>name</code> à la fois en <code>text</code> et <code>keyword</code>, vérifier avec <code>_search</code>
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <a href="https://github.com/i7paradise/formation-opensearch/blob/master/labs/tp2-index-complet/README.md" target="_blank">labs/tp2-index-complet/README.md</a></p>
+  <aside class="notes">
+    Ce TP ancre immédiatement la théorie sur les mappings. L'exercice clé : faire constater aux participants que `_analyze` sur un champ text tokenise et met en minuscules, alors que keyword renvoie la valeur brute. Point critique sur dynamic:strict — toute tentative d'indexer un champ non déclaré renvoie une erreur 400. Timing : 30 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 18 : CH3a OPENER ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h2 style="color:#fff;">Chapitre 3a</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Fonctionnement d'OpenSearch</h3>
+  <p style="color:#dbeafe;font-style:italic;">"Comment OpenSearch trouve-t-il vos documents en quelques millisecondes ?"</p>
+  <aside class="notes">Après la pause déjeuner. Faites une petite récap du matin en 2 min (CH1 + CH2 + TP2). Transition : "L'index inversé, c'est le secret d'OpenSearch."</aside>
+</section>
+
+<!-- ===================== SLIDE 21b : CRUD API ===================== -->
 <section class="slide-content">
   <h2>API CRUD</h2>
   <pre style="font-size:0.65em;"><code class="language-bash"># CREATE — PUT avec ID ou POST sans ID
@@ -844,9 +905,9 @@ POST /products/_bulk
   </aside>
 </section>
 
-<!-- ===================== SLIDE 22 : TP2 ===================== -->
+<!-- ===================== SLIDE 22 : TP3 ===================== -->
 <section class="slide-content" style="background:#f8fafc;">
-  <h2>🔧 TP2 — CRUD &amp; API</h2>
+  <h2>🔧 TP3 — CRUD &amp; API</h2>
   <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
   <ol style="font-size:0.85em;">
     <li>Créer l'index <code>products</code> avec mapping explicite complet</li>
@@ -856,9 +917,9 @@ POST /products/_bulk
     <li>Vérifier : <code>_cat/indices</code> et <code>_search match_all</code></li>
   </ol>
   <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
-    <strong>⭐ Bonus :</strong> Script Python pour générer 5000 produits aléatoires
+    <strong>⭐ Bonus :</strong> Script <code>jq</code> pour vérifier le nombre de documents indexés
   </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp2-crud-api/README.md</code></p>
+  <p style="font-size:0.8em;color:#475569;">📁 <a href="https://github.com/i7paradise/formation-opensearch/blob/master/labs/tp3-crud-api/README.md" target="_blank">labs/tp3-crud-api/README.md</a></p>
   <aside class="notes">
     Le Bulk API nécessite le format NDJSON exact. Une erreur de format et toute la requête échoue. La réponse du bulk contient les erreurs par ligne. Timing : 45 min.
   </aside>
@@ -1013,9 +1074,9 @@ POST /products/_search
   </aside>
 </section>
 
-<!-- ===================== SLIDE 30 : TP3 ===================== -->
+<!-- ===================== SLIDE 30 : TP4 ===================== -->
 <section class="slide-content" style="background:#f8fafc;">
-  <h2>🔧 TP3 — Requêtes &amp; Agrégations</h2>
+  <h2>🔧 TP4 — Requêtes &amp; Recherche</h2>
   <p style="color:#2563eb;font-weight:600;">Durée : 45 minutes</p>
   <ol style="font-size:0.85em;">
     <li>Recherche full-text dans les noms de produits</li>
@@ -1028,7 +1089,7 @@ POST /products/_search
   <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
     <strong>⭐ Bonus :</strong> Agrégation imbriquée — top 5 catégories → produit le plus cher
   </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp3-requetes-agregations/README.md</code></p>
+  <p style="font-size:0.8em;color:#475569;">📁 <a href="https://github.com/i7paradise/formation-opensearch/blob/master/labs/tp4-requetes/README.md" target="_blank">labs/tp4-requetes/README.md</a></p>
   <aside class="notes">
     Attention : pour les agrégations sur le champ category, il faut que ce soit un champ keyword (pas text). Si quelqu'un a un problème, vérifiez le mapping : GET /products/_mapping. Timing : 45 min.
   </aside>
@@ -1062,10 +1123,18 @@ POST /products/_search
       <strong>Recherche</strong><br>Query DSL, Bool, Scoring BM25, Aggs
     </div>
   </div>
-  <p style="margin-top:1.5em;color:#86efac;">Demain : Pipelines, Analyseurs Français, Géo, Dashboards, Split-brain &amp; Quorum</p>
-  <p style="font-size:0.8em;color:#94a3b8;margin-top:0.5em;">N'oubliez pas de signer la feuille de présence ! 📋</p>
+  <div style="margin-top:1.5em;border-top:1px solid rgba(255,255,255,0.15);padding-top:1em;">
+    <p style="color:#86efac;font-weight:600;margin-bottom:0.5em;">Demain — Jour 2 :</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.6em;font-size:0.78em;text-align:center;">
+      <div style="background:rgba(134,239,172,0.1);border:1px solid rgba(134,239,172,0.3);padding:0.6em;border-radius:6px;">🔒<br><strong>Sécurité</strong></div>
+      <div style="background:rgba(134,239,172,0.1);border:1px solid rgba(134,239,172,0.3);padding:0.6em;border-radius:6px;">🏗️<br><strong>Architecture cluster</strong></div>
+      <div style="background:rgba(134,239,172,0.1);border:1px solid rgba(134,239,172,0.3);padding:0.6em;border-radius:6px;">🗂️<br><strong>Shards</strong></div>
+      <div style="background:rgba(134,239,172,0.1);border:1px solid rgba(134,239,172,0.3);padding:0.6em;border-radius:6px;">🔀<br><strong>Routage</strong></div>
+    </div>
+  </div>
+  <p style="font-size:0.8em;color:#94a3b8;margin-top:1em;">N'oubliez pas de signer la feuille de présence ! 📋</p>
   <aside class="notes">
-    Remerciez le groupe pour leur participation. Donnez un aperçu du jour 2. Rappelez la feuille de présence de l'après-midi. Demandez si des participants ont besoin de temps supplémentaire pour finir les TPs (ils peuvent le faire le soir). Timing : 10 min pour ce récap + Q&A.
+    Remerciez le groupe pour leur participation. Donnez un aperçu du jour 2 : sécurité (TLS, authentification, RBAC), architecture cluster multi-nœuds, stratégie de sharding, et routage des documents. Rappelez la feuille de présence. Demandez si des participants ont besoin de temps supplémentaire pour finir les TPs (ils peuvent le faire le soir). Timing : 10 min pour ce récap + Q&A.
   </aside>
 </section>
 

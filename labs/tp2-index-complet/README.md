@@ -28,10 +28,10 @@ PUT /produits_complet
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "dynamic": "strict"
+    "number_of_replicas": 0
   },
   "mappings": {
+    "dynamic": "strict",
     "properties": {
       "name": {
         "type": "text",

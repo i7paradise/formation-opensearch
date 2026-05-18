@@ -8,8 +8,9 @@ curl -s -X DELETE "$BASE_URL/produits_complet" 2>/dev/null
 curl -s -X PUT "$BASE_URL/produits_complet" \
   -H 'Content-Type: application/json' \
   -d '{
-    "settings": { "number_of_shards": 1, "number_of_replicas": 0, "dynamic": "strict" },
+    "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
     "mappings": {
+      "dynamic": "strict",
       "properties": {
         "name": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
         "description": { "type": "text" },
