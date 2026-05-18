@@ -877,31 +877,117 @@ curl http://localhost:9200/</code></pre>
   <aside class="notes">Après la pause déjeuner. Faites une petite récap du matin en 2 min (CH1 + CH2 + TP2). Transition : "L'index inversé, c'est le secret d'OpenSearch."</aside>
 </section>
 
-<!-- ===================== SLIDE 21b : CRUD API ===================== -->
+<!-- ===================== SLIDE 21a : CRUD — CREATE ===================== -->
 <section class="slide-content">
-  <h2>API CRUD</h2>
-  <pre style="font-size:0.65em;"><code class="language-bash"># CREATE — PUT avec ID ou POST sans ID
+  <h2>API CRUD — <span style="color:#2563eb;">CREATE</span></h2>
+  <pre style="font-size:0.7em;"><code class="language-bash"># PUT avec ID — idempotent (remplace si le document existe déjà)
 PUT /products/_doc/1
 { "name": "MacBook Pro", "price": 2499.99, "category": "Électronique" }
 
-# READ
+# POST sans ID — OpenSearch génère un UUID automatiquement
+POST /products/_doc
+{ "name": "iPhone 15", "price": 999.99, "category": "Électronique" }
+
+# Réponse :
+{ "_index": "products", "_id": "1", "result": "created", "_version": 1 }</code></pre>
+  <ul style="font-size:0.85em;margin-top:0.5em;">
+    <li><strong>PUT</strong> = idempotent — rejouer la même requête donne le même résultat (safe pour les retries)</li>
+    <li><strong>POST</strong> = ID auto-généré (UUIDv4) — utile pour l'ingestion en flux</li>
+  </ul>
+  <aside class="notes">
+    Insistez sur l'idempotence de PUT : indispensable pour les retries automatiques en cas d'erreur réseau. POST sans ID génère un UUIDv4 côté OpenSearch. Montrez la différence dans la réponse : "result": "created" vs "result": "updated" selon que le doc existait déjà. Timing : 2 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 21b : CRUD — READ ===================== -->
+<section class="slide-content">
+  <h2>API CRUD — <span style="color:#16a34a;">READ</span></h2>
+  <pre style="font-size:0.7em;"><code class="language-bash"># Lire un document par son ID
 GET /products/_doc/1
 
-# UPDATE — partiel avec _update
+# Réponse :
+{ "_index": "products", "_id": "1", "_version": 1,
+  "found": true,
+  "_source": { "name": "MacBook Pro", "price": 2499.99 } }
+
+# Vérifier l'existence sans récupérer le document
+HEAD /products/_doc/1     # → 200 OK si existe, 404 sinon
+
+# Filtrer les champs retournés (réduire la bande passante)
+GET /products/_doc/1?_source_includes=name,price</code></pre>
+  <ul style="font-size:0.85em;margin-top:0.5em;">
+    <li><code>found: false</code> → HTTP 404 — le document n'existe pas</li>
+    <li><code>_source</code> contient les données originales indexées</li>
+  </ul>
+  <aside class="notes">
+    Montrez found:true vs found:false. HEAD est utile pour vérifier l'existence sans coût réseau (pas de _source retourné). _source_includes/excludes permet de réduire la bande passante — utile sur des documents volumineux. Timing : 2 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 21c : CRUD — UPDATE ===================== -->
+<section class="slide-content">
+  <h2>API CRUD — <span style="color:#f59e0b;">UPDATE</span></h2>
+  <pre style="font-size:0.65em;"><code class="language-bash"># UPDATE partiel — seul le champ "price" est modifié, les autres sont conservés
 POST /products/_update/1
 { "doc": { "price": 2299.99 } }
 
-# DELETE
+# UPDATE avec script Painless — modifier dynamiquement
+POST /products/_update/1
+{ "script": { "source": "ctx._source.stock -= params.qty",
+               "params": { "qty": 1 } } }
+
+# PUT (remplacement complet) — ATTENTION : efface tous les champs absents
+PUT /products/_doc/1
+{ "name": "MacBook Pro M3", "price": 2299.99, "category": "Électronique" }</code></pre>
+  <ul style="font-size:0.85em;margin-top:0.5em;">
+    <li><code>_update</code> = merge partiel → préserve les champs non mentionnés</li>
+    <li><code>PUT</code> = remplacement total → les champs absents <strong>disparaissent</strong></li>
+  </ul>
+  <aside class="notes">
+    Erreur classique : utiliser PUT pour un update partiel et perdre des champs silencieusement. _update est en réalité un GET + merge + re-indexation (les docs Lucene sont immuables). Les scripts Painless permettent des mises à jour atomiques (incrément, décrémentation, conditions). Timing : 2 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 21d : CRUD — DELETE ===================== -->
+<section class="slide-content">
+  <h2>API CRUD — <span style="color:#dc2626;">DELETE</span></h2>
+  <pre style="font-size:0.7em;"><code class="language-bash"># Supprimer un document par son ID
 DELETE /products/_doc/1
 
-# BULK — indexation en masse (action + source par paire)
-POST /products/_bulk
-{ "index": { "_id": "2" } }
-{ "name": "iPhone 15", "price": 999.99 }
-{ "index": { "_id": "3" } }
-{ "name": "iPad Pro", "price": 1099.99 }</code></pre>
+# Réponse :
+{ "_index": "products", "_id": "1", "result": "deleted", "_version": 2 }
+
+# Supprimer par requête (delete by query)
+POST /products/_delete_by_query
+{ "query": { "term": { "category.keyword": "Obsolète" } } }</code></pre>
+  <ul style="font-size:0.85em;margin-top:0.5em;">
+    <li>Suppression <strong>logique</strong> : le document est marqué "tombstone" — l'espace disque est libéré lors du prochain <strong>merge</strong> Lucene</li>
+    <li><code>_delete_by_query</code> → suppression en masse par critère de recherche</li>
+  </ul>
   <aside class="notes">
-    Montrez que PUT avec ID est idempotent (remplace). POST sans ID génère un ID automatique. Le Bulk API est crucial pour la performance : indexer 1 document à la fois est 10-100x plus lent qu'en bulk. Règle : toujours utiliser le Bulk API pour plus de 100 documents. Timing : 8 min.
+    Rappel du merge vu précédemment : delete marque un tombstone, ce n'est pas une suppression physique immédiate. L'espace est libéré lors du merge suivant. _delete_by_query sur de gros volumes tourne en tâche de fond — surveiller via la Task API (_tasks). Timing : 2 min.
+  </aside>
+</section>
+
+<!-- ===================== SLIDE 21e : CRUD — BULK API ===================== -->
+<section class="slide-content">
+  <h2>API CRUD — <span style="color:#7c3aed;">BULK</span></h2>
+  <pre style="font-size:0.6em;"><code class="language-bash"># Une seule requête HTTP — actions mixées (format NDJSON)
+POST /_bulk
+{ "index":  { "_index": "products", "_id": "10" } }
+{ "name": "iPhone 15",  "price": 999.99,  "category": "Électronique" }
+{ "create": { "_index": "products", "_id": "11" } }
+{ "name": "iPad Pro",   "price": 1099.99, "category": "Électronique" }
+{ "update": { "_index": "products", "_id": "1"  } }
+{ "doc": { "price": 2299.99 } }
+{ "delete": { "_index": "products", "_id": "5"  } }</code></pre>
+  <div style="background:#f5f3ff;border-left:4px solid #7c3aed;padding:0.5em 0.8em;border-radius:4px;font-size:0.82em;margin-top:0.6em;">
+    <strong>Pourquoi le Bulk ?</strong> Une app Java qui indexe 10 000 documents individuellement ouvre
+    <em>10 000 connexions HTTP</em> — sature le pool (ex: HikariCP limité à 20–50) et génère 10 000 round-trips.
+    Avec <code>_bulk</code> : <strong>1 connexion, 1 round-trip</strong> → <strong>10–100× plus rapide</strong>.
+  </div>
+  <aside class="notes">
+    Point clé : le bulk accepte des actions mixées dans la même requête (index + update + delete). Format NDJSON strict : chaque ligne séparée par \n, la dernière ligne doit se terminer par \n. La réponse liste les erreurs par item — un bulk peut être partiellement réussi ("errors": true). Règle : toujours utiliser le bulk au-delà de 100 documents. Taille idéale par batch : 5–15 Mo ou ~500–5000 documents. Timing : 4 min.
   </aside>
 </section>
 
