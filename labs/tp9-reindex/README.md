@@ -1,4 +1,4 @@
-# TP8 — Resharding avec l'API _reindex
+# TP9 — Resharding avec l'API _reindex
 
 ## Informations générales
 
