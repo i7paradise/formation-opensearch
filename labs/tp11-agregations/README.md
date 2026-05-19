@@ -1,4 +1,4 @@
-# TP9 — Agrégations avancées
+# TP10 — Agrégations avancées
 
 ## Informations générales
 
@@ -240,4 +240,4 @@ GET /products/_search
 - [ ] `max_bucket` — catégorie la plus chère
 - [ ] Requête combinée query + agrégation
 
-*Passez au [TP10 — Dashboard e-commerce](../tp10-dashboards/README.md)*
+*Passez au [TP12 — Dashboard e-commerce](../tp12-dashboards/README.md)*

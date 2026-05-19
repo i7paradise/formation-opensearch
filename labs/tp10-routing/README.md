@@ -1,4 +1,4 @@
-# TP8 — Routage : démonstration de l'importance de l'algorithme
+# TP9 — Routage : démonstration de l'importance de l'algorithme
 
 ## Informations générales
 
@@ -157,4 +157,4 @@ GET /_cluster/allocation/explain
 - [ ] Requête avec routing : 1 seul shard interrogé
 - [ ] Comprendre pourquoi le routing forcé peut être un avantage (ciblage) ou un risque (hotspot)
 
-*Passez au [TP9 — Agrégations avancées](../tp9-agregations/README.md)*
+*Passez au [TP11 — Agrégations avancées](../tp11-agregations/README.md)*

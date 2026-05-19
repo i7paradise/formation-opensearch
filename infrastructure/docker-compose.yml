@@ -29,9 +29,7 @@ services:
       - bootstrap.memory_lock=true
       # Options JVM — limité pour l'environnement de formation
       - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
-      # Désactivation du plugin de sécurité pour simplifier les TPs
-      - DISABLE_SECURITY_PLUGIN=true
-      # Mot de passe administrateur initial (requis même si la sécurité est désactivée)
+      # Mot de passe administrateur initial — utilisé par le plugin sécurité
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Formation@OpenSearch2024!
     ulimits:
       # Nécessaire pour le verrouillage mémoire
@@ -57,7 +55,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
+          "curl -sk -u admin:Formation@OpenSearch2024! https://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
         ]
       interval: 10s
       timeout: 5s
@@ -75,10 +73,10 @@ services:
       opensearch:
         condition: service_healthy
     environment:
-      # URL du noeud OpenSearch
-      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
-      # Désactivation de la sécurité côté Dashboards
-      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+      # URL du noeud OpenSearch (HTTPS avec le plugin sécurité activé)
+      - OPENSEARCH_HOSTS=["https://opensearch:9200"]
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=Formation@OpenSearch2024!
     ports:
       # Interface web Dashboards
       - "5601:5601"

@@ -13,532 +13,933 @@
 <div class="reveal">
 <div class="slides">
 
-<!-- SLIDE 1 : TITRE -->
+<!-- ===================== SLIDE 1 : TITRE ===================== -->
 <section style="background:#2563eb;color:#fff;">
   <h1 style="font-size:2em;color:#fff;">Formation OpenSearch 3.6</h1>
-  <h2 style="font-size:1.2em;color:#bfdbfe;font-weight:400;">Jour 2 — Fonctionnalités Avancées &amp; Dashboards</h2>
-  <aside class="notes">Bonjour ! Rappel rapide : aujourd'hui on va passer aux fonctionnalités avancées — pipelines, analyseurs, géo — puis aux Dashboards. Timing : 1 min.</aside>
+  <h2 style="font-size:1.2em;color:#bfdbfe;font-weight:400;">Jour 2 — Sécurité &amp; Architecture</h2>
+  <p style="margin-top:2em;color:#dbeafe;">9h00 – 17h00</p>
+  <aside class="notes">Bonjour ! Aujourd'hui : Sécurité (AAA, DLS/FLS), Ingest Pipelines, Analyseurs, Architecture cluster, Sizing des shards, _reindex, Routage. Timing : 1 min.</aside>
 </section>
 
-<!-- SLIDE 2 : RÉCAP JOUR 1 -->
-<section>
-  <h2>☀️ Récap Jour 1 — 6 questions</h2>
-  <ol style="font-size:0.85em;">
-    <li>Quelle est la différence entre un index et un shard ?</li>
-    <li>Quand utilise-t-on <code>text</code> vs <code>keyword</code> ?</li>
-    <li>À quoi sert le Bulk API ?</li>
-    <li>Quelle est la différence entre <code>must</code> et <code>filter</code> ?</li>
-    <li>Qu'est-ce que BM25 utilise pour calculer le score ?</li>
+<!-- ===================== SLIDE 2 : RÉCAP JOUR 1 ===================== -->
+<section class="slide-content">
+  <h2>Récap Jour 1 — 6 questions</h2>
+  <ol style="font-size:0.88em;line-height:2;">
+    <li>Quelle est la différence entre un <strong>index</strong> et un <strong>shard</strong> ?</li>
+    <li>Quand utiliser <code>text</code> vs <code>keyword</code> ?</li>
+    <li>Différence entre <code>must</code> et <code>filter</code> dans une bool query ?</li>
+    <li>Qu'est-ce que BM25 utilise pour scorer ?</li>
+    <li>À quoi sert le <strong>Bulk API</strong> ?</li>
     <li>Quelle agrégation donne les valeurs les plus fréquentes ?</li>
   </ol>
-  <aside class="notes">Posez les questions oralement, 30s chacune. Repérez qui a besoin d'aide sur les TPs d'hier. Proposez 15 min de Q&A si beaucoup de blocages. Timing : 15 min.</aside>
+  <aside class="notes">Posez les questions oralement, 30 secondes chacune. Repérez qui a eu des difficultés sur les TPs d'hier. Proposez 5 min de Q&amp;A si beaucoup de blocages. Timing : 10 min.</aside>
 </section>
 
-<!-- SLIDE 3 : PLAN DU JOUR 2 -->
-<section>
+<!-- ===================== SLIDE 3 : PLAN JOUR 2 ===================== -->
+<section class="slide-content">
   <h2>Plan du Jour 2</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
-    <div style="background:#f8fafc;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.82em;">
+    <div style="background:#f8fafc;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
       <strong>Matin</strong><br>
-      📖 Ch.4a : Ingest Pipelines<br>
-      📖 Ch.4b : Analyseurs &amp; Tokenizers<br>
-      📖 Ch.4c : Tri, Suggestion, Géo<br>
-      🔧 TP4 (60 min)
+      🔐 Sécurité OpenSearch (AAA, DLS, FLS)<br>
+      🔧 TP5 — Accès restreints (35 min)<br>
+      🔄 Ingest Pipelines + Processeurs<br>
+      🔤 Analyseurs &amp; Tokenizers<br>
+      🔧 TP6 — Pipeline + Analyseur (40 min)
     </div>
-    <div style="background:#f8fafc;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+    <div style="background:#f8fafc;border-left:4px solid #4338ca;padding:1em;border-radius:4px;">
       <strong>Après-midi</strong><br>
-      📖 Ch.5a : Principes Dashboards<br>
-      📖 Ch.5b : Agrégations &amp; Viz<br>
-      📖 Ch.5c : Maps &amp; Dashboard<br>
-      🔧 TP5 (75 min)<br>
-      📖 Ch.6 : Split-brain &amp; Quorum
+      🏗️ Architecture Cluster &amp; Nœuds<br>
+      🔧 TP8 — Monitoring &amp; Diagnostics (25 min)<br>
+      📐 Sizing des Shards<br>
+      ♻️ _Reindex API + TP9 (20 min)<br>
+      🗺️ Routage + TP10 (20 min)
     </div>
   </div>
-  <aside class="notes">Timing : 2 min. Transition : "On commence par les ingest pipelines — le mécanisme qui transforme vos données avant de les stocker."</aside>
+  <aside class="notes">Donnez le plan. Insistez : "Aujourd'hui on passe du mode développeur au mode ingénieur — on réfléchit à la sécurité et à l'architecture en production." Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 4 : CH4 OPENER -->
-<section style="background:#2563eb;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 4</h2>
-  <h3 style="color:#bfdbfe;font-weight:400;">Fonctionnalités Avancées</h3>
-  <p style="color:#dbeafe;font-style:italic;">"Et si vos recherches comprenaient les déclinaisons du français ?"</p>
-  <p style="color:#93c5fd;font-size:0.85em;">Problème : "vélo" ne trouve pas "vélos". "courir" ne trouve pas "couru".</p>
-  <aside class="notes">Posez le problème : sans analyseur linguistique, chaque forme d'un mot est un token différent. Le stemming résout ça. Timing : 30 secondes.</aside>
+<!-- ===================== SLIDE 4 : SÉCURITÉ OPENER ===================== -->
+<section style="background:#7c3aed;color:#fff;">
+  <h2 style="color:#fff;">Sécurité OpenSearch</h2>
+  <h3 style="color:#ddd6fe;font-weight:400;">Authentification · Autorisation · Audit</h3>
+  <p style="color:#ede9fe;margin-top:1.5em;font-style:italic;">"Qui peut lire quoi dans votre cluster ?"</p>
+  <aside class="notes">Posez la question rhétorique et laissez quelques secondes. Timing : 1 min.</aside>
 </section>
 
-<!-- SLIDE 5 : INGEST PIPELINES CONCEPT -->
-<section>
-  <h2>Ingest Pipelines — Le principe</h2>
-  <div style="text-align:center;font-size:0.85em;margin-bottom:0.8em;">
-    <span style="background:#eff6ff;padding:0.4em 0.8em;border-radius:4px;border:1px solid #bfdbfe;">Document entrant</span>
-    &rarr; <span style="background:#2563eb;color:#fff;padding:0.4em 0.8em;border-radius:4px;">Pipeline</span>
-    &rarr; <span style="background:#f0fdf4;padding:0.4em 0.8em;border-radius:4px;border:1px solid #bbf7d0;">Index</span>
+<!-- ===================== SLIDE 5 : AAA ===================== -->
+<section class="slide-content">
+  <h2>Architecture sécurité : AAA</h2>
+  <div style="display:flex;gap:0.8em;font-size:0.85em;margin-bottom:1em;">
+    <div style="flex:1;background:#faf5ff;border-left:4px solid #7c3aed;padding:0.8em;border-radius:4px;">
+      <strong style="color:#7c3aed;">1. Authentification</strong><br>
+      Qui êtes-vous ? (users internes, LDAP, OIDC)
+    </div>
+    <div style="flex:1;background:#faf5ff;border-left:4px solid #7c3aed;padding:0.8em;border-radius:4px;">
+      <strong style="color:#7c3aed;">2. Autorisation</strong><br>
+      Que pouvez-vous faire ? (rôles, permissions)
+    </div>
+    <div style="flex:1;background:#faf5ff;border-left:4px solid #7c3aed;padding:0.8em;border-radius:4px;">
+      <strong style="color:#7c3aed;">3. Audit</strong><br>
+      Qui a fait quoi ? (logs d'accès)
+    </div>
   </div>
-  <div style="font-size:0.8em;">
-    <p><strong>Processeurs courants :</strong></p>
-    <table>
-      <tbody>
-        <tr><td><code>lowercase</code></td><td>Met un champ en minuscules</td></tr>
-        <tr><td><code>trim</code></td><td>Supprime les espaces en début/fin</td></tr>
-        <tr><td><code>set</code></td><td>Définit la valeur d'un champ</td></tr>
-        <tr><td><code>remove</code></td><td>Supprime un champ</td></tr>
-        <tr><td><code>grok</code></td><td>Parse du texte libre avec des patterns</td></tr>
-        <tr><td><code>date</code></td><td>Parse et formate des dates</td></tr>
-      </tbody>
-    </table>
+  <div style="font-size:0.82em;background:#f8fafc;border-radius:4px;padding:0.8em;">
+    <strong>Security Plugin</strong> activé par défaut depuis OpenSearch 1.0.<br>
+    Toutes les requêtes passent par les 3 couches avant d'atteindre les données.
   </div>
-  <aside class="notes">
-    Distinguez pipeline vs analyseur : le pipeline s'exécute UNE FOIS à l'indexation, côté serveur, sur le document entier. L'analyseur s'exécute à l'indexation ET à la recherche, sur un champ text spécifique. Timing : 10 min.
-  </aside>
+  <aside class="notes">Le Security Plugin est la première ligne de défense. Sans lui, n'importe qui peut lire ou supprimer vos données. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 6 : CRÉER UN PIPELINE -->
-<section>
-  <h2>Créer et tester un pipeline</h2>
-  <pre style="font-size:0.6em;"><code class="language-json">// Créer le pipeline
-PUT /_ingest/pipeline/pipeline-produits
+<!-- ===================== SLIDE 6 : UTILISATEURS INTERNES ===================== -->
+<section class="slide-content">
+  <h2>Utilisateurs internes</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">// Créer un utilisateur interne
+PUT /_plugins/_security/api/internalusers/analyst
 {
-  "description": "Normalisation produits e-commerce",
+  "password": "Analyst_2025!",
+  "backend_roles": ["read_only"],
+  "attributes": { "department": "catalogue" }
+}
+
+// LDAP / OIDC : options de configuration dans opensearch.yml
+// plugins.security.authc.ldap.http_enabled: true
+// → lien avec Active Directory ou Okta</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Le mot de passe est stocké en <strong>hash bcrypt</strong> — jamais en clair. Les <code>backend_roles</code> viennent de LDAP ou OIDC.</div>
+  <aside class="notes">Montrez la création en live si possible. Précisez : les users internes sont pratiques en DEV, mais en PROD on préfère LDAP/OIDC (centralisé). Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 7 : RÔLES — CONCEPTS ===================== -->
+<section class="slide-content">
+  <h2>Rôles et permissions — concepts</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.82em;">
+    <div>
+      <p><strong>Niveaux de permissions</strong></p>
+      <ul>
+        <li><code>cluster</code> — ex: <code>cluster:monitor/*</code></li>
+        <li><code>index</code> — ex: <code>indices:data/read/*</code></li>
+        <li><code>document</code> (DLS) — filtrer par doc</li>
+        <li><code>field</code> (FLS) — masquer des champs</li>
+      </ul>
+    </div>
+    <div>
+      <p><strong>Hiérarchie</strong></p>
+      <ul>
+        <li>Un <strong>rôle</strong> = ensemble de permissions</li>
+        <li>Un <strong>utilisateur</strong> → 1+ rôles (role mapping)</li>
+        <li>Les permissions s'accumulent</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">Insistez sur la hiérarchie : cluster &gt; index &gt; document &gt; field. Le niveau le plus bas (field) est le plus précis. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 8 : RÔLES BUILT-IN ===================== -->
+<section class="slide-content">
+  <h2>Rôles built-in OpenSearch</h2>
+  <table style="font-size:0.78em;width:100%;">
+    <thead><tr><th>Rôle</th><th>Permissions</th><th>Cas d'usage</th></tr></thead>
+    <tbody>
+      <tr><td><code>all_access</code></td><td>Toutes permissions</td><td>Admin</td></tr>
+      <tr><td><code>readall</code></td><td>Lecture tous index</td><td>Reporting</td></tr>
+      <tr><td><code>kibanaserver</code></td><td>Accès Dashboards</td><td>Compte service Dashboards</td></tr>
+      <tr><td><code>logstash</code></td><td>Write index <code>logstash-*</code></td><td>Pipeline logstash</td></tr>
+      <tr><td><code>anomaly_read_access</code></td><td>Lecture ML anomalies</td><td>Monitoring</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">Ces rôles couvrent 80% des besoins. Pour les cas spécifiques (accès par tenant, FLS) → rôles custom. Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 9 : CRÉER UN RÔLE CUSTOM ===================== -->
+<section class="slide-content">
+  <h2>Créer un rôle custom</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_plugins/_security/api/roles/catalogue_reader
+{
+  "cluster_permissions": ["cluster:monitor/health"],
+  "index_permissions": [{
+    "index_patterns": ["products-*"],
+    "allowed_actions": [
+      "indices:data/read/search",
+      "indices:data/read/get",
+      "indices:monitor/settings/get"
+    ]
+  }]
+}
+
+// Deny explicite : ne pas autoriser DELETE
+// → simplement ne pas inclure l'action DELETE dans allowed_actions</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Les <code>index_patterns</code> supportent les wildcards : <code>products-*</code>, <code>logs-2025-*</code>.</div>
+  <aside class="notes">Principe du least privilege : on accorde UNIQUEMENT ce qui est nécessaire. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 10 : ROLE MAPPING ===================== -->
+<section class="slide-content">
+  <h2>Role Mapping : lier user → rôle</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_plugins/_security/api/rolesmapping/catalogue_reader
+{
+  "users": ["analyst"],
+  "backend_roles": ["ldap_catalogue_team"]
+}
+
+// Vérifier le mapping
+GET /_plugins/_security/api/rolesmapping/catalogue_reader</code></pre>
+  <div style="font-size:0.82em;margin-top:0.8em;">
+    <strong>2 façons de mapper :</strong><br>
+    • <code>users</code> → utilisateurs internes directs<br>
+    • <code>backend_roles</code> → groupes LDAP / rôles OIDC (mapping indirect)
+  </div>
+  <aside class="notes">Le mapping par backend_role est le pattern recommandé en production : les groupes LDAP sont gérés par l'infra, pas par OpenSearch. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 11 : TLS ===================== -->
+<section class="slide-content">
+  <h2>TLS : sécuriser les communications</h2>
+  <pre style="font-size:0.58em;"><code class="language-yaml"># opensearch.yml — TLS transport (nœud ↔ nœud)
+plugins.security.ssl.transport.pemcert_filepath: node.pem
+plugins.security.ssl.transport.pemkey_filepath:  node-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
+plugins.security.ssl.transport.enforce_hostname_verification: true
+
+# TLS REST (client ↔ cluster)
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.http.pemcert_filepath: node.pem
+plugins.security.ssl.http.pemkey_filepath:  node-key.pem</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#fff7ed;border-left:3px solid #ea580c;padding:0.5em;border-radius:3px;">
+    ⚠️ En prod : certificats signés CA interne, pas self-signed. TLS transport obligatoire pour protéger les données inter-nœuds.
+  </div>
+  <aside class="notes">Différenciez transport (réseau interne cluster) et REST (API externe). En formation on utilise self-signed avec -k. En prod, jamais de self-signed. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 12 : DLS ===================== -->
+<section class="slide-content">
+  <h2>Document Level Security (DLS)</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_plugins/_security/api/roles/vente_eu
+{
+  "index_permissions": [{
+    "index_patterns": ["products-*"],
+    "allowed_actions": ["indices:data/read/search"],
+    "dls": "{\"term\": {\"region\": \"EU\"}}"
+  }]
+}</code></pre>
+  <div style="font-size:0.82em;margin-top:0.8em;">
+    L'utilisateur voit <strong>uniquement</strong> les documents qui matchent le filtre DLS.<br>
+    <strong>Impact perf</strong> : le filtre DLS s'exécute en <em>filter context</em> → mis en cache, pas de calcul de score.
+  </div>
+  <aside class="notes">Le DLS est transparent pour l'utilisateur : il ne sait pas que des documents lui sont cachés. Cas typique : tenant multi-région, données PII. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 13 : FLS ===================== -->
+<section class="slide-content">
+  <h2>Field Level Security (FLS)</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_plugins/_security/api/roles/vente_eu
+{
+  "index_permissions": [{
+    "index_patterns": ["products-*"],
+    "allowed_actions": ["indices:data/read/search"],
+    "fls": ["~cost_price", "~supplier_margin"]
+  }]
+}</code></pre>
+  <div style="font-size:0.82em;margin-top:0.8em;">
+    Le préfixe <code>~</code> <strong>exclut</strong> le champ.<br>
+    Sans <code>~</code> = liste blanche (seuls ces champs sont visibles).<br>
+    <strong>Cas</strong> : masquer le prix fournisseur à l'équipe commerciale.
+  </div>
+  <aside class="notes">FLS est complémentaire au DLS : DLS filtre les lignes, FLS filtre les colonnes. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 14 : DLS + FLS EXEMPLE ===================== -->
+<section class="slide-content">
+  <h2>Exemple e-commerce : DLS + FLS combinés</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;">
+    <div style="background:#faf5ff;border-radius:6px;padding:0.8em;">
+      <strong style="color:#7c3aed;">Rôle <code>sales_eu</code></strong><br>
+      DLS : <code>region = "EU"</code><br>
+      FLS : cache <code>cost_price</code>, <code>internal_notes</code>
+    </div>
+    <div style="background:#f0fdf4;border-radius:6px;padding:0.8em;">
+      <strong style="color:#16a34a;">Admin</strong><br>
+      Voit tous les documents<br>
+      Voit tous les champs
+    </div>
+  </div>
+  <pre style="font-size:0.62em;margin-top:0.8em;"><code>// Vue sales_eu sur doc { region: "FR", price: 99, cost_price: 42 }
+{
+  "_source": { "region": "FR", "price": 99 }
+  // cost_price absent ← FLS
+  // seuls docs EU ← DLS
+}</code></pre>
+  <aside class="notes">Montrez le schéma : même document, deux vues différentes selon le rôle. C'est la puissance du RBAC combiné DLS/FLS. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 15 : API REST SÉCURITÉ ===================== -->
+<section class="slide-content">
+  <h2>API REST sécurité — CRUD users &amp; rôles</h2>
+  <pre style="font-size:0.6em;"><code class="language-bash"># CRUD users
+GET    /_plugins/_security/api/internalusers
+PUT    /_plugins/_security/api/internalusers/{user}
+DELETE /_plugins/_security/api/internalusers/{user}
+
+# CRUD rôles
+GET    /_plugins/_security/api/roles
+PUT    /_plugins/_security/api/roles/{role}
+
+# CRUD role mappings
+GET    /_plugins/_security/api/rolesmapping
+PUT    /_plugins/_security/api/rolesmapping/{role}
+PATCH  /_plugins/_security/api/rolesmapping/{role}</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Utile pour le <strong>provisioning automatisé</strong> : Terraform, scripts CI/CD, Ansible.</div>
+  <aside class="notes">Montrez que l'ensemble de la sécurité est gérable par API — donc automatisable. Pas besoin de l'UI Dashboards pour tout. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 16 : TENANT ISOLATION ===================== -->
+<section class="slide-content">
+  <h2>Tenant Isolation</h2>
+  <div style="font-size:0.85em;">
+    <p>Les <strong>tenants</strong> sont des espaces Dashboards isolés :</p>
+    <ul style="margin:0.8em 0;">
+      <li><code>global</code> — partagé entre tous</li>
+      <li><code>private</code> — personnel à chaque utilisateur</li>
+      <li>Tenants <strong>custom</strong> — par équipe, par département</li>
+    </ul>
+    <div style="background:#faf5ff;border-radius:4px;padding:0.8em;margin-top:0.8em;">
+      Chaque tenant a ses propres <strong>dashboards, index patterns et visualizations</strong>.<br>
+      Utile pour le <strong>multi-équipe</strong> : l'équipe produit ne voit pas les dashboards de l'équipe logistique.
+    </div>
+  </div>
+  <aside class="notes">Les tenants sont une feature Dashboards uniquement — ils n'impactent pas l'accès aux données (c'est DLS/FLS pour ça). Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 17 : AUDIT LOGS ===================== -->
+<section class="slide-content">
+  <h2>Audit Logs &amp; bonnes pratiques</h2>
+  <pre style="font-size:0.6em;"><code class="language-yaml"># opensearch.yml
+plugins.security.audit.type: internal_opensearch
+plugins.security.audit.config.index: security-auditlog</code></pre>
+  <div style="font-size:0.8em;margin-top:0.8em;">
+    <strong>Checklist sécurité prod :</strong>
+    <ul>
+      <li>✅ TLS obligatoire transport + REST</li>
+      <li>✅ Least privilege sur chaque rôle</li>
+      <li>✅ DLS / FLS si données PII ou multi-tenant</li>
+      <li>✅ Audit activé (RGPD, conformité)</li>
+      <li>✅ Certificat admin isolé, rotation régulière</li>
+    </ul>
+  </div>
+  <aside class="notes">L'audit log stocke : qui, quoi, quand, depuis quelle IP. Essentiel pour la conformité RGPD. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 18 : QUIZ SÉCURITÉ ===================== -->
+<section class="slide-content">
+  <h2>Quiz Sécurité — 4 questions</h2>
+  <ol style="font-size:0.88em;line-height:2.2;">
+    <li>Quelle est la différence entre <strong>DLS</strong> et <strong>FLS</strong> ?</li>
+    <li>Quelle conf YAML pour activer <strong>TLS transport</strong> ?</li>
+    <li>Comment lier un utilisateur à un rôle ?</li>
+    <li>Quel rôle built-in pour le compte service Dashboards ?</li>
+  </ol>
+  <aside class="notes">Réponses : 1) DLS filtre les documents, FLS filtre les champs. 2) plugins.security.ssl.transport.*. 3) Via rolesmapping API. 4) kibanaserver. Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 19 : TP5 ===================== -->
+<section style="background:#f8fafc;">
+  <h2>🔧 TP5 — Accès restreints champs et documents</h2>
+  <p style="color:#7c3aed;font-weight:600;">Durée : 35 minutes</p>
+  <ol style="font-size:0.85em;">
+    <li>Créer l'utilisateur <code>vente_eu</code></li>
+    <li>Créer un rôle avec DLS <code>region:EU</code> + FLS masquant <code>cost_price</code></li>
+    <li>Lier le rôle via rolesmapping</li>
+    <li>Tester avec les 2 comptes (admin vs vente_eu)</li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.8em;font-size:0.88em;">
+    <strong>⭐ Bonus :</strong> Provisioning complet de l'utilisateur via API REST (script curl)
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp5-securite/README.md</code></p>
+  <aside class="notes">Problème fréquent : oublier le -k pour les certs self-signed en formation. Solution dans le README. Timing : 35 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 20 : INGEST OPENER ===================== -->
+<section style="background:#ea580c;color:#fff;">
+  <h2 style="color:#fff;">Ingest Pipelines</h2>
+  <h3 style="color:#fed7aa;font-weight:400;">Transformer avant d'indexer</h3>
+  <p style="color:#ffedd5;margin-top:1.5em;font-style:italic;">"Et si vos données arrivaient sales ?"</p>
+  <aside class="notes">Transition naturelle après la sécurité. Timing : 1 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 21 : PRINCIPE PIPELINE ===================== -->
+<section class="slide-content">
+  <h2>Le principe : document → pipeline → index</h2>
+  <div style="text-align:center;font-size:0.88em;margin:1em 0;">
+    <span style="background:#eff6ff;padding:0.4em 0.8em;border-radius:4px;border:1px solid #bfdbfe;">Document entrant</span>
+    → <span style="background:#ea580c;color:#fff;padding:0.4em 0.8em;border-radius:4px;">Processor 1</span>
+    → <span style="background:#ea580c;color:#fff;padding:0.4em 0.8em;border-radius:4px;">Processor 2</span>
+    → <span style="background:#f0fdf4;padding:0.4em 0.8em;border-radius:4px;border:1px solid #bbf7d0;">Index</span>
+  </div>
+  <div style="font-size:0.82em;">
+    <p>S'exécute <strong>une seule fois</strong> à l'indexation, côté serveur.<br>
+    Différent de l'analyseur (qui s'exécute aussi à la recherche).</p>
+  </div>
+  <pre style="font-size:0.56em;margin-top:0.6em;"><code class="language-json">PUT /_ingest/pipeline/mon-pipeline
+{
+  "processors": [
+    { "lowercase": { "field": "category" } },            // ← Processor 1
+    { "set": { "field": "indexed_at",
+               "value": "{{{_ingest.timestamp}}}" } }    // ← Processor 2
+  ]
+}
+// Exécution séquentielle : chaque processor reçoit le doc modifié par le précédent</code></pre>
+  <aside class="notes">Bien distinguer : pipeline = transforme le document entier, une fois, à l'indexation. Analyseur = tokenise un champ text, à l'indexation ET à la recherche. Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 22 : PROCESSORS ESSENTIELS ===================== -->
+<section class="slide-content">
+  <h2>Processors essentiels</h2>
+  <table style="font-size:0.78em;width:100%;">
+    <thead><tr><th>Processor</th><th>Effet</th><th>Exemple</th></tr></thead>
+    <tbody>
+      <tr><td><code>lowercase</code></td><td>Minuscules</td><td><code>"ELECTRONIQUE"</code> → <code>"electronique"</code></td></tr>
+      <tr><td><code>trim</code></td><td>Supprime espaces</td><td><code>"  ordi  "</code> → <code>"ordi"</code></td></tr>
+      <tr><td><code>set</code></td><td>Définit un champ</td><td>Ajouter <code>indexed_at</code></td></tr>
+      <tr><td><code>remove</code></td><td>Supprime un champ</td><td>Supprimer <code>_tmp</code></td></tr>
+      <tr><td><code>rename</code></td><td>Renomme un champ</td><td><code>ts</code> → <code>@timestamp</code></td></tr>
+      <tr><td><code>convert</code></td><td>Change le type</td><td><code>"42"</code> → <code>42</code> (integer)</td></tr>
+    </tbody>
+  </table>
+  <pre style="font-size:0.6em;margin-top:0.6em;"><code>{ "set": { "field": "indexed_at", "value": "{{{_ingest.timestamp}}}" } }</code></pre>
+  <aside class="notes">Ce tableau couvre 80% des cas. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 22b : PROCESSORS ESSENTIELS — EXEMPLE COMPLET ===================== -->
+<section class="slide-content">
+  <h2>Processors essentiels — pipeline complet</h2>
+  <pre style="font-size:0.58em;"><code class="language-json">PUT /_ingest/pipeline/nettoyage-produits
+{
   "processors": [
     { "lowercase": { "field": "category" } },
-    { "trim": { "field": "description" } },
-    { "set": { "field": "indexed_at", "value": "{{_ingest.timestamp}}" } }
+    { "trim":      { "field": "description" } },
+    { "rename":    { "field": "ts",    "target_field": "@timestamp" } },
+    { "convert":   { "field": "price", "type": "float" } },
+    { "remove":    { "field": "_tmp",  "ignore_missing": true } },
+    { "set":       { "field": "indexed_at", "value": "{{{_ingest.timestamp}}}" } }
   ]
 }
 
-// Tester sans indexer
+POST /_ingest/pipeline/nettoyage-produits/_simulate
+{ "docs": [{ "_source": { "category": "ELECTRONIQUE", "description": "  Ordi  ",
+                           "ts": "2025-01-15", "price": "299.99", "_tmp": "draft" } }] }
+
+// → category:"electronique", description:"Ordi", @timestamp:"2025-01-15", price:299.99</code></pre>
+  <aside class="notes">Insister sur _simulate avant tout passage en prod. Timing : 3 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 23 : PROCESSORS AVANCÉS ===================== -->
+<section class="slide-content">
+  <h2>Processors avancés</h2>
+  <table style="font-size:0.78em;width:100%;">
+    <thead><tr><th>Processor</th><th>Cas d'usage</th></tr></thead>
+    <tbody>
+      <tr><td><code>grok</code></td><td>Parser du texte libre avec patterns nommés</td></tr>
+      <tr><td><code>date</code></td><td>Normaliser les formats de date</td></tr>
+      <tr><td><code>split</code></td><td>Découper une string en tableau</td></tr>
+      <tr><td><code>gsub</code></td><td>Remplacer par regex</td></tr>
+      <tr><td><code>html_strip</code></td><td>Supprimer les balises HTML</td></tr>
+      <tr><td><code>uri_parts</code></td><td>Décomposer une URL en champs</td></tr>
+    </tbody>
+  </table>
+  <pre style="font-size:0.6em;margin-top:0.6em;"><code>// gsub : normaliser un numéro de téléphone
+{ "gsub": { "field": "phone", "pattern": "[^0-9]", "replacement": "" } }</code></pre>
+  <aside class="notes">grok est le plus puissant pour les logs (nginx, apache, application custom). date est indispensable pour normaliser @timestamp. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 23b : PROCESSORS AVANCÉS — EXEMPLE COMPLET ===================== -->
+<section class="slide-content">
+  <h2>Processors avancés — pipeline complet</h2>
+  <pre style="font-size:0.58em;"><code class="language-json">PUT /_ingest/pipeline/enrichissement-logs
+{
+  "processors": [
+    { "grok":       { "field": "raw",  "patterns": ["%{IP:ip} %{WORD:method} %{URIPATHPARAM:path}"] } },
+    { "split":      { "field": "tags", "separator": ","  } },
+    { "gsub":       { "field": "phone","pattern": "[^0-9]", "replacement": "" } },
+    { "html_strip": { "field": "body" } },
+    { "uri_parts":  { "field": "url"  } }
+  ]
+}
+
+// Entrée  : { "raw":"1.2.3.4 GET /api?q=test", "tags":"prod,fr", "phone":"+33 6 12 34" }
+// Sortie  : { "ip":"1.2.3.4", "method":"GET", "path":"/api?q=test",
+//             "tags":["prod","fr"], "phone":"3361234" }</code></pre>
+  <aside class="notes">Montrer grok + split en combinaison : cas réel logs applicatifs. Timing : 3 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 24 : CRÉER ET TESTER UN PIPELINE ===================== -->
+<section class="slide-content">
+  <h2>Créer et tester : PUT + _simulate</h2>
+  <pre style="font-size:0.58em;"><code class="language-json">// 1. Créer le pipeline
+PUT /_ingest/pipeline/pipeline-produits
+{
+  "processors": [
+    { "lowercase": { "field": "category" } },
+    { "trim":      { "field": "description" } },
+    { "set":       { "field": "indexed_at", "value": "{{{_ingest.timestamp}}}" } }
+  ]
+}
+
+// 2. Tester sans indexer ← TOUJOURS faire ça avant prod
 POST /_ingest/pipeline/pipeline-produits/_simulate
 {
-  "docs": [{
-    "_source": {
-      "category": "ELECTRONIQUE",
-      "description": "   Ordinateur portable   "
+  "docs": [{ "_source": { "category": "ELECTRONIQUE", "description": "  Ordi  " } }]
+}
+
+// 3. Utiliser à l'indexation
+PUT /products/_doc/1?pipeline=pipeline-produits
+{ "category": "ELECTRONIQUE", "description": "  Ordi  " }</code></pre>
+  <aside class="notes">_simulate est ESSENTIEL. Une erreur dans un processor peut corrompre des millions de documents. Montrez la réponse _simulate : le document transformé sans l'avoir indexé. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 25 : GROK ===================== -->
+<section class="slide-content">
+  <h2>Grok processor : parser des logs</h2>
+  <pre style="font-size:0.58em;"><code class="language-json">PUT /_ingest/pipeline/nginx-logs
+{
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns": [
+        "%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:status:int}"
+      ]
     }
   }]
 }
 
-// Utiliser le pipeline à l'indexation
-PUT /products/_doc/1?pipeline=pipeline-produits
-{ "name": "MacBook Pro", "category": "ELECTRONIQUE", "description": "   Super ordi   " }</code></pre>
-  <aside class="notes">
-    _simulate est ESSENTIEL. Testez toujours un pipeline avant de l'appliquer en prod — une erreur dans un processor peut corrompre des millions de documents. Montrez la réponse de _simulate : vous voyez le document transformé sans l'avoir indexé. Timing : 12 min.
-  </aside>
+// Entrée  : "192.168.1.1 GET /api/products?q=ordi 200"
+// Sortie  : { "client": "192.168.1.1", "method": "GET",
+//             "request": "/api/products?q=ordi", "status": 200 }</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Bibliothèque de patterns : <code>/etc/opensearch/patterns/</code> — ou définir les siens.</div>
+  <aside class="notes">grok est la killer feature pour l'ingestion de logs. Les patterns %{IP}, %{NUMBER}, %{WORD} sont prédéfinis. Timing : 6 min.</aside>
 </section>
 
-<!-- SLIDE 7 : CHAÎNE D'ANALYSE -->
-<section>
-  <h2>Chaîne d'analyse — L'ordre compte !</h2>
-  <div style="text-align:center;font-size:0.85em;margin:1em 0;">
-    <span style="background:#eff6ff;padding:0.5em;border-radius:4px;border:1px solid #bfdbfe;">Texte brut</span>
-    → <span style="background:#faf5ff;padding:0.5em;border-radius:4px;border:1px solid #e9d5ff;">Char Filter</span>
-    → <span style="background:#fff7ed;padding:0.5em;border-radius:4px;border:1px solid #fed7aa;">Tokenizer</span>
-    → <span style="background:#f0fdf4;padding:0.5em;border-radius:4px;border:1px solid #bbf7d0;">Token Filters</span>
-    → <span style="background:#f8fafc;padding:0.5em;border-radius:4px;border:1px solid #e2e8f0;">Tokens</span>
+<!-- ===================== SLIDE 26 : DATE PROCESSOR ===================== -->
+<section class="slide-content">
+  <h2>Date processor : normaliser les formats</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_ingest/pipeline/normalize-dates
+{
+  "processors": [{
+    "date": {
+      "field":        "raw_date",
+      "formats":      ["dd/MM/yyyy", "MM/dd/yyyy", "ISO8601"],
+      "target_field": "@timestamp",
+      "timezone":     "Europe/Paris"
+    }
+  }]
+}
+
+// "15/01/2025" → "@timestamp": "2025-01-15T00:00:00.000Z"
+// "01/15/2025" → "@timestamp": "2025-01-15T00:00:00.000Z"</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#fff7ed;border-left:3px solid #ea580c;padding:0.5em;border-radius:3px;">
+    ⚠️ Toujours préciser le timezone — sinon UTC par défaut → décalage de 1h/2h en France.
   </div>
-  <pre style="font-size:0.65em;"><code>Entrée : "Vélos électriques d'entrée DE GAMME"
-
-Char Filter (html_strip) : aucun changement
-Tokenizer (standard)     : ["Vélos", "électriques", "d", "entrée", "DE", "GAMME"]
-lowercase                : ["vélos", "électriques", "d", "entrée", "de", "gamme"]
-asciifolding             : ["velos", "electriques", "d", "entree", "de", "gamme"]
-french_stop              : ["velos", "electriques", "entree", "gamme"]  (d, de supprimés)
-french_stemmer           : ["velo", "electr", "entre", "gamm"]</code></pre>
-  <aside class="notes">
-    C'est la slide la plus importante du jour 2. Montrez l'API _analyze en live : POST /products-v2/_analyze avec les différents analyseurs. L'ordre des Token Filters COMPTE : lowercase doit être avant asciifolding sinon "É" ne sera pas normalisé. Timing : 10 min.
-  </aside>
+  <aside class="notes">Le date processor est indispensable dès qu'on ingère des données horodatées venant de sources différentes. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 8 : ANALYSEUR FRANÇAIS -->
-<section>
+<!-- ===================== SLIDE 27 : ON_FAILURE ===================== -->
+<section class="slide-content">
+  <h2>On_failure handler : gérer les erreurs</h2>
+  <pre style="font-size:0.58em;"><code class="language-json">PUT /_ingest/pipeline/pipeline-robuste
+{
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns": ["%{IP:client} %{WORD:method}"],
+      "on_failure": [{
+        "set": {
+          "field":  "_index",
+          "value":  "failed-docs"
+        }
+      }]
+    }
+  }]
+}</code></pre>
+  <div style="font-size:0.82em;margin-top:0.5em;">
+    <strong>Sans on_failure</strong> : le document est <em>rejeté silencieusement</em>.<br>
+    <strong>Pattern prod</strong> : router les docs en erreur vers un index dédié pour inspection.
+  </div>
+  <aside class="notes">Ne jamais laisser un pipeline sans on_failure en production — vous perdrez des données sans vous en rendre compte. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 28 : PROCESSORS CONDITIONNELS ===================== -->
+<section class="slide-content">
+  <h2>Processors conditionnels : if Painless</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_ingest/pipeline/pipeline-premium
+{
+  "processors": [{
+    "set": {
+      "if":    "ctx.price != null &amp;&amp; ctx.price > 1000",
+      "field": "segment",
+      "value": "premium"
+    }
+  }, {
+    "remove": {
+      "if":    "ctx.containsKey('_tmp')",
+      "field": "_tmp"
+    }
+  }]
+}</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Painless est <strong>compilé</strong> → performances acceptables. Ne pas y mettre de logique métier complexe.</div>
+  <aside class="notes">Le if Painless permet d'éviter plusieurs pipelines distincts. Mais si la logique devient complexe, mieux vaut la mettre en amont (dans le client). Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 29 : DEFAULT/FINAL PIPELINE ===================== -->
+<section class="slide-content">
+  <h2><code>default_pipeline</code> et <code>final_pipeline</code></h2>
+  <pre style="font-size:0.6em;"><code class="language-json">// Appliquer automatiquement à tout nouvel index
+PUT /products/_settings
+{
+  "index.default_pipeline": "pipeline-produits"
+}
+
+// final_pipeline s'exécute EN DERNIER,
+// même si le document spécifie un autre pipeline
+PUT /products/_settings
+{
+  "index.final_pipeline": "audit-pipeline"
+}</code></pre>
+  <div style="font-size:0.82em;margin-top:0.5em;">
+    <strong><code>default_pipeline</code></strong> — appliqué si aucun pipeline spécifié dans la requête d'indexation.<br>
+    <strong><code>final_pipeline</code></strong> — toujours exécuté en dernier (ex: enrichissement, audit).
+  </div>
+  <aside class="notes">Cas concret : final_pipeline pour ajouter indexed_at sur tous les docs quel que soit le pipeline utilisé. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 30 : ANALYSE OPENER ===================== -->
+<section style="background:#2563eb;color:#fff;">
+  <h2 style="color:#fff;">Analyse du texte</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Pourquoi "vélos" ≠ "velo" ?</h3>
+  <p style="color:#dbeafe;margin-top:1.5em;font-style:italic;">"La recherche plein texte commence ici."</p>
+  <aside class="notes">Transition depuis les pipelines. Dites : "On vient de voir comment transformer les données à l'indexation. Maintenant on va voir comment OpenSearch comprend le texte." Timing : 1 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 31 : CHAÎNE D'ANALYSE ===================== -->
+<section class="slide-content">
+  <h2>Chaîne d'analyse : Char Filter → Tokenizer → Token Filters</h2>
+  <div style="text-align:center;font-size:0.82em;margin:0.8em 0;">
+    <span style="background:#eff6ff;padding:0.4em 0.6em;border-radius:4px;border:1px solid #bfdbfe;">Texte brut</span>
+    → <span style="background:#faf5ff;padding:0.4em 0.6em;border-radius:4px;border:1px solid #e9d5ff;">Char Filter</span>
+    → <span style="background:#fff7ed;padding:0.4em 0.6em;border-radius:4px;border:1px solid #fed7aa;">Tokenizer</span>
+    → <span style="background:#f0fdf4;padding:0.4em 0.6em;border-radius:4px;border:1px solid #bbf7d0;">Token Filters</span>
+    → <span style="background:#f8fafc;padding:0.4em 0.6em;border-radius:4px;border:1px solid #e2e8f0;">Tokens finaux</span>
+  </div>
+  <pre style="font-size:0.62em;"><code>Entrée          : "Vélos électriques d'ENTRÉE DE GAMME"
+Tokenizer       : ["Vélos", "électriques", "d", "ENTRÉE", "DE", "GAMME"]
+lowercase       : ["vélos", "électriques", "d", "entrée", "de", "gamme"]
+asciifolding    : ["velos", "electriques", "d", "entree", "de", "gamme"]
+french_stop     : ["velos", "electriques", "entree", "gamme"]
+french_stemmer  : ["velo", "electr", "entre", "gamm"]</code></pre>
+  <aside class="notes">L'ordre des filtres COMPTE : lowercase AVANT asciifolding sinon "É" n'est pas normalisé. Montrez _analyze en live. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 32 : TOKENIZERS ===================== -->
+<section class="slide-content">
+  <h2>Tokenizers : standard, whitespace, ngram, edge_ngram</h2>
+  <table style="font-size:0.76em;width:100%;">
+    <thead><tr><th>Tokenizer</th><th>Tokens de "ordi-portable"</th><th>Cas d'usage</th></tr></thead>
+    <tbody>
+      <tr><td><code>standard</code></td><td>["ordi", "portable"]</td><td>Texte général</td></tr>
+      <tr><td><code>whitespace</code></td><td>["ordi-portable"]</td><td>Codes produits</td></tr>
+      <tr><td><code>ngram</code> (2-3)</td><td>["or","rd","di","po","or"...]</td><td>Recherche substring</td></tr>
+      <tr><td><code>edge_ngram</code> (2-6)</td><td>["or","ord","ordi"...]</td><td>Autocomplétion préfixe</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#fff7ed;border-left:3px solid #ea580c;padding:0.5em;border-radius:3px;">
+    ⚠️ ngram et edge_ngram augmentent significativement l'espace disque de l'index.
+  </div>
+  <aside class="notes">edge_ngram est le choix standard pour l'autocomplétion. ngram pour la recherche au milieu d'un mot (coûteux). Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 33 : TOKEN FILTERS ===================== -->
+<section class="slide-content">
+  <h2>Token Filters : lowercase, asciifolding, stop, stemmer, synonym</h2>
+  <table style="font-size:0.76em;width:100%;">
+    <thead><tr><th>Filter</th><th>Transformation</th></tr></thead>
+    <tbody>
+      <tr><td><code>lowercase</code></td><td>"ORDI" → "ordi"</td></tr>
+      <tr><td><code>asciifolding</code></td><td>"Vélo" → "Velo" (après lowercase)</td></tr>
+      <tr><td><code>stop</code></td><td>["de", "le", "un"] → supprimés</td></tr>
+      <tr><td><code>stemmer (french)</code></td><td>"électriques" → "electr"</td></tr>
+      <tr><td><code>synonym</code></td><td>"ordi" → "ordinateur"</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#eff6ff;border-left:3px solid #2563eb;padding:0.5em;border-radius:3px;">
+    💡 Ordre critique : <code>lowercase</code> AVANT <code>asciifolding</code> — sinon "É" majuscule n'est pas normalisé.
+  </div>
+  <aside class="notes">Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 34 : ANALYSEUR FRANÇAIS ===================== -->
+<section class="slide-content">
   <h2>Créer un analyseur français personnalisé</h2>
-  <pre style="font-size:0.58em;"><code class="language-json">PUT /products-v2
+  <pre style="font-size:0.55em;"><code class="language-json">PUT /products-v2
 {
   "settings": {
     "analysis": {
       "filter": {
-        "french_stemmer": { "type": "stemmer", "language": "french" },
-        "french_stop": { "type": "stop", "stopwords": "_french_" }
+        "french_stemmer": { "type": "stemmer",  "language": "french" },
+        "french_stop":    { "type": "stop",     "stopwords": "_french_" }
       },
       "analyzer": {
         "french_custom": {
-          "type": "custom",
+          "type":      "custom",
           "tokenizer": "standard",
-          "filter": ["lowercase", "asciifolding", "french_stop", "french_stemmer"]
+          "filter":    ["lowercase", "asciifolding", "french_stop", "french_stemmer"]
         }
       }
     }
   },
   "mappings": {
     "properties": {
-      "name": { "type": "text", "analyzer": "french_custom" },
+      "name":        { "type": "text", "analyzer": "french_custom" },
       "description": { "type": "text", "analyzer": "french_custom" }
     }
   }
-}
-
-// Tester l'analyseur
-POST /products-v2/_analyze
-{ "analyzer": "french_custom", "text": "Vélos électriques d'entrée de gamme" }</code></pre>
-  <aside class="notes">
-    Expliquez que l'analyseur doit être défini AVANT d'indexer des données. Si on le change après, il faut réindexer (les tokens en index ne correspondent plus à la requête). L'API _reindex permet de migrer les données. Timing : 10 min.
-  </aside>
+}</code></pre>
+  <aside class="notes">L'analyseur doit être défini AVANT d'indexer des données. Si on le change après, il faut _reindexer. Timing : 7 min.</aside>
 </section>
 
-<!-- SLIDE 9 : COMPLETION SUGGESTER -->
-<section>
-  <h2>Completion Suggester — Autocomplétion</h2>
-  <pre style="font-size:0.62em;"><code class="language-json">// 1. Mapping — type completion
-PUT /products-v2/_mapping
+<!-- ===================== SLIDE 35 : API _ANALYZE ===================== -->
+<section class="slide-content">
+  <h2>API _analyze : tester et déboguer</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">// Tester l'analyseur sur un texte
+POST /products-v2/_analyze
+{
+  "analyzer": "french_custom",
+  "text":     "Vélos électriques d'entrée de gamme"
+}
+// → tokens : ["velo", "electr", "entre", "gamm"]
+
+// Comparer avec l'analyseur standard
+POST /products-v2/_analyze
+{
+  "analyzer": "standard",
+  "text":     "Vélos électriques d'entrée de gamme"
+}
+// → tokens : ["vélos", "électriques", "d", "entrée", "de", "gamme"]</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">La réponse inclut : <strong>tokens + positions + offsets</strong> — très utile pour déboguer des requêtes qui ne trouvent rien.</div>
+  <aside class="notes">Montrez la différence côte à côte. C'est la démo la plus "aha moment" de la journée : on voit exactement pourquoi "vélo" trouve "vélos". Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 36 : MULTI-FIELDS ===================== -->
+<section class="slide-content">
+  <h2>Multi-fields : keyword + text sur le même champ</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /products-v2/_mapping
 {
   "properties": {
-    "name_suggest": { "type": "completion" }
-  }
-}
-
-// 2. Requête d'autocomplétion
-POST /products-v2/_search
-{
-  "suggest": {
-    "produit-suggest": {
-      "prefix": "ordi",
-      "completion": {
-        "field": "name_suggest",
-        "size": 5,
-        "fuzzy": { "fuzziness": 1 }
+    "name": {
+      "type":     "text",
+      "analyzer": "french_custom",
+      "fields": {
+        "raw": { "type": "keyword" }
       }
     }
   }
-}</code></pre>
-  <div style="font-size:0.75em;margin-top:0.5em;color:#475569;">
-    Le type <code>completion</code> utilise une structure FST (Finite State Transducer) en mémoire — ultra-rapide pour les suggestions.
-  </div>
-  <aside class="notes">
-    Le completion suggester est optimisé pour l'autocomplétion préfixe (comme la barre de recherche d'Amazon). Il ne fait PAS d'analyse linguistique — c'est des préfixes exacts. Pour la correction orthographique, utiliser le term suggester. Timing : 7 min.
-  </aside>
-</section>
-
-<!-- SLIDE 10 : HIGHLIGHTING ET GÉO -->
-<section>
-  <h2>Highlighting &amp; Recherche Géographique</h2>
-  <pre style="font-size:0.6em;"><code class="language-json">// Highlighting
-POST /products/_search
-{
-  "query": { "match": { "description": "ordinateur portable" } },
-  "highlight": {
-    "pre_tags": ["&lt;mark&gt;"], "post_tags": ["&lt;/mark&gt;"],
-    "fields": { "description": { "fragment_size": 150 } }
-  }
 }
 
-// Geo distance — magasins à moins de 5km de Paris
-POST /stores/_search
-{
-  "query": {
-    "geo_distance": {
-      "distance": "5km",
-      "location": { "lat": 48.8566, "lon": 2.3522 }
-    }
-  },
-  "sort": [{ "_geo_distance": { "location": { "lat": 48.8566, "lon": 2.3522 }, "order": "asc", "unit": "km" } }]
+// Recherche full-text  → products-v2.name
+// Sort / agrégation   → products-v2.name.raw</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Stocké une seule fois, indexé deux façons. Pas de duplication de données.</div>
+  <aside class="notes">Pattern très courant : champ name analysé pour la recherche, name.raw keyword pour le tri et les agrégations. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 37 : ANALYSEUR INDEX VS SEARCH ===================== -->
+<section class="slide-content">
+  <h2>Analyseur à l'indexation vs à la recherche</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">"name_suggest": {
+  "type":           "text",
+  "analyzer":       "edge_ngram_analyzer",  // indexation : génère les préfixes
+  "search_analyzer": "standard"             // recherche  : ne pas découper le préfixe
 }</code></pre>
-  <aside class="notes">
-    Highlighting : les balises pre_tags/post_tags entourent les termes matchés dans les extraits. Le champ stores.location doit être de type geo_point dans le mapping. Timing : 7 min.</aside>
-</section>
-
-<!-- SLIDE 11 : OPTIMISATION -->
-<section>
-  <h2>Optimisation — Indexation &amp; Requêtes</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.8em;">
-    <div>
-      <p><strong>⚡ Optimiser l'indexation</strong></p>
-      <ul>
-        <li>Utiliser le <strong>Bulk API</strong> (toujours)</li>
-        <li><code>refresh_interval: -1</code> pendant le chargement</li>
-        <li><code>replicas: 0</code> pendant le chargement massif</li>
-        <li><code>dynamic: strict</code> pour éviter le mapping explosion</li>
-      </ul>
-    </div>
-    <div>
-      <p><strong>🔍 Optimiser les requêtes</strong></p>
-      <ul>
-        <li><code>filter</code> au lieu de <code>must</code> (pas de score)</li>
-        <li><code>_source</code> filtering pour réduire le payload</li>
-        <li><code>search_after</code> pour la pagination profonde</li>
-        <li>Éviter les <code>wildcard</code> avec leading star (<code>*term</code>)</li>
-      </ul>
-    </div>
-  </div>
-  <aside class="notes">
-    Le piège du wildcard leading : `*ordinateur` nécessite de scanner tous les termes de l'index inversé. Très coûteux. Utilisez un edge_ngram tokenizer à la place pour les autocomplétion. Le dynamic:strict protège contre un développeur qui envoie accidentellement des champs inconnus qui créent des mappings dynamiques. Timing : 7 min.
-  </aside>
-</section>
-
-<!-- SLIDE 12 : DEMO LIVE CH4 -->
-<section style="background:#f8fafc;">
-  <h2>🖥️ Démo Live — Analyseur Français</h2>
-  <div style="font-size:0.85em;">
-    <ol>
-      <li>Créer <code>products-v2</code> avec <code>french_custom</code></li>
-      <li><code>POST /products-v2/_analyze</code> sur "Vélos électriques"</li>
-      <li>Comparer avec l'analyseur standard</li>
-      <li>Réindexer depuis <code>products</code></li>
-      <li>Comparer les résultats de recherche "velo" sur les deux index</li>
-    </ol>
-  </div>
-  <aside class="notes">Montrez la différence de tokens entre analyseur standard et french_custom. C'est la démonstration la plus "wow" du jour 2. Timing : 8 min.</aside>
-</section>
-
-<!-- SLIDE 13 : TP4 -->
-<section style="background:#f8fafc;">
-  <h2>🔧 TP4 — Fonctionnalités Avancées</h2>
-  <p style="color:#2563eb;font-weight:600;">Durée : 60 minutes</p>
-  <ol style="font-size:0.85em;">
-    <li>Créer le pipeline <code>pipeline-produits</code> + tester avec <code>_simulate</code></li>
-    <li>Créer l'analyseur <code>french_custom</code> dans <code>products-v2</code></li>
-    <li>Réindexer <code>products</code> → <code>products-v2</code></li>
-    <li>Ajouter l'autocomplétion (<code>completion</code> field)</li>
-    <li>Tester le highlighting avec <code>&lt;mark&gt;</code></li>
-    <li>Recherche géo sur <code>stores</code> dans 5 km de Paris</li>
-  </ol>
-  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
-    <strong>⭐ Bonus :</strong> Term suggester "Voulez-vous dire ?" + Geo bounding box
-  </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp4-fonctionnalites-avancees/README.md</code></p>
-  <aside class="notes">
-    Problème courant : "Mon reindex ne trouve pas les tokens". Cause : l'analyseur a changé mais les tokens de l'ancien index sont toujours dans la mémoire de la session. Demander de chercher avec le nouvel index. Timing : 60 min.
-  </aside>
-</section>
-
-<!-- SLIDE 14 : QUIZ CH4 -->
-<section>
-  <h2>⚡ Quiz — Chapitre 4</h2>
-  <ol style="font-size:0.85em;">
-    <li>Quel processeur parse du texte libre avec des patterns nommés ?</li>
-    <li>Dans la chaîne d'analyse, qu'est-ce qui vient EN PREMIER ?</li>
-    <li>Quel token filter supprime les accents ?</li>
-    <li>Quel type de champ pour le completion suggester ?</li>
-  </ol>
-  <aside class="notes">Réponses : 1) grok. 2) Char Filter. 3) asciifolding. 4) type: completion. Timing : 5 min.</aside>
-</section>
-
-<!-- SLIDE 15 : CH5 OPENER -->
-<section style="background:#16a34a;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 5</h2>
-  <h3 style="color:#bbf7d0;font-weight:400;">Visualisation avec OpenSearch Dashboards</h3>
-  <p style="color:#d1fae5;font-style:italic;">"Et si vos données parlaient d'elles-mêmes ?"</p>
-  <aside class="notes">Après le déjeuner. Faites un point d'énergie. Timing : 30 secondes.</aside>
-</section>
-
-<!-- SLIDE 16 : INTERFACE DASHBOARDS -->
-<section>
-  <h2>Interface OpenSearch Dashboards</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.82em;">
-    <div style="background:#f8fafc;border-radius:8px;padding:0.8em;">
-      <strong style="color:#2563eb;">🔍 Discover</strong><br>
-      Exploration des données brutes, filtres temporels, KQL
-    </div>
-    <div style="background:#f8fafc;border-radius:8px;padding:0.8em;">
-      <strong style="color:#16a34a;">📊 Visualize</strong><br>
-      Créer des graphiques à partir d'agrégations
-    </div>
-    <div style="background:#f8fafc;border-radius:8px;padding:0.8em;">
-      <strong style="color:#9333ea;">📋 Dashboard</strong><br>
-      Assembler des visualisations en tableau de bord
-    </div>
-    <div style="background:#f8fafc;border-radius:8px;padding:0.8em;">
-      <strong style="color:#ea580c;">⚙️ Management</strong><br>
-      Index Patterns, Saved Objects, Mappings
-    </div>
-  </div>
-  <p style="font-size:0.8em;margin-top:0.5em;">URL : <strong>http://localhost:5601</strong></p>
-  <aside class="notes">Faites un tour de l'interface en live. Chaque section a un rôle précis. Management → Stack Management → Index Patterns est le point de départ obligatoire. Timing : 8 min.</aside>
-</section>
-
-<!-- SLIDE 17 : INDEX PATTERNS ET KQL -->
-<section>
-  <h2>Index Patterns &amp; KQL</h2>
-  <div style="font-size:0.85em;">
-    <p><strong>Index Pattern :</strong> Indiquer à Dashboards quels index utiliser</p>
+  <div style="font-size:0.82em;margin-top:0.8em;">
+    <p><strong>Cas autocomplétion :</strong></p>
     <ul>
-      <li>Pattern : <code>products</code> ou <code>products-*</code> (wildcard)</li>
-      <li>Champ date : <code>created_at</code> (pour les filtres temporels)</li>
-      <li>Management → Stack Management → Index Patterns → Create</li>
+      <li>Indexation avec <code>edge_ngram</code> → stocke "or", "ord", "ordi", "ordin"…</li>
+      <li>Recherche avec <code>standard</code> → cherche le token exact saisi ("ordi")</li>
+      <li>Résultat : "ordi" matche "ordinateur" sans sur-matching</li>
     </ul>
-    <p style="margin-top:0.8em;"><strong>KQL (Kibana Query Language) dans Discover :</strong></p>
-    <pre style="font-size:0.85em;"><code>category: "Électronique" AND price > 500
-in_stock: true AND rating >= 4
-name: "ordinateur" OR name: "laptop"</code></pre>
   </div>
-  <aside class="notes">
-    Problème fréquent : KQL est sensible à la casse sur les champs keyword ! "Electronique" ne trouve pas "Électronique". Montrez la différence en live dans Discover. Timing : 8 min.
-  </aside>
+  <aside class="notes">Si on utilisait edge_ngram aussi à la recherche, "ordi" serait découpé en "or","rd","di" → trop de faux positifs. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 18 : TYPES DE VISUALISATIONS -->
-<section>
-  <h2>Choisir la bonne visualisation</h2>
-  <div style="font-size:0.8em;">
-    <table>
-      <thead><tr><th>Visualisation</th><th>Cas d'usage</th><th>Agrégation</th></tr></thead>
+<!-- ===================== SLIDE 38 : IMPACT _REINDEX ===================== -->
+<section class="slide-content">
+  <h2>Changer d'analyseur impose un _reindex</h2>
+  <div style="font-size:0.85em;">
+    <p>Les tokens stockés dans l'index inversé <strong>ne sont pas recalculés automatiquement</strong> quand on modifie l'analyseur.</p>
+    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:0.8em;border-radius:4px;margin:0.8em 0;">
+      <strong>Workflow obligatoire :</strong><br>
+      1. Créer <code>products-v2</code> avec le nouveau mapping + analyseur<br>
+      2. <code>POST /_reindex</code> pour migrer les données<br>
+      3. Swap d'alias → zéro downtime
+    </div>
+    <p style="color:#2563eb;font-weight:600;">→ Transition naturelle vers l'après-midi : l'API _reindex en détail.</p>
+  </div>
+  <aside class="notes">C'est la slide de transition matin/après-midi. Insistez : dans un système en production, tout changement de mapping ou d'analyseur passe par _reindex + alias swap. C'est pour ça qu'on y consacre une section complète cet après-midi. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 39 : TP6 ===================== -->
+<section style="background:#f8fafc;">
+  <h2>🔧 TP6 — Pipeline d'ingestion + analyseur français</h2>
+  <p style="color:#ea580c;font-weight:600;">Durée : 40 minutes</p>
+  <ol style="font-size:0.83em;">
+    <li>Créer un pipeline : grok + date + lowercase</li>
+    <li>Créer l'analyseur <code>french_custom</code> sur <code>products-v2</code></li>
+    <li>Indexer des documents avec <code>?pipeline=</code></li>
+    <li>Tester <code>_analyze</code> et comparer <code>standard</code> vs <code>french_custom</code></li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.8em;font-size:0.88em;">
+    <strong>⭐ Bonus :</strong> Configurer <code>edge_ngram</code> pour autocomplétion
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp6-fonctionnalites-avancees/README.md</code></p>
+  <aside class="notes">Timing : 40 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 40 : RÉCAP MATIN ===================== -->
+<section style="background:#0f172a;color:#fff;">
+  <h2 style="color:#86efac;">Récap Matin — 5 points clés</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;margin-top:1em;">
+    <div style="background:rgba(255,255,255,0.1);padding:0.8em;border-radius:8px;">
+      <strong>1. AAA sécurité</strong><br>Auth → Authorisation → Audit
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.8em;border-radius:8px;">
+      <strong>2. DLS / FLS</strong><br>Filtrer documents et champs
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.8em;border-radius:8px;">
+      <strong>3. Pipeline</strong><br>Transform à l'indexation (une fois)
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.8em;border-radius:8px;">
+      <strong>4. Analyseur</strong><br>Tokenisation index + recherche
+    </div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.8em;border-radius:8px;grid-column:1/-1;">
+      <strong>5. Changer d'analyseur → _reindex obligatoire</strong>
+    </div>
+  </div>
+  <p style="color:#94a3b8;margin-top:1em;font-size:0.8em;">🍽️ Pause déjeuner — Reprise 13h30</p>
+  <aside class="notes">Faites un tour de table rapide : qui a bloqué sur TP5 ou TP6 ? Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 41 : ARCHITECTURE OPENER ===================== -->
+<section style="background:#4338ca;color:#fff;">
+  <h2 style="color:#fff;">Architecture Cluster</h2>
+  <h3 style="color:#c7d2fe;font-weight:400;">Les internals OpenSearch</h3>
+  <p style="color:#e0e7ff;margin-top:1.5em;font-style:italic;">"Comment OpenSearch distribue vos données sur 3+ machines ?"</p>
+  <aside class="notes">Reprise après le déjeuner. Faites un point d'énergie. Timing : 1 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 42 : LUCENE INTERNALS ===================== -->
+<section class="slide-content">
+  <h2>Lucene internals : segments et inverted index</h2>
+  <div style="font-size:0.82em;">
+    <ul>
+      <li>Un index Lucene = ensemble de <strong>segments immutables</strong></li>
+      <li><strong>Inverted index</strong> : terme → liste de doc IDs (comme l'index d'un livre)</li>
+      <li><strong>Refresh</strong> (1s, in-memory) : rend les docs visibles sans garantie durabilité</li>
+      <li><strong>Flush</strong> : écrit sur disque + créé un commit point (durabilité garantie)</li>
+      <li><strong>Merge</strong> : fusionne les petits segments périodiquement</li>
+    </ul>
+    <div style="background:#eff6ff;border-radius:4px;padding:0.8em;margin-top:0.8em;">
+      Un shard OpenSearch = une instance Lucene complète.
+    </div>
+  </div>
+  <aside class="notes">Les segments immutables expliquent pourquoi les updates sont en réalité delete + index. Le merge en arrière-plan nettoie les segments marqués deleted. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 43 : SHARD = LUCENE ===================== -->
+<section class="slide-content">
+  <h2>De Lucene à OpenSearch : shard = instance Lucene</h2>
+  <div style="font-size:0.85em;">
+    <p>1 shard primaire = 1 index Lucene indépendant.<br>
+    OpenSearch orchestre <strong>N shards</strong> sur <strong>M nœuds</strong>.</p>
+    <div style="background:#f8fafc;border-radius:4px;padding:0.8em;margin-top:0.8em;font-size:0.88em;">
+      <strong>Cluster 3 nœuds, index "products" (2 shards primaires, 1 replica) :</strong><br><br>
+      Nœud 1 : P0 + R1<br>
+      Nœud 2 : P1 + R0<br>
+      Nœud 3 : (coordinating + replicas overflow)<br><br>
+      P = primary, R = replica
+    </div>
+  </div>
+  <aside class="notes">Insistez : primary et replica du même shard ne sont JAMAIS sur le même nœud. OpenSearch le garantit automatiquement. Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 44 : TYPES DE NŒUDS ===================== -->
+<section class="slide-content">
+  <h2>Types de nœuds OpenSearch</h2>
+  <table style="font-size:0.78em;width:100%;">
+    <thead><tr><th>Rôle</th><th>Fonction</th><th>Config</th></tr></thead>
+    <tbody>
+      <tr><td><code>master-eligible</code></td><td>Vote + élection du master</td><td>Léger en CPU/RAM</td></tr>
+      <tr><td><code>data</code></td><td>Stockage + exécution queries</td><td>RAM + disque rapide</td></tr>
+      <tr><td><code>ingest</code></td><td>Exécution des pipelines</td><td>CPU</td></tr>
+      <tr><td><code>coordinating-only</code></td><td>Routage des requêtes clients</td><td>RAM + réseau</td></tr>
+      <tr><td><code>ml</code></td><td>Modèles ML (anomaly detection)</td><td>GPU optionnel</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:0.8em;margin-top:0.5em;">Un nœud peut cumuler plusieurs rôles. En DEV : tout sur 1 nœud. En prod : séparation recommandée.</div>
+  <aside class="notes">Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 45 : CONFIGURER RÔLES ===================== -->
+<section class="slide-content">
+  <h2>Configurer les rôles de nœuds</h2>
+  <pre style="font-size:0.6em;"><code class="language-yaml"># opensearch.yml — nœud data+master (DEV / petits clusters)
+node.roles: [master, data]
+
+# Nœud master dédié (recommandé dès 5+ nœuds)
+node.roles: [master]
+
+# Nœud data dédié
+node.roles: [data]
+
+# Nœud coordinating-only (load balancer)
+node.roles: []</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#f0fdf4;border-left:3px solid #16a34a;padding:0.5em;border-radius:3px;">
+    ✅ Recommandation prod : séparer les nœuds master-eligible des data nodes au-delà de 5 nœuds.
+  </div>
+  <aside class="notes">Les nœuds master dédiés sont légers : 2-4 Go RAM suffit. Ce sont les data nodes qui ont besoin de resources. Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 46 : SPLIT-BRAIN ET QUORUM ===================== -->
+<section class="slide-content">
+  <h2>Split-brain et quorum : pourquoi 3 nœuds minimum</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.82em;margin-bottom:0.8em;">
+    <div style="background:#fef2f2;border-radius:6px;padding:0.8em;text-align:center;">
+      <strong style="color:#dc2626;">❌ 2 nœuds</strong><br>
+      Réseau coupé → 2 masters<br>
+      → données incohérentes
+    </div>
+    <div style="background:#f0fdf4;border-radius:6px;padding:0.8em;text-align:center;">
+      <strong style="color:#16a34a;">✓ 3 nœuds</strong><br>
+      Si 1 tombe : 2 restants = quorum<br>
+      → cluster continue
+    </div>
+  </div>
+  <div style="font-size:0.82em;background:#eff6ff;border-radius:4px;padding:0.8em;">
+    <strong>Formule :</strong> quorum = ⌊N/2⌋ + 1<br>
+    <br>
+    <table style="font-size:0.9em;width:100%;">
+      <thead><tr><th>N master-eligible</th><th>Quorum</th><th>Tolérance</th></tr></thead>
       <tbody>
-        <tr><td>Bar Chart</td><td>Comparer des catégories</td><td>Terms</td></tr>
-        <tr><td>Line Chart</td><td>Évolution temporelle</td><td>Date histogram</td></tr>
-        <tr><td>Pie Chart</td><td>Répartition proportionnelle (&lt;7 slices)</td><td>Terms</td></tr>
-        <tr><td>Metric</td><td>KPI unique (count, avg)</td><td>Metric</td></tr>
-        <tr><td>Data Table</td><td>Détail ligne par ligne</td><td>Terms + Metric</td></tr>
-        <tr><td>Coordinate Map</td><td>Données géographiques</td><td>Geohash grid</td></tr>
+        <tr style="color:#dc2626;"><td>1</td><td>1</td><td>0 panne ❌</td></tr>
+        <tr style="color:#dc2626;"><td>2</td><td>2</td><td>split-brain ❌</td></tr>
+        <tr style="color:#16a34a;"><td><strong>3</strong></td><td>2</td><td>1 panne ✓</td></tr>
+        <tr><td>5</td><td>3</td><td>2 pannes ✓</td></tr>
       </tbody>
     </table>
   </div>
-  <aside class="notes">
-    Règle de base : si vous voulez COMPARER → Bar Chart. Si vous voulez voir UNE TENDANCE dans le temps → Line Chart. Si vous voulez des PROPORTIONS → Pie (max 7 slices sinon illisible). Si vous voulez voir des DONNÉES SUR UNE CARTE → Coordinate Map. Timing : 8 min.
-  </aside>
+  <aside class="notes">Toujours impair en prod. Avec 2 nœuds : si 1 tombe, l'autre n'a pas le quorum → cluster bloqué (pire que split-brain). Timing : 6 min.</aside>
 </section>
 
-<!-- SLIDE 19 : CONSTRUIRE UN DASHBOARD -->
-<section>
-  <h2>Construire un Dashboard</h2>
-  <div style="font-size:0.82em;">
-    <ol>
-      <li>Créer chaque visualisation individuellement dans <strong>Visualize</strong></li>
-      <li>Aller dans <strong>Dashboard</strong> → Create new dashboard</li>
-      <li>Ajouter les panneaux via "Add an existing" ou "Create new"</li>
-      <li>Redimensionner et réorganiser par glisser-déposer</li>
-      <li>Ajouter des filtres globaux (s'appliquent à toutes les viz)</li>
-      <li>Définir la plage temporelle par défaut</li>
-      <li>Sauvegarder et partager (Share → Copy link)</li>
-    </ol>
-  </div>
-  <aside class="notes">
-    Montrez la construction d'un dashboard simple en live. Insistez sur : les filtres globaux affectent toutes les visualisations du dashboard. La plage temporelle dépend du champ date défini dans l'Index Pattern. Timing : 10 min.
-  </aside>
-</section>
-
-<!-- SLIDE 20 : DEMO LIVE CH5 -->
-<section style="background:#f8fafc;">
-  <h2>🖥️ Démo Live — Dashboard E-commerce</h2>
-  <div style="font-size:0.85em;">
-    <ol>
-      <li>Créer Index Pattern <code>products</code> (date: <code>created_at</code>)</li>
-      <li>Explorer dans Discover avec KQL : <code>category:"Électronique" AND price > 500</code></li>
-      <li>Créer un Pie Chart : répartition par <code>category</code> (Terms agg)</li>
-      <li>Créer un Metric : nombre total de produits</li>
-      <li>Assembler un dashboard avec ces 2 visualisations</li>
-    </ol>
-  </div>
-  <aside class="notes">Faites la démo pas à pas. Les participants vont reproduire ça en TP5. Timing : 10 min.</aside>
-</section>
-
-<!-- SLIDE 21 : TP5 -->
-<section style="background:#f8fafc;">
-  <h2>🔧 TP5 — Dashboard E-commerce</h2>
-  <p style="color:#16a34a;font-weight:600;">Durée : 75 minutes</p>
-  <ol style="font-size:0.82em;">
-    <li>Créer Index Pattern <code>products</code> (champ date: <code>created_at</code>)</li>
-    <li>Explorer avec Discover (KQL : <code>category: "Électronique" AND price &gt; 500</code>)</li>
-    <li>Créer 6 visualisations :
-      <ul>
-        <li>Metric : nombre total de produits, prix moyen</li>
-        <li>Pie Chart : répartition par catégorie</li>
-        <li>Bar Chart : top 10 catégories par count</li>
-        <li>Data Table : top 20 produits les plus chers</li>
-        <li>Coordinate Map : emplacements des magasins (index <code>stores</code>)</li>
-      </ul>
-    </li>
-    <li>Assembler le dashboard complet avec filtres</li>
-  </ol>
-  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
-    <strong>⭐ Bonus :</strong> Exporter le dashboard en JSON, importer <code>saved-objects-export.ndjson</code>
-  </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp5-dashboards/README.md</code></p>
-  <aside class="notes">
-    Le Coordinate Map nécessite l'index stores avec geo_point. Vérifier : GET /stores/_count. Problème fréquent : les tuiles de carte ne chargent pas (connexion internet requise). Timing : 75 min.
-  </aside>
-</section>
-
-<!-- SLIDE 22 : QUIZ CH5 -->
-<section>
-  <h2>⚡ Quiz — Chapitre 5</h2>
-  <ol style="font-size:0.85em;">
-    <li>Quel objet doit-on créer avant toute visualisation ?</li>
-    <li>Quelle visualisation pour l'évolution du prix moyen dans le temps ?</li>
-    <li>Quelle agrégation Dashboards pour voir les 10 catégories les plus vendues ?</li>
-  </ol>
-  <aside class="notes">Réponses : 1) Index Pattern. 2) Line Chart avec Date histogram. 3) Terms. Timing : 5 min.</aside>
-</section>
-
-<!-- SLIDE CH6 OPENER : ARCHITECTURE DISTRIBUÉE -->
-<section style="background:#7c3aed;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 6</h2>
-  <h3 style="color:#ddd6fe;font-weight:400;">Architecture distribuée — Split-brain &amp; Quorum</h3>
-  <p style="color:#ede9fe;margin-top:1em;font-style:italic;">"Comment éviter le pire cauchemar d'un cluster en production ?"</p>
-  <aside class="notes">Diapo de transition. Laissez quelques secondes de silence après la question. Timing : 30 secondes.</aside>
-</section>
-
-<!-- SLIDE 10e : SPLIT-BRAIN — LE PROBLÈME -->
-<section>
-  <h2>Split-brain — Le cauchemar distribué</h2>
-  <div style="font-size:0.82em;">
-    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:1em;border-radius:4px;margin-bottom:0.8em;">
-      <strong style="color:#ea580c;">⚠️ Scénario : cluster à 2 nœuds, réseau coupé</strong><br>
-      Nœud A pense que Nœud B est mort → se proclame master<br>
-      Nœud B pense que Nœud A est mort → se proclame master<br>
-      <strong>→ 2 masters, 2 vérités, données incohérentes</strong>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
-      <div style="background:#fef2f2;padding:0.8em;border-radius:8px;text-align:center;">
-        <strong style="color:#dc2626;">❌ 2 nœuds</strong><br>
-        Réseau coupé → split-brain<br>
-        Chaque nœud = 1 vote<br>
-        Impossible de décider !
-      </div>
-      <div style="background:#f0fdf4;padding:0.8em;border-radius:8px;text-align:center;">
-        <strong style="color:#16a34a;">✓ 3 nœuds</strong><br>
-        Réseau coupe 1 + 2<br>
-        Le groupe de 2 a le quorum<br>
-        → Élit le master. Sûr !
-      </div>
-    </div>
-  </div>
-  <aside class="notes">
-    Exemple concret : "Imagine deux banques dans un système distribué qui pensent toutes les deux être la référence. Client A dépose 100€ sur nœud A, client B retire 100€ sur nœud B. Les deux opérations réussissent... le compte est à -100€ quand le réseau revient." Le split-brain en production peut corrompre des données irrémédiablement. C'est la raison numéro 1 pour laquelle on ne fait JAMAIS un cluster à 2 nœuds. Timing : 6 min. Transition : "La solution, c'est le quorum — voyons comment ça marche."
-  </aside>
-</section>
-
-<!-- SLIDE 10f : QUORUM — LA SOLUTION -->
-<section>
-  <h2>Quorum — Pourquoi 3 nœuds minimum ?</h2>
-  <div style="font-size:0.85em;">
-    <div style="background:#eff6ff;border-radius:8px;padding:1em;margin-bottom:0.8em;">
-      <strong style="color:#2563eb;">Formule du quorum</strong><br>
-      <code style="font-size:1.1em;">quorum = ⌊ nb_master_eligible / 2 ⌋ + 1</code>
-    </div>
-    <table style="font-size:0.85em;">
-      <thead><tr><th>Nœuds master-eligible</th><th>Quorum</th><th>Tolérance aux pannes</th></tr></thead>
-      <tbody>
-        <tr style="color:#dc2626;"><td>1</td><td>1</td><td>0 panne possible ❌</td></tr>
-        <tr style="color:#dc2626;"><td>2</td><td>2</td><td>0 panne — split-brain ! ❌</td></tr>
-        <tr style="color:#16a34a;"><td><strong>3</strong></td><td>2</td><td>1 panne tolérée ✓</td></tr>
-        <tr><td>5</td><td>3</td><td>2 pannes tolérées ✓</td></tr>
-        <tr><td>7</td><td>4</td><td>3 pannes tolérées ✓</td></tr>
-      </tbody>
-    </table>
-    <p style="margin-top:0.8em;color:#475569;font-size:0.85em;">
-      💡 Toujours un nombre <strong>impair</strong> de nœuds master-eligible en production
-    </p>
-  </div>
-  <aside class="notes">
-    Avec 3 nœuds : si 1 tombe, 2 restent → quorum atteint → le cluster continue. Si 2 tombent, 1 reste → quorum non atteint → le cluster refuse d'écrire (pour éviter la corruption). Avec 2 nœuds : si 1 tombe, 1 reste mais il lui faut 2 votes → cluster en arrêt. C'est pire que le split-brain ! Ne jamais mettre 2 nœuds master-eligible. Pour la formation jour 3 en cluster, on utilisera exactement 3 nœuds. Timing : 6 min. Transition : "Voyons comment configurer ça dans OpenSearch."
-  </aside>
-</section>
-
-<!-- SLIDE 10g : CONFIGURATION SPLIT-BRAIN -->
-<section>
-  <h2>Configuration OpenSearch — Anti-split-brain</h2>
-  <pre style="font-size:0.62em;"><code class="language-yaml"># opensearch.yml — nœud 1 sur 3
-cluster.name: formation-opensearch
-node.name: node-1
-node.roles: [ master, data ]
+<!-- ===================== SLIDE 47 : OPENSEARCH.YML ===================== -->
+<section class="slide-content">
+  <h2>opensearch.yml : configuration cluster</h2>
+  <pre style="font-size:0.58em;"><code class="language-yaml">cluster.name: formation-opensearch
+node.name:    node-1
+node.roles:   [master, data]
 
 # Découverte des pairs
 discovery.seed_hosts:
@@ -546,45 +947,619 @@ discovery.seed_hosts:
   - node-2:9300
   - node-3:9300
 
-# CRITIQUE : liste les nœuds master à la création du cluster
-# (à supprimer après le premier démarrage)
+# UNIQUEMENT au bootstrap (premier démarrage)
+# → supprimer après que le cluster est formé
 cluster.initial_master_nodes:
   - node-1
   - node-2
   - node-3</code></pre>
-  <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;font-size:0.8em;margin-top:0.5em;">
-    ✅ OpenSearch calcule automatiquement le quorum à partir de <code>initial_master_nodes</code>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#fff7ed;border-left:3px solid #ea580c;padding:0.5em;border-radius:3px;">
+    ⚠️ <code>initial_master_nodes</code> : uniquement au bootstrap — supprimer après le premier démarrage réussi.
   </div>
-  <aside class="notes">
-    `cluster.initial_master_nodes` est UNIQUEMENT utilisé au tout premier démarrage du cluster (bootstrap). Une fois le cluster formé, OpenSearch maintient la liste des nœuds master-eligible lui-même. Si on redémarre un cluster existant avec cette config, il l'ignore. Erreur courante en formation : configurer initial_master_nodes mais oublier de mettre les 3 nœuds → le cluster attend indéfiniment. Rappel : le jour 3 on configure exactement ce fichier sur 3 conteneurs Docker. Timing : 5 min. Transition : "Maintenant, vérifiez que vous avez bien compris avec le quiz."
-  </aside>
+  <aside class="notes">Erreur courante : laisser initial_master_nodes dans le fichier sur un cluster existant. OpenSearch l'ignore mais c'est une bombe à retardement si le cluster doit être reformé. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 23 : RÉCAP JOUR 2 -->
-<section style="background:#0f172a;color:#fff;">
-  <h2 style="color:#86efac;">Récap Jour 2 — Ce que vous savez maintenant</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.8em;text-align:center;margin-top:1em;">
-    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
-      <strong>Ingest Pipelines</strong><br>Normaliser les données à l'indexation
+<!-- ===================== SLIDE 48 : TOPOLOGIES ===================== -->
+<section class="slide-content">
+  <h2>Topologies recommandées</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;font-size:0.78em;">
+    <div style="background:#f8fafc;border-radius:6px;padding:0.8em;">
+      <strong>Dev</strong><br>
+      1 nœud all-roles<br>
+      1 shard, 0 replica<br>
+      <em style="color:#94a3b8;">Pas de HA</em>
     </div>
-    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
-      <strong>Analyseurs Français</strong><br>Stemming, asciifolding, stop words
+    <div style="background:#f8fafc;border-radius:6px;padding:0.8em;">
+      <strong>Staging</strong><br>
+      3 nœuds all-roles<br>
+      1 shard, 1 replica<br>
+      <em style="color:#94a3b8;">HA basique</em>
     </div>
-    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
-      <strong>Autocomplétion &amp; Géo</strong><br>Completion suggester, geo_distance
-    </div>
-    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
-      <strong>Dashboards</strong><br>Index Patterns, KQL, 6 types de viz
-    </div>
-    <div style="background:rgba(255,255,255,0.1);padding:1em;border-radius:8px;">
-      <strong>Split-brain &amp; Quorum</strong><br>Quorum, anti-split-brain, opensearch.yml
+    <div style="background:#f8fafc;border-radius:6px;padding:0.8em;">
+      <strong>Production</strong><br>
+      3 masters dédiés<br>
+      N data nodes<br>
+      2 coordinating<br>
+      <em style="color:#16a34a;">Résilience max</em>
     </div>
   </div>
-  <p style="margin-top:1.5em;color:#86efac;">Demain : Cluster multi-nœuds, Administration, Sécurité</p>
-  <p style="font-size:0.8em;color:#94a3b8;margin-top:0.5em;">N'oubliez pas de signer la feuille de présence ! 📋</p>
-  <aside class="notes">
-    Remerciez pour la journée. Donnez un preview excitant du jour 3 : "Demain on passe en mode production — 3 nœuds, haute disponibilité, et sécurité RBAC." Timing : 10 min pour récap + Q&A. Signer la feuille de présence après-midi !
-  </aside>
+  <aside class="notes">Insistez sur le coût vs résilience : les masters dédiés coûtent relativement peu mais apportent beaucoup de stabilité. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 49 : RÉPLICATION ===================== -->
+<section class="slide-content">
+  <h2>Réplication : primary + replica</h2>
+  <div style="font-size:0.85em;">
+    <p><strong>Écriture</strong> : toujours vers le primary → propagé aux replicas de façon synchrone.</p>
+    <p style="margin-top:0.5em;"><strong>Lecture</strong> : load balance sur tous les shards (primary + replicas).</p>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      ✅ <code>number_of_replicas: 1</code> minimum en production.<br>
+      ✅ Augmenter les replicas = <strong>scale lecture</strong> sans _reindex.<br>
+      ⚠️ Replica ≠ backup — les replicas sont affectés par les mêmes suppressions accidentelles que les primaries.
+    </div>
+  </div>
+  <aside class="notes">La distinction replica vs backup est importante : si quelqu'un fait DELETE /products/*, les replicas sont aussi effacés. Les snapshots sont le vrai backup. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 50 : CLUSTER HEALTH ===================== -->
+<section class="slide-content">
+  <h2>Cluster health : green / yellow / red</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;font-size:0.82em;margin-bottom:0.8em;">
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;border-radius:4px;">
+      <strong style="color:#16a34a;">🟢 Green</strong><br>
+      Tous les shards (primaries + replicas) assignés
+    </div>
+    <div style="background:#fefce8;border-left:4px solid #ca8a04;padding:0.8em;border-radius:4px;">
+      <strong style="color:#ca8a04;">🟡 Yellow</strong><br>
+      Replicas non assignés (cluster fonctionne)
+    </div>
+    <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:0.8em;border-radius:4px;">
+      <strong style="color:#dc2626;">🔴 Red</strong><br>
+      Shards primaires manquants → perte de données possible
+    </div>
+  </div>
+  <pre style="font-size:0.6em;"><code>GET /_cluster/health
+GET /_cluster/allocation/explain   // diagnostic shard non assigné</code></pre>
+  <aside class="notes">Yellow est souvent normal sur un cluster 1 nœud (pas de nœud pour les replicas). Red nécessite une action immédiate. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 51 : MONITORING ===================== -->
+<section class="slide-content">
+  <h2>Requêtes de monitoring et diagnostic</h2>
+  <pre style="font-size:0.6em;"><code class="language-bash">GET /_cat/nodes?v                        # état des nœuds
+GET /_cat/shards?v                       # distribution des shards
+GET /_cluster/stats                      # statistiques globales
+GET /_nodes/stats                        # métriques par nœud (JVM, indexing, search)
+GET /_nodes/hot_threads                  # threads CPU actifs
+GET /_cat/allocation?v                   # répartition shards/nœud + espace disque
+GET /_cluster/allocation/explain         # pourquoi un shard est unassigned</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">
+    <strong>En prod</strong> : <code>_nodes/stats</code> pour surveiller <code>jvm.heap_used_percent</code> (alerte &gt; 75%) et <code>indices.search.query_time_in_millis</code>.
+  </div>
+  <aside class="notes">_cat/allocation est le premier réflexe quand un cluster est yellow/red. Timing : 8 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 52 : TP8 ===================== -->
+<section style="background:#f8fafc;">
+  <h2>🔧 TP8 — Monitoring cluster + diagnostics</h2>
+  <p style="color:#4338ca;font-weight:600;">Durée : 25 minutes</p>
+  <p style="font-size:0.85em;font-style:italic;">Pratique directement sur le cluster de la formation (pas de Docker requis).</p>
+  <ol style="font-size:0.83em;">
+    <li><code>_cat/nodes</code>, <code>_cat/shards</code>, <code>_cluster/health</code></li>
+    <li><code>_cluster/allocation/explain</code> pour diagnostiquer un shard unassigned</li>
+    <li><code>_nodes/hot_threads</code></li>
+    <li><code>_nodes/stats</code> — identifier les métriques clés prod</li>
+  </ol>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp8-cluster-3noeuds/README.md</code></p>
+  <aside class="notes">Timing : 25 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 53 : SHARDS OPENER ===================== -->
+<section style="background:#b45309;color:#fff;">
+  <h2 style="color:#fff;">Sizing des Shards</h2>
+  <h3 style="color:#fde68a;font-weight:400;">La brique fondamentale</h3>
+  <p style="color:#fef3c7;margin-top:1.5em;font-style:italic;">"Combien de shards pour votre use case ?"</p>
+  <aside class="notes">Timing : 1 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 54 : QU'EST-CE QU'UN SHARD ===================== -->
+<section class="slide-content">
+  <h2>Qu'est-ce qu'un shard ? Lifecycle</h2>
+  <div style="font-size:0.85em;">
+    <p>Un shard est à la fois une unité de <strong>distribution</strong> ET de <strong>parallélisme</strong>.</p>
+    <div style="background:#f8fafc;border-radius:4px;padding:0.8em;margin-top:0.8em;">
+      <strong>Lifecycle :</strong><br>
+      Création → segments Lucene → merges périodiques → suppression
+    </div>
+    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      ⚠️ Le nombre de shards primaires est <strong>figé à la création</strong> de l'index.<br>
+      Pour le changer : <code>_reindex</code> obligatoire.
+    </div>
+  </div>
+  <aside class="notes">Cette contrainte (shards figés) est la raison pour laquelle il faut bien penser le sizing avant. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 55 : PRIMARY VS REPLICA ===================== -->
+<section class="slide-content">
+  <h2>Primary vs Replica : écriture vs lecture</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.83em;">
+    <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:0.8em;border-radius:4px;">
+      <strong>Primary shards</strong><br>
+      • Reçoivent toutes les écritures<br>
+      • Nombre fixé à la création<br>
+      • Augmenter = scale écriture<br>
+      • Nécessite <code>_reindex</code>
+    </div>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;border-radius:4px;">
+      <strong>Replica shards</strong><br>
+      • Partagent les lectures<br>
+      • Modifiable à chaud<br>
+      • Augmenter = scale lecture<br>
+      • Pas besoin de <code>_reindex</code>
+    </div>
+  </div>
+  <aside class="notes">Key insight : seul le nombre de replicas est modifiable à chaud. Pour l'écriture, on doit anticiper le sizing. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 56 : RÈGLE 10-50 GB ===================== -->
+<section class="slide-content">
+  <h2>Règle de base : 10–50 GB par shard</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;font-size:0.8em;margin-top:0.8em;">
+    <div style="background:#fef2f2;border-radius:6px;padding:0.8em;text-align:center;">
+      <strong style="color:#dc2626;">Trop petit</strong><br>
+      &lt; 1 GB<br>
+      Overhead JVM + Lucene<br>
+      Trop de threads
+    </div>
+    <div style="background:#f0fdf4;border-radius:6px;padding:0.8em;text-align:center;">
+      <strong style="color:#16a34a;">Idéal</strong><br>
+      ~30 GB<br>
+      Cible recommandée<br>
+      Merges et recovery rapides
+    </div>
+    <div style="background:#fef2f2;border-radius:6px;padding:0.8em;text-align:center;">
+      <strong style="color:#dc2626;">Trop grand</strong><br>
+      &gt; 50 GB<br>
+      Merges lents<br>
+      Recovery très long
+    </div>
+  </div>
+  <aside class="notes">La règle des 50 GB vient de l'expérience de nombreuses équipes en production. Au-delà, le recovery après une panne peut prendre 30+ minutes. Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 57 : SUR-SHARDING ===================== -->
+<section class="slide-content">
+  <h2>Sur-sharding : les pièges</h2>
+  <div style="font-size:0.85em;">
+    <p>Chaque shard = <strong>threads JVM</strong> + <strong>heap</strong> + <strong>file descriptors</strong>.</p>
+    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:0.8em;border-radius:4px;margin:0.8em 0;">
+      1000 shards sur 3 nœuds → instabilité, GC pauses, OOM.
+    </div>
+    <p><strong>Règle</strong> : max ~20 shards / Go de RAM heap.</p>
+    <pre style="font-size:0.65em;"><code>GET /_cluster/stats
+// → .indices.shards.total  : nombre total de shards dans le cluster</code></pre>
+  </div>
+  <aside class="notes">Le sur-sharding est l'erreur la plus fréquente. Des équipes créent 5 shards par index par défaut, accumulent 200 index, se retrouvent avec 1000 shards. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 58 : SIZING ÉCRITURE ===================== -->
+<section class="slide-content">
+  <h2>Calcul pour l'écriture : sizing par throughput</h2>
+  <div style="font-size:0.85em;background:#eff6ff;border-radius:6px;padding:1em;margin-bottom:0.8em;">
+    <code>nb_primary_shards = write_throughput_peak / throughput_per_shard</code>
+  </div>
+  <div style="font-size:0.82em;">
+    <p><strong>Benchmark typique :</strong> 1 shard ≈ 5 000 – 10 000 docs/s selon la taille du document.</p>
+    <div style="background:#f8fafc;border-radius:4px;padding:0.8em;margin-top:0.8em;">
+      <strong>Exemple :</strong><br>
+      Pic d'écriture : 50 000 docs/s<br>
+      1 shard ≈ 7 000 docs/s<br>
+      → <strong>7-8 shards primaires</strong>
+    </div>
+  </div>
+  <aside class="notes">Le benchmark de 5-10k docs/s est indicatif. En pratique : benchmarkez sur votre matériel avec vos données réelles. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 59 : SIZING LECTURE ===================== -->
+<section class="slide-content">
+  <h2>Calcul pour la lecture : sizing par volume</h2>
+  <div style="font-size:0.85em;background:#eff6ff;border-radius:6px;padding:1em;margin-bottom:0.8em;">
+    <code>nb_primary_shards = total_data_GB / target_shard_size_GB</code>
+  </div>
+  <div style="font-size:0.82em;">
+    <div style="background:#f8fafc;border-radius:4px;padding:0.8em;margin-top:0.8em;">
+      <strong>Exemple :</strong><br>
+      Volume total : 300 GB<br>
+      Cible par shard : 30 GB<br>
+      → <strong>10 shards primaires</strong><br><br>
+      Anticiper 3 ans de croissance : 300 GB × 3 = 900 GB → 30 shards → peut-être mieux penser à de l'ILM/rollover
+    </div>
+  </div>
+  <aside class="notes">Pour les données temporelles (logs), l'ILM (Index Lifecycle Management) résout mieux le problème de croissance que le sur-sizing. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 60 : EXERCICE LIVE SIZING ===================== -->
+<section class="slide-content">
+  <h2>Exercice live : sizing catalogue e-commerce</h2>
+  <div style="font-size:0.83em;">
+    <p><strong>Données :</strong></p>
+    <ul>
+      <li>200 millions de produits × 2 Ko = <strong>400 Go</strong></li>
+      <li>Pic d'écriture : <strong>20 000 docs/s</strong></li>
+    </ul>
+    <p style="margin-top:0.8em;"><strong>Calculer ensemble :</strong></p>
+    <ul>
+      <li><code>nb_primary_shards</code> (écriture → 3, volume → 14, choix ?)</li>
+      <li><code>nb_replicas</code> (HA + scale lecture)</li>
+      <li>Nombre de nœuds minimum</li>
+    </ul>
+    <div style="background:#f0fdf4;border-radius:4px;padding:0.7em;margin-top:0.8em;font-size:0.88em;">
+      Plusieurs réponses valides selon la priorité lecture/écriture.
+    </div>
+  </div>
+  <aside class="notes">Faites cet exercice de façon interactive. Demandez aux participants de proposer leurs calculs. Pas de bonne/mauvaise réponse unique — c'est un trade-off. Timing : 7 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 61 : ALLOCATION AWARENESS ===================== -->
+<section class="slide-content">
+  <h2>Shard allocation awareness : topologie rack/AZ</h2>
+  <pre style="font-size:0.6em;"><code class="language-yaml"># opensearch.yml — déclarer l'attribut du nœud
+node.attr.rack: rack1          # ou az: eu-west-1a
+
+# Configuration cluster
+cluster.routing.allocation.awareness.attributes: rack</code></pre>
+  <pre style="font-size:0.6em;"><code class="language-json">// OpenSearch garantit que primary et replica
+// sont sur des racks différents
+GET /_cat/shards?v  // → vérifier la distribution</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Si rack1 tombe : tous les primaries de rack1 ont leur replica sur rack2 → <strong>aucune perte de données</strong>.</div>
+  <aside class="notes">Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 62 : FORCED AWARENESS ===================== -->
+<section class="slide-content">
+  <h2>Forced awareness : garantir la résilience</h2>
+  <pre style="font-size:0.6em;"><code class="language-yaml"># opensearch.yml
+cluster.routing.allocation.awareness.force.rack.values: rack1,rack2,rack3</code></pre>
+  <div style="font-size:0.83em;margin-top:0.8em;">
+    <p>Sans <code>forced awareness</code> : si rack2 tombe, OpenSearch peut surcharger rack1 avec des replicas supplémentaires.</p>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      Avec <code>forced awareness</code> : le cluster reste <strong>Yellow</strong> plutôt que de surcharger les racks survivants.<br>
+      → Comportement prévisible, pas de surcharge mémoire inattendue.
+    </div>
+  </div>
+  <aside class="notes">Timing : 4 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 63 : CHECKLIST SIZING ===================== -->
+<section class="slide-content">
+  <h2>Checklist sizing production</h2>
+  <ul style="font-size:0.85em;line-height:2.2;">
+    <li>☑ Taille shard &lt; 50 GB</li>
+    <li>☑ Max 20 shards / Go de RAM heap</li>
+    <li>☑ Replicas ≥ 1 (HA + scale lecture)</li>
+    <li>☑ Awareness si multi-rack / multi-AZ</li>
+    <li>☑ Anticiper 3 ans de croissance (ou utiliser rollover/ILM)</li>
+    <li>☑ Benchmarker avec des données réelles avant prod</li>
+  </ul>
+  <aside class="notes">Cette checklist est à afficher dans votre runbook de mise en production. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 64 : REINDEX OPENER ===================== -->
+<section style="background:#0f172a;color:#fff;">
+  <h2 style="color:#94a3b8;">_Reindex API</h2>
+  <h3 style="color:#64748b;font-weight:400;">Resharding et migration</h3>
+  <p style="color:#475569;margin-top:1.5em;font-style:italic;">"Le shard count est figé à la création → _reindex pour tout changer."</p>
+  <aside class="notes">Timing : 1 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 65 : SYNTAXE DE BASE ===================== -->
+<section class="slide-content">
+  <h2>Syntaxe de base : POST _reindex</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">POST /_reindex
+{
+  "source": { "index": "products" },
+  "dest":   { "index": "products-v2" }
+}
+
+// Réponse
+{
+  "took":    3200,
+  "created": 1000,
+  "updated": 0,
+  "failed":  0,
+  "failures": []
+}
+
+// Ignorer les conflits de version
+POST /_reindex
+{
+  "conflicts": "proceed",
+  "source": { "index": "products" },
+  "dest":   { "index": "products-v2", "op_type": "create" }
+}</code></pre>
+  <aside class="notes">Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 66 : _REINDEX AVEC QUERY ===================== -->
+<section class="slide-content">
+  <h2>_reindex avec query filter</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">// Migrer uniquement les produits EU
+POST /_reindex
+{
+  "source": {
+    "index": "products",
+    "query": {
+      "term": { "region": "EU" }
+    }
+  },
+  "dest": { "index": "products-eu" }
+}
+
+// Cas : splitter un index trop gros par région
+// products → products-eu + products-us + products-asia</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">La <code>query</code> dans <code>source</code> est une requête OpenSearch standard — supports bool, range, term, etc.</div>
+  <aside class="notes">Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 67 : _REINDEX PAINLESS ===================== -->
+<section class="slide-content">
+  <h2>_reindex avec script Painless</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">POST /_reindex
+{
+  "source": { "index": "products" },
+  "dest":   { "index": "products-v2" },
+  "script": {
+    "source": """
+      ctx._source.price_eur    = ctx._source.price * 1.1;
+      ctx._source.migrated_at  = params.ts;
+      ctx._source.remove('old_field');
+    """,
+    "params": { "ts": "2025-01-01T00:00:00Z" }
+  }
+}</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Le script Painless peut : renommer un champ, calculer une valeur, supprimer un champ, changer l'index de destination (<code>ctx._index</code>).</div>
+  <aside class="notes">Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 68 : MODE ASYNC ===================== -->
+<section class="slide-content">
+  <h2>Mode async + suivi avec _tasks</h2>
+  <pre style="font-size:0.6em;"><code class="language-bash"># Démarrer en asynchrone
+POST /_reindex?wait_for_completion=false
+{
+  "source": { "index": "products" },
+  "dest":   { "index": "products-v2" }
+}
+# → { "task": "oTUltX4IQMOUUVeiohTt8A:12345" }
+
+# Suivre la progression
+GET /_tasks/oTUltX4IQMOUUVeiohTt8A:12345
+
+# Annuler
+POST /_tasks/oTUltX4IQMOUUVeiohTt8A:12345/_cancel
+
+# Lister toutes les tâches reindex en cours
+GET /_cat/tasks?v&amp;actions=*reindex</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Recommandé pour les volumes &gt;100M documents.</div>
+  <aside class="notes">En mode synchrone, le timeout HTTP peut couper la connexion avant la fin du reindex. En mode async, la tâche continue même si la connexion est perdue. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 69 : SLICES ET PARAMÈTRES ===================== -->
+<section class="slide-content">
+  <h2>Paramètres avancés : slices, scroll, size</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">POST /_reindex
+{
+  "source": {
+    "index": "products",
+    "size":  1000
+  },
+  "dest":   { "index": "products-v2" },
+  "slices": "auto"
+}
+
+// slices: "auto" → 1 slice par shard primaire source
+// Parallélise le reindex → divise le temps proportionnellement
+//
+// size : batch size par scroll (défaut 1000)
+// _source filtering : migrer seulement certains champs
+// "source": { "_source": ["name", "price", "category"] }</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;background:#f0fdf4;border-left:3px solid #16a34a;padding:0.5em;border-radius:3px;">
+    ✅ <code>slices: "auto"</code> est le paramètre le plus impactant sur les performances.
+  </div>
+  <aside class="notes">Timing : 7 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 70 : ZERO-DOWNTIME ALIAS ===================== -->
+<section class="slide-content">
+  <h2>Zero-downtime avec aliases : blue-green reindex</h2>
+  <pre style="font-size:0.58em;"><code class="language-json">// 1. products-v1 actif via alias "products"
+POST /_aliases
+{ "actions": [{ "add": { "index": "products-v1", "alias": "products" } }] }
+
+// 2. Créer products-v2 + _reindex (en parallèle du trafic)
+POST /_reindex
+{ "source": { "index": "products-v1" }, "dest": { "index": "products-v2" } }
+
+// 3. Swap atomique ← zéro interruption de service
+POST /_aliases
+{
+  "actions": [
+    { "remove": { "index": "products-v1", "alias": "products" } },
+    { "add":    { "index": "products-v2", "alias": "products" } }
+  ]
+}
+
+// 4. Supprimer products-v1 après validation
+DELETE /products-v1</code></pre>
+  <aside class="notes">Le swap atomique est la technique incontournable en production. Les clients continuent de requêter l'alias "products" sans interruption. Timing : 8 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 71 : TP9 REINDEX ===================== -->
+<section style="background:#f8fafc;">
+  <h2>🔧 TP9 — Resharding d'un index avec _reindex</h2>
+  <p style="color:#0f172a;font-weight:600;">Durée : 20 minutes</p>
+  <ol style="font-size:0.83em;">
+    <li>Créer <code>products-v2</code> avec 3 shards primaires</li>
+    <li>_reindex avec script Painless (ajouter <code>migrated_at</code>)</li>
+    <li>Vérifier la distribution : <code>_cat/shards</code></li>
+    <li>Swap d'alias : <code>products-current</code> → <code>products-v2</code></li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.8em;font-size:0.88em;">
+    <strong>⭐ Bonus :</strong> Mode async + monitoring <code>_tasks</code>
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp9-reindex/README.md</code></p>
+  <aside class="notes">Timing : 20 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 72 : ROUTAGE OPENER ===================== -->
+<section style="background:#16a34a;color:#fff;">
+  <h2 style="color:#fff;">Routage des Données</h2>
+  <h3 style="color:#bbf7d0;font-weight:400;">Contrôler où vont vos documents</h3>
+  <p style="color:#d1fae5;margin-top:1.5em;font-style:italic;">"Par défaut, OpenSearch distribue au hasard. Vous pouvez faire mieux."</p>
+  <aside class="notes">Timing : 1 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 73 : ROUTAGE PAR DÉFAUT ===================== -->
+<section class="slide-content">
+  <h2>Routage par défaut : hash(_id)</h2>
+  <div style="font-size:0.85em;background:#eff6ff;border-radius:6px;padding:1em;margin-bottom:0.8em;">
+    <code>shard = hash(_id) % number_of_primary_shards</code>
+  </div>
+  <div style="font-size:0.83em;">
+    <p>C'est pour ça que le shard count est <strong>figé à la création</strong> :</p>
+    <ul>
+      <li>Si on changeait le nombre de shards, les docs existants seraient sur les <em>mauvais</em> shards</li>
+      <li>Les requêtes GET par _id ne trouveraient plus les documents</li>
+      <li>→ <code>_reindex</code> obligatoire pour recalculer la distribution</li>
+    </ul>
+  </div>
+  <aside class="notes">Ce slide explique enfin POURQUOI on ne peut pas modifier le shard count. C'est une contrainte de l'algorithme de routage. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 74 : CUSTOM ROUTING INDEXATION ===================== -->
+<section class="slide-content">
+  <h2>Custom routing : définir à l'indexation</h2>
+  <pre style="font-size:0.6em;"><code class="language-bash"># Indexer tous les produits électronique → même shard
+PUT /products/_doc/1?routing=electronics
+{ "name": "iPhone 15", "category": "electronics", "region": "EU" }
+
+PUT /products/_doc/2?routing=electronics
+{ "name": "MacBook Pro", "category": "electronics", "region": "US" }
+
+# Observer la distribution
+GET /_cat/shards/products?v</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">
+    <strong>Cas d'usage</strong> : co-localiser les documents d'un même tenant, d'une même catégorie, ou d'une même région sur le même shard.
+  </div>
+  <aside class="notes">Montrez _cat/shards avant/après. Avec le routing forcé, tous les docs "electronics" sont sur le même shard. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 75 : CUSTOM ROUTING REQUÊTES ===================== -->
+<section class="slide-content">
+  <h2>Custom routing : requêtes ciblées</h2>
+  <pre style="font-size:0.6em;"><code class="language-bash"># Sans routing : scatter-gather sur TOUS les shards
+GET /products/_search
+{ "query": { "term": { "category": "electronics" } } }
+
+# Avec routing : va UNIQUEMENT vers le shard "electronics"
+GET /products/_search?routing=electronics
+{ "query": { "term": { "category": "electronics" } } }</code></pre>
+  <div style="font-size:0.83em;margin-top:0.8em;">
+    <p><strong>Impact latence</strong> : requête ciblée → 1 shard sollicité au lieu de N.<br>
+    Sur un grand cluster : <strong>réduction de latence proportionnelle</strong> au nombre de shards évités.</p>
+  </div>
+  <aside class="notes">C'est le gain principal du custom routing : transformer un scatter-gather N-shard en une requête mono-shard. Timing : 6 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 76 : REQUIRED ROUTING ===================== -->
+<section class="slide-content">
+  <h2>Required routing : forcer le routing</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /products/_mapping
+{
+  "routing": { "required": true }
+}
+
+// Sans ?routing= → erreur explicite
+PUT /products/_doc/42
+{ "name": "Ordi" }
+// → 400 Bad Request: routing is required for [products]/[_doc]/[42]
+
+// Avec routing → OK
+PUT /products/_doc/42?routing=electronics
+{ "name": "Ordi" }</code></pre>
+  <div style="font-size:0.8em;margin-top:0.5em;">Garantit que <strong>personne n'oublie accidentellement le routing</strong> lors de l'indexation.</div>
+  <aside class="notes">Required routing est une bonne pratique dans les architectures multi-tenant. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 77 : ROUTING BONNES PRATIQUES ===================== -->
+<section class="slide-content">
+  <h2>Custom routing + bonnes pratiques</h2>
+  <div style="font-size:0.83em;">
+    <p><strong>Cas typique prod</strong> : SaaS multi-tenant — routing par <code>tenant_id</code>.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;margin-top:0.8em;">
+      <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;border-radius:4px;">
+        <strong>Avantages</strong><br>
+        • Requêtes tenant isolées<br>
+        • Latence réduite<br>
+        • Isolation CPU des tenants
+      </div>
+      <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:0.8em;border-radius:4px;">
+        <strong>Risques</strong><br>
+        • Tenants inégaux → hot shards<br>
+        • Cardinalité faible → déséquilibre<br>
+        • Distribution uniforme requise
+      </div>
+    </div>
+    <p style="margin-top:0.8em;font-size:0.9em;"><strong>Combo prod idéal :</strong> routing + allocation awareness = co-localisation et résilience multi-AZ.</p>
+  </div>
+  <aside class="notes">Le hot shard est le piège : si 1 tenant représente 80% du volume, son shard sera surchargé. Recommandé : valeurs de haute cardinalité avec distribution uniforme. Timing : 8 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 78 : TP10 ===================== -->
+<section style="background:#f8fafc;">
+  <h2>🔧 TP10 — Routage : définir et utiliser le routing</h2>
+  <p style="color:#16a34a;font-weight:600;">Durée : 20 minutes</p>
+  <ol style="font-size:0.83em;">
+    <li>Indexer des produits avec <code>?routing=&lt;category&gt;</code></li>
+    <li>Vérifier la distribution avec <code>_cat/shards</code></li>
+    <li>Requête ciblée avec <code>?routing=electronics</code></li>
+    <li>Activer <code>required routing</code> sur le mapping</li>
+  </ol>
+  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.8em;font-size:0.88em;">
+    <strong>⭐ Bonus :</strong> Mesurer la différence de latence avec / sans routing sur 10 000 docs
+  </div>
+  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp10-routing/README.md</code></p>
+  <aside class="notes">Timing : 20 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 79 : QUIZ APRÈS-MIDI ===================== -->
+<section class="slide-content">
+  <h2>Quiz Après-midi</h2>
+  <ol style="font-size:0.88em;line-height:2.2;">
+    <li>Quel est le quorum pour 5 nœuds master-eligible ?</li>
+    <li>Quelle est la taille idéale d'un shard ?</li>
+    <li>Quel paramètre _reindex pour paralléliser par shard ?</li>
+    <li>Quelle est la formule du routage par défaut ?</li>
+  </ol>
+  <aside class="notes">Réponses : 1) 3 (⌊5/2⌋+1). 2) 10-50 GB, cible ~30 GB. 3) slices: "auto". 4) hash(_id) % nb_primary_shards. Timing : 5 min.</aside>
+</section>
+
+<!-- ===================== SLIDE 80 : RÉCAP JOUR 2 ===================== -->
+<section style="background:#0f172a;color:#fff;">
+  <h2 style="color:#86efac;">Récap Jour 2 + Preview Jour 3</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7em;font-size:0.75em;text-align:center;margin-top:0.8em;">
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">🔐 <strong>AAA Sécurité</strong><br>Auth, RBAC, TLS</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">🔒 <strong>DLS / FLS</strong><br>Filtres documents &amp; champs</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">🔄 <strong>Ingest Pipelines</strong><br>Transform à l'indexation</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">🔤 <strong>Analyseurs</strong><br>Tokenisation française</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">🏗️ <strong>Architecture</strong><br>Nœuds, shards, quorum</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">📐 <strong>Sizing</strong><br>10-50 GB/shard, 20 shards/Go</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">♻️ <strong>_Reindex</strong><br>Resharding zero-downtime</div>
+    <div style="background:rgba(255,255,255,0.1);padding:0.7em;border-radius:8px;">🗺️ <strong>Routage</strong><br>hash(_id), custom routing</div>
+  </div>
+  <p style="margin-top:1em;color:#86efac;font-size:0.82em;">Demain : Agrégations avancées, Scoring &amp; Relevance, Dashboards, ISM</p>
+  <p style="font-size:0.75em;color:#94a3b8;margin-top:0.5em;">📋 N'oubliez pas la feuille de présence !</p>
+  <aside class="notes">Remerciez pour la journée. Preview Jour 3 : "Demain on va plus loin sur les agrégations, on travaillera le scoring, on fera les Dashboards en détail, et on verra l'ISM pour automatiser la gestion du cycle de vie des index." Timing : 5 min.</aside>
 </section>
 
 </div>

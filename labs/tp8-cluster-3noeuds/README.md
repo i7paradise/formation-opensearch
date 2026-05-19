@@ -13,7 +13,7 @@
 
 Configurer et démarrer un cluster OpenSearch 3 nœuds, puis vérifier son bon fonctionnement et la distribution des shards.
 
-> **Note** : ISM et Snapshots → TP11
+> **Note** : ISM et Snapshots → TP12
 
 ## Contexte
 
@@ -229,7 +229,7 @@ curl -X GET "http://localhost:9200/_cluster/health?wait_for_status=green&timeout
 ## Ressources
 
 - [Documentation Cluster OpenSearch](https://opensearch.org/docs/latest/opensearch/cluster/)
-- [Snapshot & Restore → voir TP11](../tp11-reindex-ism/README.md)
-- [ISM (Index State Management) → voir TP11](../tp11-reindex-ism/README.md)
+- [Snapshot & Restore → voir TP12](../tp13-reindex-ism/README.md)
+- [ISM (Index State Management) → voir TP12](../tp13-reindex-ism/README.md)
 
-*Passez au [TP8 — Routage](../tp8-routing/README.md)*
+*Passez au [TP9 — Reindex & Resharding](../tp9-reindex/README.md)*

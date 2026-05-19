@@ -1,4 +1,4 @@
-# TP10 — Tableau de bord e-commerce avec OpenSearch Dashboards
+# TP11 — Tableau de bord e-commerce avec OpenSearch Dashboards
 
 ## Informations générales
 
@@ -281,4 +281,4 @@ A la fin de ce TP, vous devez avoir :
 - [Guide KQL (Kibana Query Language)](https://opensearch.org/docs/latest/dashboards/dql/)
 - [Types de visualisations](https://opensearch.org/docs/latest/dashboards/visualize/viz-index/)
 
-*Passez au [TP11 — Reindex + ISM](../tp11-reindex-ism/README.md)*
+*Passez au [TP13 — Reindex + ISM](../tp13-reindex-ism/README.md)*

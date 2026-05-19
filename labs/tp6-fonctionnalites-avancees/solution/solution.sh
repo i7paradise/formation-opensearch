@@ -1,407 +1,195 @@
 #!/bin/bash
-# TP4 — Solution complète — Fonctionnalités Avancées
-# Chaque commande est commentée pour expliquer POURQUOI elle fonctionne
+# TP6 — Solution complète — Ingest Pipelines
 
 BASE_URL="http://localhost:9200"
 
 echo "================================================"
-echo " TP4 — Solution : Fonctionnalités Avancées"
+echo " TP6 — Solution : Ingest Pipelines"
 echo "================================================"
 
+
 # ============================================
-# EXERCICE 1 : Ingest Pipeline
+# EXERCICE 1 : Pipeline de normalisation
 # ============================================
 echo ""
-echo "=== Exercice 1 : Création du pipeline ==="
+echo "=== Exercice 1 : Pipeline de normalisation ==="
 
-# Le pipeline normalise les données à l'indexation :
-# - lowercase : garantit que "ELECTRONIQUE" et "Electronique" sont traités de façon identique
-# - trim : supprime les espaces en début/fin qui fausseraient les recherches sur champs keyword
-# - set : ajoute un timestamp d'indexation pour l'audit
-curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-produits" \
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-normalisation" \
   -H 'Content-Type: application/json' \
   -d '{
-  "description": "Pipeline normalisation produits e-commerce",
+  "description": "Normalisation champs produit",
   "processors": [
-    {
-      "lowercase": {
-        "field": "category",
-        "ignore_missing": true
-      }
-    },
-    {
-      "trim": {
-        "field": "description",
-        "ignore_missing": true
-      }
-    },
-    {
-      "set": {
-        "field": "indexed_at",
-        "value": "{{_ingest.timestamp}}"
-      }
-    }
+    { "lowercase": { "field": "category",    "ignore_missing": true } },
+    { "trim":      { "field": "description", "ignore_missing": true } },
+    { "convert":   { "field": "price",       "type": "float", "ignore_missing": true } }
   ]
-}'
+}' | jq '{acknowledged}'
 
 echo ""
-echo "--- Test du pipeline avec _simulate ---"
-# _simulate permet de tester sans indexer réellement — essentiel avant de déployer en prod !
-curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-produits/_simulate" \
+echo "--- Test _simulate ---"
+# _simulate transforme le document sans l indexer — toujours faire ça avant la prod
+curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-normalisation/_simulate" \
   -H 'Content-Type: application/json' \
   -d '{
   "docs": [
     {
       "_source": {
-        "name": "MacBook Pro 16 pouces",
+        "name": "MacBook Pro",
         "category": "ELECTRONIQUE",
-        "description": "   Ordinateur portable Apple avec puce M3 Pro.   ",
-        "price": 2499.99
+        "description": "  Ordinateur portable Apple.  ",
+        "price": "299.99"
       }
     }
   ]
-}'
+}' | jq '.docs[0]._source | {name, category, description, price}'
+# Attendu : category "electronique", description "Ordinateur portable Apple.", price 299.99
 
+
+# ============================================
+# EXERCICE 2 : Enrichissement + on_failure
+# ============================================
 echo ""
-echo "--- Indexation d un produit avec le pipeline ---"
-# Le paramètre ?pipeline= déclenche le pipeline avant l'indexation
-curl -s -X PUT "$BASE_URL/products/_doc/test-pipeline-001?pipeline=pipeline-produits" \
+echo "=== Exercice 2 : Pipeline enrichissement + on_failure ==="
+
+# on_failure sur le processor set : si le set échoue (champ manquant par ex.),
+# le document est redirigé vers l index failed-products pour inspection
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-enrichissement" \
   -H 'Content-Type: application/json' \
   -d '{
-  "name": "Vélo électrique VTT Pro",
-  "category": "SPORTS",
-  "description": "   VTT électrique 27.5 pouces, moteur 250W, autonomie 80km.   ",
-  "price": 1299.00,
-  "in_stock": true
-}'
-
-echo ""
-echo "--- Vérification : category doit être en minuscules et indexed_at présent ---"
-curl -s "$BASE_URL/products/_doc/test-pipeline-001?pretty"
-
-
-# ============================================
-# EXERCICE 2 : Analyseur Français
-# ============================================
-echo ""
-echo "=== Exercice 2 : Création de l index avec analyseur français ==="
-
-# Pourquoi un analyseur personnalisé ?
-# - lowercase : "Vélo" → "vélo"
-# - asciifolding : "vélo" → "velo" (recherche insensible aux accents)
-# - french_stop : supprime "de", "le", "la", etc. (stop words français)
-# - french_stemmer : "vélos" → "velo", "courir" → "cour" (racines communes)
-# Résultat : chercher "velo" trouve "Vélos", "Vélo", "vélos électriques"
-
-curl -s -X DELETE "$BASE_URL/products-v2" > /dev/null 2>&1  # Nettoyer si existe
-
-curl -s -X PUT "$BASE_URL/products-v2" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "analysis": {
-      "filter": {
-        "french_stemmer": {
-          "type": "stemmer",
-          "language": "french"
-        },
-        "french_stop": {
-          "type": "stop",
-          "stopwords": "_french_"
-        }
-      },
-      "analyzer": {
-        "french_custom": {
-          "type": "custom",
-          "tokenizer": "standard",
-          "filter": [
-            "lowercase",
-            "asciifolding",
-            "french_stop",
-            "french_stemmer"
-          ]
-        }
-      }
-    }
-  },
-  "mappings": {
-    "properties": {
-      "name": {
-        "type": "text",
-        "analyzer": "french_custom",
-        "fields": {
-          "keyword": { "type": "keyword" }
-        }
-      },
-      "description": {
-        "type": "text",
-        "analyzer": "french_custom"
-      },
-      "category": { "type": "keyword" },
-      "sub_category": { "type": "keyword" },
-      "brand": { "type": "keyword" },
-      "price": { "type": "float" },
-      "original_price": { "type": "float" },
-      "in_stock": { "type": "boolean" },
-      "stock_quantity": { "type": "integer" },
-      "rating": { "type": "float" },
-      "reviews_count": { "type": "integer" },
-      "tags": { "type": "keyword" },
-      "created_at": { "type": "date" },
-      "updated_at": { "type": "date" },
-      "seller": { "type": "keyword" },
-      "weight_kg": { "type": "float" },
-      "color": { "type": "keyword" }
-    }
-  }
-}'
-
-echo ""
-echo "--- Test de l analyseur : 'Vélos électriques d entrée de gamme' ---"
-# On voit ici la tokenisation complète, avec suppression des accents et des stop words
-curl -s -X POST "$BASE_URL/products-v2/_analyze" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "analyzer": "french_custom",
-  "text": "Vélos électriques d'\''entrée de gamme"
-}'
-
-
-# ============================================
-# EXERCICE 3 : Réindexation
-# ============================================
-echo ""
-echo "=== Exercice 3 : Réindexation products → products-v2 ==="
-
-# _reindex copie les documents d'un index vers un autre
-# Sans modifier les données sources — non-destructif
-curl -s -X POST "$BASE_URL/_reindex?wait_for_completion=true" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "source": {
-    "index": "products"
-  },
-  "dest": {
-    "index": "products-v2"
-  }
-}'
-
-echo ""
-echo "--- Vérification des counts ---"
-echo -n "products count: "
-curl -s "$BASE_URL/products/_count" | jq -r '.count' 2>/dev/null
-echo -n "products-v2 count: "
-curl -s "$BASE_URL/products-v2/_count" | jq -r '.count' 2>/dev/null
-
-echo ""
-echo "--- Comparaison : chercher 'velo' dans products vs products-v2 ---"
-echo -n "Résultats dans products (sans analyseur français): "
-curl -s "$BASE_URL/products/_search?q=name:velo&size=0" | jq -r '.hits.total.value' 2>/dev/null
-echo -n "Résultats dans products-v2 (avec analyseur français): "
-curl -s "$BASE_URL/products-v2/_search?q=name:velo&size=0" | jq -r '.hits.total.value' 2>/dev/null
-
-
-# ============================================
-# EXERCICE 4 : Completion Suggester
-# ============================================
-echo ""
-echo "=== Exercice 4 : Completion Suggester ==="
-
-# Pour le completion suggester, on a besoin d'un champ de type "completion"
-# Il faut créer un index avec ce champ dans le mapping
-echo "--- Création de products-v3 avec champ name_suggest ---"
-curl -s -X DELETE "$BASE_URL/products-v3" > /dev/null 2>&1
-
-curl -s -X PUT "$BASE_URL/products-v3" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "analysis": {
-      "filter": {
-        "french_stemmer": { "type": "stemmer", "language": "french" },
-        "french_stop": { "type": "stop", "stopwords": "_french_" }
-      },
-      "analyzer": {
-        "french_custom": {
-          "type": "custom",
-          "tokenizer": "standard",
-          "filter": ["lowercase", "asciifolding", "french_stop", "french_stemmer"]
-        }
-      }
-    }
-  },
-  "mappings": {
-    "properties": {
-      "name": { "type": "text", "analyzer": "french_custom" },
-      "name_suggest": { "type": "completion" },
-      "description": { "type": "text", "analyzer": "french_custom" },
-      "category": { "type": "keyword" },
-      "price": { "type": "float" },
-      "in_stock": { "type": "boolean" },
-      "rating": { "type": "float" }
-    }
-  }
-}'
-
-echo ""
-echo "--- Réindexation avec script pour copier name vers name_suggest ---"
-curl -s -X POST "$BASE_URL/_reindex?wait_for_completion=true" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "source": { "index": "products" },
-  "dest": { "index": "products-v3" },
-  "script": {
-    "source": "ctx._source.name_suggest = ctx._source.name"
-  }
-}' | jq -r '"Réindexé: \(.created // 0) docs"' 2>/dev/null
-
-echo ""
-echo "--- Test autocomplétion pour le préfixe 'ordi' ---"
-curl -s -X POST "$BASE_URL/products-v3/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "_source": false,
-  "suggest": {
-    "produit-suggest": {
-      "prefix": "ordi",
-      "completion": {
-        "field": "name_suggest",
-        "size": 5,
-        "fuzzy": { "fuzziness": 1 }
-      }
-    }
-  }
-}'
-
-
-# ============================================
-# EXERCICE 5 : Highlighting
-# ============================================
-echo ""
-echo "=== Exercice 5 : Highlighting ==="
-
-# Le highlighting extrait des fragments de texte et entoure les termes matchés
-# pre_tags/post_tags définissent les balises de surligange
-# fragment_size : longueur max de l'extrait en caractères
-# number_of_fragments : nombre max d'extraits retournés par champ
-curl -s -X POST "$BASE_URL/products-v2/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "query": {
-    "multi_match": {
-      "query": "ordinateur portable",
-      "fields": ["name", "description"]
-    }
-  },
-  "highlight": {
-    "pre_tags": ["<mark>"],
-    "post_tags": ["</mark>"],
-    "fields": {
-      "name": {},
-      "description": {
-        "fragment_size": 150,
-        "number_of_fragments": 2
-      }
-    }
-  },
-  "size": 3
-}'
-
-
-# ============================================
-# EXERCICE 6 : Recherche Géographique
-# ============================================
-echo ""
-echo "=== Exercice 6 : Recherche géographique ==="
-
-# geo_distance filtre selon un cercle autour d'un point GPS
-# _geo_distance dans sort trie par distance et retourne la distance calculée
-# L'index stores doit avoir le champ 'location' de type geo_point
-curl -s -X POST "$BASE_URL/stores/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "query": {
-    "geo_distance": {
-      "distance": "5km",
-      "location": {
-        "lat": 48.8566,
-        "lon": 2.3522
-      }
-    }
-  },
-  "sort": [
+  "description": "Enrichissement et nettoyage",
+  "processors": [
     {
-      "_geo_distance": {
-        "location": {
-          "lat": 48.8566,
-          "lon": 2.3522
-        },
-        "order": "asc",
-        "unit": "km",
-        "distance_type": "arc"
+      "set": {
+        "field": "indexed_at",
+        "value": "{{{_ingest.timestamp}}}",
+        "on_failure": [
+          { "set": { "field": "_index", "value": "failed-products" } }
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": "_tmp",
+        "ignore_missing": true
       }
     }
-  ],
-  "_source": ["name", "city", "address", "type"],
-  "size": 10
-}'
+  ]
+}' | jq '{acknowledged}'
 
-
-# ============================================
-# BONUS A : Term Suggester ("Voulez-vous dire ?")
-# ============================================
 echo ""
-echo "=== Bonus A : Term Suggester ==="
-
-# suggest_mode "missing" : ne suggère que si le terme n'existe pas dans l'index
-# max_edits: 2 : distance d'édition maximale (2 = "ordi" → "orden", 2 caractères différents)
-# min_word_length: 4 : ne tente pas de corriger les mots très courts
-curl -s -X POST "$BASE_URL/products-v2/_search" \
+echo "--- Indexation avec pipeline-enrichissement ---"
+curl -s -X PUT "$BASE_URL/products/_doc/test-pipeline-001?pipeline=pipeline-enrichissement" \
   -H 'Content-Type: application/json' \
   -d '{
-  "suggest": {
-    "correction-ortho": {
-      "text": "ordenateur portatif",
-      "term": {
-        "field": "name",
-        "suggest_mode": "missing",
-        "max_edits": 2,
-        "min_word_length": 4,
-        "min_doc_freq": 1
-      }
-    }
-  }
-}'
+  "name": "Vélo VTT Pro",
+  "category": "sports",
+  "price": 499.0,
+  "_tmp": "draft"
+}' | jq '{result, _id}'
+
+echo ""
+echo "--- Vérification : indexed_at présent, _tmp absent ---"
+curl -s "$BASE_URL/products/_doc/test-pipeline-001" | jq '._source | {name, indexed_at, _tmp}'
 
 
 # ============================================
-# BONUS B : Geo Bounding Box
+# EXERCICE 3 : Processor conditionnel
 # ============================================
 echo ""
-echo "=== Bonus B : Geo Bounding Box — Île-de-France ==="
+echo "=== Exercice 3 : Processor conditionnel ==="
 
-# geo_bounding_box définit un rectangle par les coins nord-ouest et sud-est
-# Plus rapide que geo_distance car pas de calcul de distance circulaire
-curl -s -X POST "$BASE_URL/stores/_search" \
+# Painless est compilé côté serveur — performances correctes pour des conditions simples
+# Ne pas y mettre de logique métier complexe (préférer le traitement en amont)
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-segment" \
   -H 'Content-Type: application/json' \
   -d '{
-  "query": {
-    "geo_bounding_box": {
-      "location": {
-        "top_left": { "lat": 49.0, "lon": 1.8 },
-        "bottom_right": { "lat": 48.1, "lon": 3.0 }
+  "processors": [
+    {
+      "set": {
+        "if":    "ctx.price != null && ctx.price > 500",
+        "field": "segment",
+        "value": "premium"
+      }
+    },
+    {
+      "set": {
+        "if":    "ctx.price != null && ctx.price <= 500",
+        "field": "segment",
+        "value": "standard"
       }
     }
-  },
-  "_source": ["name", "city", "location"],
-  "size": 20
-}'
+  ]
+}' | jq '{acknowledged}'
+
+echo ""
+echo "--- Simulation : deux documents avec segments différents ---"
+curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-segment/_simulate" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "docs": [
+    { "_source": { "name": "Laptop Pro", "price": 799 } },
+    { "_source": { "name": "Souris USB",  "price": 49  } }
+  ]
+}' | jq '.docs[] | ._source | {name, price, segment}'
+# Attendu : Laptop Pro → premium, Souris USB → standard
+
+
+# ============================================
+# EXERCICE 4 : Chaîner plusieurs pipelines
+# ============================================
+echo ""
+echo "=== Exercice 4 : Pipeline maître — chaîner plusieurs pipelines ==="
+
+# Le processor "pipeline" permet d appeler un autre pipeline depuis le courant.
+# Avantage : pipelines petits, réutilisables, testables indépendamment.
+# Ordre d exécution : pipeline-normalisation d abord, puis pipeline-enrichissement.
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-produits-complet" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Pipeline maître : normalisation puis enrichissement",
+  "processors": [
+    { "pipeline": { "name": "pipeline-normalisation"  } },
+    { "pipeline": { "name": "pipeline-enrichissement" } }
+  ]
+}' | jq '{acknowledged}'
+
+echo ""
+echo "--- Test _simulate : toutes les transformations en un seul appel ---"
+curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-produits-complet/_simulate" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "docs": [
+    {
+      "_source": {
+        "name": "Casque Audio BT",
+        "category": "AUDIO",
+        "description": "  Casque sans fil 30h autonomie.  ",
+        "price": "89.99",
+        "_tmp": "brouillon"
+      }
+    }
+  ]
+}' | jq '.docs[0]._source | {name, category, description, price, indexed_at}'
+# Attendu : category "audio", description sans espaces, price 89.99, indexed_at présent, _tmp absent
+
+echo ""
+echo "--- Indexation réelle avec le pipeline maître ---"
+curl -s -X PUT "$BASE_URL/products/_doc/test-master-001?pipeline=pipeline-produits-complet" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "Clavier mécanique RGB",
+  "category": "INFORMATIQUE",
+  "description": "   Clavier TKL switches Cherry MX Red.   ",
+  "price": "129.99",
+  "_tmp": "draft"
+}' | jq '{result, _id}'
+
+echo ""
+echo "--- Vérification finale ---"
+curl -s "$BASE_URL/products/_doc/test-master-001" \
+  | jq '._source | {name, category, description, price, indexed_at}'
 
 echo ""
 echo "================================================"
-echo " TP4 Solution terminée !"
+echo " TP6 Solution terminée !"
 echo "================================================"

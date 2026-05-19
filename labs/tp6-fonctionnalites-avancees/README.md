@@ -1,83 +1,88 @@
-# TP6 — Fonctionnalités Avancées
+# TP6 — Ingest Pipelines
 
 ## Objectif
-Implémenter l'enrichissement des données et l'analyse linguistique française pour le moteur de recherche e-commerce.
-
-> **Note** : Les exercices géolocalisation et completion suggester ont été déplacés dans des TPs optionnels dédiés.
+Maîtriser les ingest pipelines OpenSearch : créer, tester, gérer les erreurs et chaîner plusieurs pipelines.
 
 ## Prérequis
 - TP5 terminé, index `products` avec 1000+ documents
 - Cluster OpenSearch running sur http://localhost:9200
 
 ## Durée estimée
-60 minutes
+40 minutes
 
 ## Contexte (fil rouge)
-Nous enrichissons notre moteur de recherche e-commerce : meilleure gestion du français, surlignage des termes et optimisation des pipelines d'indexation.
+Les données de notre catalogue e-commerce arrivent sales : catégories en majuscules, descriptions avec espaces parasites, prix sous forme de chaîne. On va transformer tout ça **avant** l'indexation, côté serveur, sans toucher au code applicatif.
 
-## Exercices
+---
 
-### Exercice 1 : Créer un Ingest Pipeline
-**Objectif** : Transformer automatiquement les documents à l'indexation
+### Exercice 1 : Créer un pipeline de normalisation
+**Objectif** : Transformer automatiquement les documents à l'indexation.
+
 **Instructions** :
-1. Créer un pipeline `pipeline-produits` avec les processeurs : lowercase sur `category`, trim sur `description`, et set pour ajouter un champ `indexed_at` avec la valeur `{{_ingest.timestamp}}`
-2. Tester le pipeline avec l'API `_simulate` sur un document exemple
-3. Indexer un produit test en utilisant `?pipeline=pipeline-produits`
+1. Créer un pipeline `pipeline-normalisation` avec les processors :
+   - `lowercase` sur le champ `category`
+   - `trim` sur le champ `description`
+   - `convert` sur le champ `price` → type `float`
+2. Tester avec `_simulate` sur un document exemple (`category: "ELECTRONIQUE"`, `description: "  Ordi  "`, `price: "299.99"`)
+3. Vérifier que le document simulé a bien `category: "electronique"`, `description: "Ordi"`, `price: 299.99`
 
-**Indice** : `PUT _ingest/pipeline/pipeline-produits`
-**Vérification** : Le champ `category` doit être en minuscules et `indexed_at` présent
+**Indice** : `PUT /_ingest/pipeline/pipeline-normalisation`
+**Vérification** : La réponse `_simulate` doit montrer le document transformé sans erreur.
 
-### Exercice 2 : Créer un Analyseur Français Personnalisé
-**Objectif** : Améliorer la recherche full-text pour le français
+---
+
+### Exercice 2 : Ajouter un champ d'audit et gérer les erreurs
+**Objectif** : Enrichir les documents et rendre le pipeline robuste en production.
+
 **Instructions** :
-1. Créer un nouvel index `products-v2` avec un analyseur custom `french_custom` incluant : tokenizer `standard`, token filters `lowercase`, `asciifolding`, `french_stop` (_french_), `french_stemmer` (language: french)
-2. Ajouter le champ `name` avec l'analyseur `french_custom`
-3. Tester avec `POST products-v2/_analyze` : "Vélos électriques d'entrée de gamme"
+1. Créer un pipeline `pipeline-enrichissement` avec les processors :
+   - `set` pour ajouter `indexed_at` avec la valeur `{{{_ingest.timestamp}}}`
+   - `remove` pour supprimer le champ `_tmp` avec `ignore_missing: true`
+2. Ajouter un `on_failure` sur le processor `set` qui route les documents en erreur vers l'index `failed-products` (via `set` sur `_index`)
+3. Indexer un produit réel avec `?pipeline=pipeline-enrichissement` et vérifier que `indexed_at` est présent
 
-**Indice** : Définir l'analyseur dans `settings.analysis`
-**Vérification** : Le token "vélos" doit produire le token "velo" (ou similaire après stemming)
+**Indice** : `PUT /products/_doc/1?pipeline=pipeline-enrichissement`
+**Vérification** : `GET /products/_doc/1` doit montrer le champ `indexed_at`.
 
-### Exercice 3 : Réindexer avec le Nouvel Analyseur
-**Objectif** : Migrer les données vers le nouvel index
+---
+
+### Exercice 3 : Processor conditionnel
+**Objectif** : Appliquer un processor uniquement sous condition (Painless).
+
 **Instructions** :
-1. Utiliser `POST _reindex` pour copier `products` vers `products-v2`
-2. Vérifier le count : `GET products-v2/_count`
-3. Tester la différence : chercher "vélo" dans `products` puis dans `products-v2`
+1. Créer un pipeline `pipeline-segment` avec un processor `set` conditionnel :
+   - Si `ctx.price != null && ctx.price > 500` → ajouter `segment: "premium"`
+   - Sinon → ajouter `segment: "standard"`
+2. Tester avec `_simulate` sur deux documents : un à `price: 799` et un à `price: 49`
+3. Vérifier que chaque document reçoit le bon segment
 
-**Indice** : `POST _reindex { "source": {"index": "products"}, "dest": {"index": "products-v2"} }`
-**Vérification** : `products-v2` doit avoir le même nombre de documents que `products`
+**Indice** : `"if": "ctx.price != null && ctx.price > 500"` dans le processor
+**Vérification** : Les deux documents simulés ont des valeurs `segment` différentes.
 
-### Exercice 4 : Surlignage des Résultats
-**Objectif** : Mettre en valeur les termes recherchés dans les résultats
+---
+
+### Exercice 4 : Chaîner plusieurs pipelines
+**Objectif** : Combiner des pipelines spécialisés en un pipeline maître via le processor `pipeline`.
+
+**Contexte** : En production, on préfère des pipelines petits et réutilisables plutôt qu'un seul pipeline monolithique. Le processor `pipeline` permet d'en appeler un autre depuis un pipeline courant.
+
 **Instructions** :
-1. Faire une recherche avec highlighting sur `name` et `description`
-2. Utiliser `<mark>` et `</mark>` comme balises
-3. Configurer `fragment_size: 150` pour les extraits
+1. Les pipelines `pipeline-normalisation` et `pipeline-enrichissement` (créés aux exercices 1 et 2) sont déjà disponibles.
+2. Créer un pipeline maître `pipeline-produits-complet` qui enchaîne les deux :
+   - d'abord `pipeline-normalisation`
+   - puis `pipeline-enrichissement`
+3. Tester avec `_simulate` : un seul appel doit déclencher les deux pipelines en séquence.
+4. Indexer un document avec `?pipeline=pipeline-produits-complet` et vérifier que toutes les transformations sont appliquées.
 
-**Indice** : Clé `highlight` au même niveau que `query`
-**Vérification** : Les résultats doivent contenir des champs `highlight.name` ou `highlight.description`
+**Indice** : `{ "pipeline": { "name": "pipeline-normalisation" } }` comme processor
+**Vérification** : Le document final doit avoir `category` en minuscules ET `indexed_at` présent.
 
-### Exercice 5 : Tri et Pagination avancée
-**Objectif** : Implémenter une pagination efficace pour de gros volumes
-**Instructions** :
-1. Faire une recherche triée par prix décroissant avec `sort`
-2. Tester la pagination avec `from` + `size`
-3. Implémenter `search_after` pour la pagination profonde (sans limite des 10 000 premiers résultats)
-
-**Indice** : `"sort": [{"price": {"order": "desc"}}]` + `"search_after": [valeur_du_dernier_doc]`
-**Vérification** : Les résultats sont triés par prix et la pagination `search_after` fonctionne sur plusieurs pages
-
-## TP Bonus (pour les plus rapides)
-Implémenter "Voulez-vous dire ?" avec le term suggester :
-- Utiliser `term` suggester sur le champ `name`
-- Tester avec une faute d'orthographe : "ordenateur"
-- Configurer `suggest_mode: "missing"` et `max_edits: 2`
+---
 
 ## Vérification finale
-- [ ] Pipeline créé et testé avec _simulate
-- [ ] Index `products-v2` avec analyseur français
-- [ ] Reindex effectué, counts identiques
-- [ ] Highlighting présent dans les résultats
-- [ ] Tri par prix et pagination search_after fonctionnels
+- [ ] Pipeline `pipeline-normalisation` : lowercase + trim + convert testés via `_simulate`
+- [ ] Pipeline `pipeline-enrichissement` : `indexed_at` présent sur le document indexé
+- [ ] Processor conditionnel : deux documents avec segments différents
+- [ ] Pipeline `pipeline-produits-complet` : enchaîne les deux pipelines en un seul appel
 
-*Passez au [TP7 — Installation cluster 3 nœuds](../tp7-cluster-3noeuds/README.md)*
+*Passez au [TP7 — Analyseur français](../tp7-analyseur/README.md)*

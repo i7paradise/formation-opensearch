@@ -1,124 +1,154 @@
 #!/bin/bash
-# TP4 — Fonctionnalités Avancées OpenSearch
+# TP6 — Ingest Pipelines
 # Complétez les sections marquées # TODO
 
 BASE_URL="http://localhost:9200"
 
-echo "=== Exercice 1 : Ingest Pipeline ==="
+echo "=== Exercice 1 : Pipeline de normalisation ==="
 
-# TODO: Créer le pipeline pipeline-produits
-# Processeurs requis:
-#   1. lowercase sur le champ "category"
-#   2. trim sur le champ "description"
-#   3. set pour ajouter "indexed_at" avec "{{_ingest.timestamp}}"
-curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-produits" \
+# TODO: Créer le pipeline pipeline-normalisation
+# Processors requis:
+#   1. lowercase sur "category"
+#   2. trim sur "description"
+#   3. convert sur "price" → type "float"
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-normalisation" \
   -H 'Content-Type: application/json' \
   -d '{
-  # TODO: Compléter la définition du pipeline
+  "description": "Normalisation champs produit",
+  "processors": [
+    # TODO: lowercase
+    # TODO: trim
+    # TODO: convert price en float
+  ]
 }'
 
 echo ""
-echo "--- Test avec _simulate ---"
-# TODO: Tester le pipeline avec un document exemple
-# Utiliser POST _ingest/pipeline/pipeline-produits/_simulate
-# avec un document exemple ayant category="ELECTRONIQUE" et une description avec des espaces
-curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-produits/_simulate" \
+echo "--- Test _simulate ---"
+# TODO: Tester avec un document { "category": "ELECTRONIQUE", "description": "  Ordi  ", "price": "299.99" }
+curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-normalisation/_simulate" \
   -H 'Content-Type: application/json' \
   -d '{
-  # TODO: Ajouter le document de test
-}'
-
-echo ""
-echo "=== Exercice 2 : Analyseur Français ==="
-
-# TODO: Créer l'index products-v2 avec l'analyseur french_custom
-# L'analyseur doit contenir:
-#   - tokenizer: standard
-#   - filters: lowercase, asciifolding, french_stop (_french_), french_stemmer (language: french)
-# Ajouter le champ "name" mappé avec l'analyseur french_custom
-curl -s -X PUT "$BASE_URL/products-v2" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  # TODO: Définir settings.analysis et mappings.properties
-}'
-
-echo ""
-echo "--- Test de l'analyseur ---"
-# TODO: Tester l'analyseur avec la phrase "Vélos électriques d'entrée de gamme"
-curl -s -X POST "$BASE_URL/products-v2/_analyze" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  # TODO: Utiliser l'analyseur french_custom sur le texte ci-dessus
-}'
-
-echo ""
-echo "=== Exercice 3 : Réindexation ==="
-
-# TODO: Réindexer products vers products-v2
-curl -s -X POST "$BASE_URL/_reindex" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  # TODO: source: products, dest: products-v2
-}'
-
-# Vérification du count
-echo "Count products-v2:"
-curl -s "$BASE_URL/products-v2/_count"
-
-echo ""
-echo "=== Exercice 4 : Completion Suggester ==="
-
-# TODO: Chercher avec autocomplétion - préfixe "ordi"
-curl -s -X POST "$BASE_URL/products-v2/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "suggest": {
-    "produit-suggest": {
-      "prefix": "ordi",
-      # TODO: Compléter avec completion field name_suggest et fuzzy fuzziness 1
+  "docs": [
+    {
+      "_source": {
+        # TODO: ajouter les champs du document de test
+      }
     }
-  }
+  ]
+}' | jq '.docs[0]._source'
+
+
+echo ""
+echo "=== Exercice 2 : Pipeline d enrichissement + on_failure ==="
+
+# TODO: Créer pipeline-enrichissement
+# Processors requis:
+#   1. set → indexed_at: "{{{_ingest.timestamp}}}"  avec on_failure qui route vers "failed-products"
+#   2. remove → champ "_tmp", ignore_missing: true
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-enrichissement" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Enrichissement et nettoyage",
+  "processors": [
+    # TODO: set indexed_at + on_failure
+    # TODO: remove _tmp
+  ]
 }'
 
 echo ""
-echo "=== Exercice 5 : Highlighting ==="
-
-# TODO: Recherche avec highlighting sur name et description
-curl -s -X POST "$BASE_URL/products-v2/_search" \
+echo "--- Indexation avec pipeline ---"
+# TODO: Indexer ce document avec ?pipeline=pipeline-enrichissement
+# { "name": "Vélo VTT Pro", "category": "sports", "price": 499.0, "_tmp": "draft" }
+curl -s -X PUT "$BASE_URL/products/_doc/test-pipeline-001?pipeline=pipeline-enrichissement" \
   -H 'Content-Type: application/json' \
   -d '{
-  "query": {
-    "match": { "name": "ordinateur" }
-  },
-  # TODO: Ajouter le highlighting avec balises <mark></mark> et fragment_size 150
+  # TODO: corps du document
 }'
 
 echo ""
-echo "=== Exercice 6 : Recherche Géographique ==="
+echo "--- Vérification : indexed_at doit être présent ---"
+curl -s "$BASE_URL/products/_doc/test-pipeline-001" | jq '._source | {name, indexed_at}'
 
-# TODO: Trouver les magasins dans un rayon de 5km autour de Paris
-# Paris: lat 48.8566, lon 2.3522
-# Trier par distance croissante
-curl -s -X POST "$BASE_URL/stores/_search" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  # TODO: geo_distance query + _geo_distance sort
-}'
 
 echo ""
-echo "=== TP Bonus : Voulez-vous dire ? ==="
+echo "=== Exercice 3 : Processor conditionnel ==="
 
-# TODO: Term suggester pour corriger "ordenateur"
-curl -s -X POST "$BASE_URL/products-v2/_search" \
+# TODO: Créer pipeline-segment
+# Règle : price > 500 → segment "premium" ; sinon → segment "standard"
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-segment" \
   -H 'Content-Type: application/json' \
   -d '{
-  "suggest": {
-    "correction": {
-      "text": "ordenateur",
-      # TODO: term suggester sur le champ name avec suggest_mode missing
+  "processors": [
+    {
+      "set": {
+        # TODO: condition if + field "segment" + value "premium"
+      }
+    },
+    {
+      "set": {
+        # TODO: condition if (prix <= 500) + field "segment" + value "standard"
+      }
     }
-  }
+  ]
 }'
 
 echo ""
-echo "=== TP4 terminé ! ==="
+echo "--- Test avec deux documents (price 799 et price 49) ---"
+curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-segment/_simulate" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "docs": [
+    { "_source": { "name": "Laptop Pro", "price": 799 } },
+    { "_source": { "name": "Souris USB",  "price": 49  } }
+  ]
+}' | jq '.docs[] | ._source | {name, price, segment}'
+
+
+echo ""
+echo "=== Exercice 4 : Chaîner plusieurs pipelines ==="
+
+# TODO: Créer pipeline-produits-complet qui appelle en séquence :
+#   1. pipeline-normalisation  (via processor "pipeline")
+#   2. pipeline-enrichissement (via processor "pipeline")
+curl -s -X PUT "$BASE_URL/_ingest/pipeline/pipeline-produits-complet" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "description": "Pipeline maître : normalisation puis enrichissement",
+  "processors": [
+    # TODO: appel pipeline-normalisation
+    # TODO: appel pipeline-enrichissement
+  ]
+}'
+
+echo ""
+echo "--- Test _simulate : toutes les transformations doivent s appliquer ---"
+curl -s -X POST "$BASE_URL/_ingest/pipeline/pipeline-produits-complet/_simulate" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "docs": [
+    {
+      "_source": {
+        "name": "Casque Audio BT",
+        "category": "AUDIO",
+        "description": "  Casque sans fil 30h autonomie.  ",
+        "price": "89.99",
+        "_tmp": "brouillon"
+      }
+    }
+  ]
+}' | jq '.docs[0]._source | {name, category, description, price, indexed_at}'
+
+echo ""
+echo "--- Indexation avec le pipeline maître ---"
+curl -s -X PUT "$BASE_URL/products/_doc/test-master-001?pipeline=pipeline-produits-complet" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "Clavier mécanique RGB",
+  "category": "INFORMATIQUE",
+  "description": "   Clavier TKL switches Cherry MX Red.   ",
+  "price": "129.99",
+  "_tmp": "draft"
+}' | jq '{result, _id}'
+
+echo ""
+echo "=== TP6 terminé ! ==="
