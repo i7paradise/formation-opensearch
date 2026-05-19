@@ -43,15 +43,15 @@ Security Plugin
 ```bash
 # Vérifier l'état du plugin de sécurité
 curl -X GET "https://localhost:9200/_plugins/_security/health?pretty" \
-  -k -u admin:admin
+  -k -u admin:Formation@OpenSearch2024!
 
 # Informations sur l'utilisateur connecté
 curl -X GET "https://localhost:9200/_plugins/_security/authinfo?pretty" \
-  -k -u admin:admin
+  -k -u admin:Formation@OpenSearch2024!
 
 # Lister les utilisateurs existants
 curl -X GET "https://localhost:9200/_plugins/_security/api/internalusers?pretty" \
-  -k -u admin:admin
+  -k -u admin:Formation@OpenSearch2024!
 ```
 
 ---
@@ -60,7 +60,7 @@ curl -X GET "https://localhost:9200/_plugins/_security/api/internalusers?pretty"
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_permissions": [
@@ -91,7 +91,7 @@ curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader
 Vérifier :
 ```bash
 curl -X GET "https://localhost:9200/_plugins/_security/api/roles/products_reader?pretty" \
-  -k -u admin:admin
+  -k -u admin:Formation@OpenSearch2024!
 ```
 
 ---
@@ -101,7 +101,7 @@ curl -X GET "https://localhost:9200/_plugins/_security/api/roles/products_reader
 ```bash
 # Créer l'utilisateur
 curl -X PUT "https://localhost:9200/_plugins/_security/api/internalusers/analyst" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "password":      "Analyst@Pass2026!",
@@ -111,7 +111,7 @@ curl -X PUT "https://localhost:9200/_plugins/_security/api/internalusers/analyst
 
 # Mapper au rôle
 curl -X PUT "https://localhost:9200/_plugins/_security/api/rolesmapping/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{ "backend_roles": [], "hosts": [], "users": ["analyst"] }'
 ```
@@ -142,7 +142,7 @@ curl -X POST "https://localhost:9200/products/_doc" \
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_permissions": ["cluster:monitor/health"],
@@ -169,7 +169,7 @@ L'analyst ne voit que la catégorie `Électronique` :
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_permissions": ["cluster:monitor/health"],

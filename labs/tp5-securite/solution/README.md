@@ -30,7 +30,7 @@ curl -X GET "https://localhost:9200/" -k
 # Réponse attendue : HTTP 401
 
 # Test avec auth → 200 OK
-curl -X GET "https://localhost:9200/" -k -u admin:admin
+curl -X GET "https://localhost:9200/" -k -u admin:Formation@OpenSearch2024!
 ```
 
 ---
@@ -104,7 +104,7 @@ echo | openssl s_client -connect localhost:9200 -showcerts 2>/dev/null \
 
 | Utilisateur | Mot de passe | Rôle          |
 |-------------|-------------|---------------|
-| `admin`     | `admin`     | Superadmin    |
+| `admin`     | `Formation@OpenSearch2024!` | Superadmin    |
 | `kibanaserver` | `kibanaserver` | Dashboards service |
 | `kibanaro`  | `kibanaro`  | Dashboards lecture |
 | `logstash`  | `logstash`  | Ingestion     |
@@ -115,7 +115,7 @@ echo | openssl s_client -connect localhost:9200 -showcerts 2>/dev/null \
 
 ```bash
 # Informations sur l'utilisateur connecté
-curl -X GET "https://localhost:9200/_plugins/_security/authinfo?pretty" -k -u admin:admin
+curl -X GET "https://localhost:9200/_plugins/_security/authinfo?pretty" -k -u admin:Formation@OpenSearch2024!
 ```
 
 **Réponse :**
@@ -139,7 +139,7 @@ curl -X GET "https://localhost:9200/_plugins/_security/authinfo?pretty" -k -u ad
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/internalusers/admin" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "password":      "Admin@SecureP@ss2026!",
@@ -158,7 +158,7 @@ curl -X PUT "https://localhost:9200/_plugins/_security/api/internalusers/admin" 
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_permissions": [
@@ -207,7 +207,7 @@ curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/internalusers/analyst" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "password":      "Analyst@Pass2026!",
@@ -225,7 +225,7 @@ curl -X PUT "https://localhost:9200/_plugins/_security/api/internalusers/analyst
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/rolesmapping/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "backend_roles": [],
@@ -304,7 +304,7 @@ curl -s -o /dev/null -w "%{http_code}" \
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/audit/config" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "enabled": true,
@@ -344,7 +344,7 @@ curl -X PUT "https://localhost:9200/_plugins/_security/api/audit/config" \
 
 ```bash
 curl -X GET "https://localhost:9200/.opensearch-security-audit*/_search?pretty" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "query": {
@@ -378,7 +378,7 @@ curl -X GET "https://localhost:9200/.opensearch-security-audit*/_search?pretty" 
 
 ```bash
 curl -X PUT "https://localhost:9200/_plugins/_security/api/roles/products_reader" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_permissions": [
@@ -430,7 +430,7 @@ curl -X GET "https://localhost:9200/products/_count" \
 
 # Comparer avec admin (voit tous les produits)
 curl -X GET "https://localhost:9200/products/_count" \
-  -k -u admin:admin \
+  -k -u admin:Formation@OpenSearch2024! \
   -H "Content-Type: application/json" \
   -d '{ "query": { "match_all": {} } }'
 ```
