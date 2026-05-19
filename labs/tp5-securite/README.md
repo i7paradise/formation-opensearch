@@ -6,8 +6,31 @@
 |------------|------------------------------------------------------|
 | Durée      | 30 minutes                                           |
 | Difficulté | Intermédiaire                                        |
-| Prérequis  | TP4 terminé, cluster 3 nœuds démarré (docker-compose.cluster.yml) avec sécurité activée |
+| Prérequis  | TP4 terminé, stack sécurité démarrée (`docker-compose.security.yml`) |
 | Objectif   | RBAC (rôles, permissions) + FLS (masquage de champ)  |
+
+## Démarrage du stack sécurité
+
+Ce TP utilise `docker-compose.security.yml` — un nœud unique avec le plugin sécurité activé et des certificats TLS auto-signés. Il expose les **mêmes ports** que le stack principal (9200, 5601) : il faut donc arrêter l'autre stack avant de démarrer celui-ci.
+
+```bash
+# 1. Arrêter le stack principal (si démarré)
+docker compose -f infrastructure/docker-compose.yml down
+
+# 2. Démarrer le stack sécurité
+docker compose -f infrastructure/docker-compose.security.yml up -d
+
+# 3. Attendre ~30 secondes le démarrage du plugin sécurité, puis vérifier
+curl -k -u admin:Formation@OpenSearch2024! \
+  https://localhost:9200/_cluster/health?pretty
+
+# 4. Charger les données de démonstration
+./scripts/seed-data-with-security.sh
+```
+
+> **Dashboards** est accessible sur [http://localhost:5601](http://localhost:5601) — login `admin` / `Formation@OpenSearch2024!`
+
+---
 
 ## Objectif
 
