@@ -1,0 +1,29 @@
+# infrastructure/docker-compose.logstash.yml
+# Utilisé pour TP15 — Logstash Jour 3
+services:
+  opensearch-node1:
+    image: opensearchproject/opensearch:2.18.0
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    networks:
+      - logstash-net
+
+  logstash:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:8.9.0
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/data:/data
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    depends_on:
+      - opensearch-node1
+    networks:
+      - logstash-net
+
+networks:
+  logstash-net:
+    driver: bridge

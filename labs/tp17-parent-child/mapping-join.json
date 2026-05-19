@@ -1,0 +1,17 @@
+{
+  "mappings": {
+    "properties": {
+      "join_field": {
+        "type": "join",
+        "relations": {
+          "rocket": "launch"
+        }
+      },
+      "name": { "type": "keyword" },
+      "country": { "type": "keyword" },
+      "date_utc": { "type": "date" },
+      "success": { "type": "boolean" },
+      "flight_number": { "type": "integer" }
+    }
+  }
+}

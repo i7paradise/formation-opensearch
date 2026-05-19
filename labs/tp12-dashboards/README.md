@@ -1,284 +1,221 @@
-# TP11 — Tableau de bord e-commerce avec OpenSearch Dashboards
+# TP12 — Dashboard "Product Analytics" sur l'index products
 
 ## Informations générales
 
-| Paramètre  | Valeur                          |
-|------------|---------------------------------|
-| Durée      | 45 minutes                      |
-| Difficulté | Intermédiaire                   |
-| Prérequis  | TP9 terminé (agrégations complètes requises) |
-| URL        | http://localhost:5601           |
+| Paramètre  | Valeur                                                                         |
+|------------|--------------------------------------------------------------------------------|
+| Durée      | 40 minutes                                                                     |
+| Difficulté | Intermédiaire                                                                  |
+| Prérequis  | Index `products` indexé depuis le Jour 2 (1000+ documents), OpenSearch Dashboards sur http://localhost:5601 |
 
 ## Objectif
 
-Créer un tableau de bord e-commerce complet dans OpenSearch Dashboards permettant d'analyser les produits, les catégories et les performances commerciales de notre boutique en ligne.
-
-## Contexte
-
-Notre équipe de direction souhaite disposer d'un tableau de bord analytique centralisé pour piloter l'activité e-commerce. Vous allez construire ce tableau de bord de bout en bout : de la configuration de l'index pattern jusqu'à l'assemblage final des visualisations.
-
-## Prérequis techniques
-
-- TP4 terminé et données chargées dans l'index `products`
-- OpenSearch Dashboards accessible sur http://localhost:5601
-- OpenSearch accessible sur http://localhost:9200
-- Navigateur web moderne (Chrome ou Firefox recommandé)
+Construire un dashboard analytique complet "Product Analytics" dans OpenSearch Dashboards en utilisant Lens pour toutes les visualisations. Vous allez créer la Data View, explorer les données avec Discover et KQL, puis assembler le dashboard final avec un control interactif.
 
 ---
 
-## Exercice 1 — Créer l'Index Pattern pour `products`
+## Exercice 1 — Créer la Data View pour `products`
 
-### 1.1 Accéder à la gestion des index patterns
+### 1.1 Accéder à la gestion des Data Views
 
-1. Ouvrez http://localhost:5601 dans votre navigateur
-2. Dans le menu de gauche, cliquez sur l'icône **hamburger** (☰) pour ouvrir la navigation
+1. Ouvrez http://localhost:5601
+2. Dans le menu de gauche, cliquez sur l'icône hamburger (☰)
 3. Allez dans **Management** → **Stack Management**
-4. Dans la section **Kibana / Dashboards**, cliquez sur **Index Patterns**
+4. Dans la section **Dashboards Management**, cliquez sur **Data Views**
 
-### 1.2 Créer l'index pattern
+### 1.2 Créer la Data View
 
-1. Cliquez sur le bouton **Create index pattern**
-2. Dans le champ **Index pattern name**, tapez : `products`
-3. Dashboards affiche la liste des index correspondants — vérifiez que `products` apparaît bien
-4. Cliquez sur **Next step**
-5. Dans le menu déroulant **Time field**, sélectionnez : `created_at`
-6. Cliquez sur **Create index pattern**
+1. Cliquez sur **Create data view**
+2. Dans le champ **Name**, tapez : `products`
+3. Dans le champ **Index pattern**, tapez : `products`
+4. Dashboards affiche la liste des index correspondants — vérifiez que `products` apparaît bien
+5. Dans le menu déroulant **Timestamp field**, sélectionnez : `indexed_at` (ou `created_at` si disponible)
+6. Cliquez sur **Save data view to OpenSearch Dashboards**
 
 ### 1.3 Explorer les champs disponibles
 
-Après la création, explorez la liste des champs :
-- Repérez les champs de type `keyword` (ex. `category.keyword`, `brand.keyword`)
-- Repérez les champs de type `text` (ex. `name`, `description`)
-- Repérez les champs numériques : `price`, `stock_quantity`, `rating`
-- Repérez le champ date : `created_at`
+Après la création, parcourez la liste des champs :
+- Champs de type `keyword` : `category.keyword`, `brand.keyword`, `name.keyword`
+- Champs numériques : `price`, `stock_quantity`, `rating`
+- Champ date : `indexed_at` ou `created_at`
 
-> **Astuce** : Les champs suffixés `.keyword` sont utilisés pour les agrégations et les tris.
+> Les champs suffixés `.keyword` sont utilisés pour les agrégations et les tris dans Lens.
 
 ---
 
-## Exercice 2 — Explorer les données avec Discover
+## Exercice 2 — Explorer les données avec Discover + KQL
 
 ### 2.1 Ouvrir Discover
 
 1. Dans le menu de gauche, cliquez sur **Discover**
-2. Sélectionnez l'index pattern `products` si ce n'est pas déjà fait (menu déroulant en haut à gauche)
-3. Ajustez la plage temporelle en haut à droite — essayez **Last 1 year** ou **Last 5 years**
+2. Sélectionnez la Data View `products` (menu déroulant en haut à gauche)
+3. Ajustez la plage temporelle — essayez **Last 1 year** ou **Last 5 years**
 
 ### 2.2 Appliquer des filtres KQL
 
-Dans la barre de recherche en haut de Discover, tapez les filtres suivants (un par un) et observez les résultats :
+Dans la barre de recherche en haut de Discover, testez les filtres suivants :
 
-**Filtre 1 — Produits électroniques chers :**
+**Filtre 1 — Produits électroniques :**
 ```
-category: "Électronique" AND price > 500
+category.keyword: "Electronics"
 ```
 
-**Filtre 2 — Produits bien notés en stock :**
+**Filtre 2 — Produits dans une fourchette de prix :**
 ```
-rating >= 4.5 AND stock_quantity > 0
+price >= 100 AND price <= 500
 ```
 
 **Filtre 3 — Recherche textuelle :**
 ```
-name: "Samsung" OR brand: "Apple"
+name: "laptop" OR name: "phone"
 ```
 
 **Filtre 4 — Combinaison avancée :**
 ```
-category: "Vêtements" AND price < 50 AND rating > 3
+category.keyword: "Electronics" AND price < 200 AND rating > 4
 ```
 
-### 2.3 Personnaliser les colonnes
-
-1. Dans le panneau de gauche, cliquez sur les champs `name`, `category`, `price`, `rating` pour les ajouter comme colonnes
-2. Réorganisez les colonnes selon vos préférences
-3. Triez par `price` décroissant en cliquant sur l'en-tête de colonne
-
-### 2.4 Sauvegarder la recherche
+### 2.3 Sauvegarder la recherche
 
 1. Cliquez sur **Save** en haut de la page
-2. Nommez la recherche : `Produits Électronique > 500€`
+2. Nommez la recherche : `Electronics < 200€ bien notés`
 3. Cliquez sur **Save**
 
 ---
 
-## Exercice 3 — Créer les visualisations
+## Exercice 3 — Créer les visualisations Lens
 
-### Visualisation A — Métrique : Nombre total de produits
+Accédez à **Visualize Library** → **Create visualization** et choisissez **Lens** pour chaque visualisation.
 
-1. Allez dans **Visualize Library** (menu gauche → Visualize)
-2. Cliquez sur **Create visualization**
-3. Sélectionnez le type **Metric**
-4. Choisissez l'index pattern `products`
-5. Dans le panneau de gauche sous **Metrics** :
-   - Metric : `Count`
-   - Label : `Nombre total de produits`
-6. Cliquez sur **Update** (bouton bleu en bas)
-7. Sauvegardez sous le nom : `Métrique - Nombre de produits`
+### Visualisation A — Donut "Répartition par catégorie"
 
-### Visualisation B — Métrique : Prix moyen
-
-1. Créez une nouvelle visualisation **Metric**
-2. Dans **Metrics** :
-   - Cliquez sur **Add metric**
-   - Sélectionnez l'agrégation : `Average`
-   - Field : `price`
-   - Label : `Prix moyen (€)`
-3. Dans les options d'affichage, définissez le format à 2 décimales
-4. Sauvegardez sous : `Métrique - Prix moyen`
-
-### Visualisation C — Camembert : Répartition par catégorie
-
-1. Créez une nouvelle visualisation **Pie**
-2. Sous **Buckets** :
-   - Cliquez sur **Add bucket** → **Split slices**
-   - Agrégation : `Terms`
-   - Field : `category.keyword`
+1. Dans Lens, sélectionnez le type de graphique **Donut** (icône en haut à droite)
+2. Glissez le champ `category.keyword` sur la zone **Slice by**
+   - Agrégation : `Top values`
    - Size : `10`
-   - Order by : `Count`
-3. Cliquez sur **Update**
-4. Dans **Options** (onglet en haut), activez **Show labels**
-5. Sauvegardez sous : `Camembert - Répartition catégories`
+3. Glissez `Records` (ou laissez le défaut Count) sur la zone **Size by**
+4. Dans les options du panneau : activez **Show values**
+5. Titre : `Répartition par catégorie`
+6. Sauvegardez sous : `Donut - Répartition par catégorie`
 
-### Visualisation D — Bar Chart : Top 10 catégories par nombre de produits
+### Visualisation B — Bar Chart "Prix moyen par catégorie"
 
-1. Créez une nouvelle visualisation **Vertical Bar**
-2. Sous **Metrics** :
-   - Y-axis : `Count`
-3. Sous **Buckets** :
-   - **X-axis** : Agrégation `Terms`, Field `category.keyword`, Size `10`, Order `Descending by Count`
-4. Dans **Options**, activez **Show values on chart**
-5. Sauvegardez sous : `Bar Chart - Top 10 catégories`
+1. Dans Lens, sélectionnez le type **Bar vertical**
+2. Axe X : glissez `category.keyword` → agrégation `Top values`, Size `10`
+3. Axe Y : glissez `price` → agrégation `Average`
+4. Titre : `Prix moyen par catégorie`
+5. Sauvegardez sous : `Bar - Prix moyen par catégorie`
 
-### Visualisation E — Line Chart : Prix moyen par tranche de prix
+### Visualisation C — Métriques "Total produits" et "Prix moyen global"
 
-1. Créez une nouvelle visualisation **Line**
-2. Sous **Metrics** :
-   - Y-axis : Agrégation `Average`, Field `price`, Label `Prix moyen`
-3. Sous **Buckets** :
-   - **X-axis** : Agrégation `Histogram`, Field `price`, Minimum interval `100`
-4. Dans **Options**, activez **Show dots** et **Fill lines**
-5. Sauvegardez sous : `Line Chart - Prix moyen par tranche`
-
-### Visualisation F — Data Table : Top 20 produits les plus chers
-
-1. Créez une nouvelle visualisation **Data Table**
-2. Sous **Metrics** :
-   - Metric : `Max`, Field : `price`, Label : `Prix maximum (€)`
-3. Sous **Buckets** :
-   - **Split rows** : Agrégation `Terms`, Field `name.keyword`, Size `20`, Order `Descending by metric: Prix maximum`
-4. Sauvegardez sous : `Table - Top 20 produits chers`
-
-### Visualisation G — Coordinate Map : Emplacements des magasins
-
-> Cette visualisation utilise l'index `stores` qui doit être créé.
-
-1. Créez l'index pattern `stores` avec le champ de date `created_at`
-2. Créez une nouvelle visualisation **Coordinate Map** (ou **Maps**)
-3. Sous **Metrics** :
+1. Dans Lens, sélectionnez le type **Metric**
+2. Ajoutez une première métrique :
    - Agrégation : `Count`
-4. Sous **Buckets** :
-   - Agrégation : `Geohash`, Field : `location`, Precision : `3`
-5. Sauvegardez sous : `Map - Emplacements magasins`
+   - Label : `Total produits`
+3. Cliquez sur **Add layer** → **Add metric** pour ajouter une deuxième valeur :
+   - Champ : `price`, Agrégation : `Average`
+   - Label : `Prix moyen global`
+4. Titre : `KPIs produits`
+5. Sauvegardez sous : `Metric - KPIs produits`
+
+### Visualisation D — Data Table "Top 10 produits les plus chers"
+
+1. Dans Lens, sélectionnez le type **Table**
+2. Ajoutez une colonne de découpage (row) :
+   - Champ : `name.keyword`, Agrégation : `Top values`, Size : `10`
+   - Tri : par valeur de métrique décroissant
+3. Ajoutez une métrique :
+   - Champ : `price`, Agrégation : `Max`
+   - Label : `Prix maximum`
+4. Titre : `Top 10 produits les plus chers`
+5. Sauvegardez sous : `Table - Top 10 produits chers`
 
 ---
 
-## Exercice 4 — Assembler le tableau de bord complet
+## Exercice 4 — Assembler le dashboard "Product Analytics"
 
 ### 4.1 Créer le dashboard
 
 1. Dans le menu gauche, cliquez sur **Dashboard**
 2. Cliquez sur **Create dashboard**
-3. Cliquez sur **Add** (ou **Add an existing**) pour ajouter les visualisations
 
 ### 4.2 Ajouter les visualisations
 
-Ajoutez dans cet ordre :
-1. `Métrique - Nombre de produits`
-2. `Métrique - Prix moyen`
-3. `Camembert - Répartition catégories`
-4. `Bar Chart - Top 10 catégories`
-5. `Line Chart - Prix moyen par tranche`
-6. `Table - Top 20 produits chers`
-7. `Map - Emplacements magasins` (si disponible)
+Cliquez sur **Add** → **Add from library** et ajoutez :
+1. `Donut - Répartition par catégorie`
+2. `Bar - Prix moyen par catégorie`
+3. `Metric - KPIs produits`
+4. `Table - Top 10 produits chers`
 
-### 4.3 Organiser le layout
+### 4.3 Ajouter un Control interactif
 
-1. Faites glisser les panneaux pour les réorganiser
-2. Redimensionnez les visualisations en tirant le coin inférieur droit
-3. Disposition suggérée :
-   - Ligne 1 : Les 2 métriques côte à côte (petits panneaux)
-   - Ligne 2 : Camembert (gauche) + Bar Chart (droite)
-   - Ligne 3 : Line Chart (pleine largeur)
-   - Ligne 4 : Data Table + Map côte à côte
+1. Cliquez sur **Add** → **Add a panel** → **Controls**
+2. Choisissez **Options list**
+3. Configurez :
+   - Data view : `products`
+   - Field : `category.keyword`
+   - Label : `Filtrer par catégorie`
+4. Cliquez sur **Save and close**
 
-### 4.4 Configurer les filtres globaux
+### 4.4 Organiser le layout
 
-1. Cliquez sur **Add filter** dans la barre de filtres en haut
-2. Ajoutez un filtre : `category.keyword` `is` `Électronique`
-3. Observez que toutes les visualisations se mettent à jour simultanément
-4. Retirez le filtre pour revenir à la vue complète
+Disposition suggérée :
+- Ligne 1 : Metric KPIs (petite largeur, pleine hauteur réduite)
+- Ligne 2 : Donut (gauche, 50%) + Bar Chart (droite, 50%)
+- Ligne 3 : Data Table (pleine largeur)
 
-### 4.5 Configurer le sélecteur de plage temporelle
+Testez le Control "Filtrer par catégorie" — toutes les visualisations doivent se mettre à jour.
 
-1. En haut à droite, cliquez sur le sélecteur de plage temporelle
-2. Sélectionnez **Last 1 year**
-3. Activez le rafraîchissement automatique : **Every 30 seconds**
-4. Observez le comportement du dashboard
-
-### 4.6 Sauvegarder le dashboard
+### 4.5 Sauvegarder le dashboard
 
 1. Cliquez sur **Save** en haut à droite
-2. Nommez le dashboard : `Tableau de bord E-commerce`
-3. Cochez **Store time with dashboard** pour mémoriser la plage temporelle
-4. Cliquez sur **Save**
+2. Nommez le dashboard : `Product Analytics`
+3. Cliquez sur **Save**
 
 ---
 
-## TP Bonus — Import/Export d'objets sauvegardés
+## Exercice Bonus — Visualisations avancées
 
-### Exporter le dashboard
+### Bonus A — Line Chart "Produits indexés par mois"
 
-1. Allez dans **Management** → **Stack Management** → **Saved Objects**
-2. Cochez le dashboard `Tableau de bord E-commerce`
-3. Cliquez sur **Export**
-4. Choisissez **Include related objects** pour inclure toutes les visualisations
-5. Téléchargez le fichier `export.ndjson`
+1. Dans Lens, créez un graphique **Line**
+2. Axe X : champ date (`indexed_at` ou `created_at`) → agrégation `Date histogram`, interval `1 month`
+3. Axe Y : `Count`
+4. Titre : `Produits indexés par mois`
+5. Ajoutez au dashboard.
 
-### Importer un dashboard existant
+### Bonus B — Gauge "% produits en stock"
 
-1. Dans **Saved Objects**, cliquez sur **Import**
-2. Glissez-déposez le fichier `saved-objects-export.ndjson` fourni dans ce répertoire
-3. Choisissez **Automatically overwrite conflicts**
-4. Cliquez sur **Import**
-5. Vérifiez que les objets `products index pattern`, `Pie - Catégories (import)` et `Dashboard E-commerce (import)` apparaissent bien
-
-### Tester le dashboard importé
-
-1. Allez dans **Dashboard**
-2. Ouvrez `Dashboard E-commerce (import)`
-3. Vérifiez que la visualisation s'affiche correctement
+1. Dans Lens, créez un graphique **Gauge**
+2. Métrique : expression `Filters`
+   - Filtre A : `stock_quantity > 0` (label : `En stock`)
+   - Divisé par Count total pour obtenir un pourcentage
+3. Sinon : utilisez une métrique `Count` avec filtre KQL `stock_quantity > 0` et comparez manuellement
+4. Titre : `Produits en stock`
 
 ---
 
 ## Vérification finale
 
-A la fin de ce TP, vous devez avoir :
-
-- [ ] L'index pattern `products` créé avec le champ de date `created_at`
-- [ ] Une recherche sauvegardée dans Discover avec filtre KQL
-- [ ] 6 visualisations créées (Metric x2, Pie, Bar, Line, Table)
-- [ ] Un dashboard assemblé avec toutes les visualisations
-- [ ] Les filtres globaux testés
-- [ ] Le sélecteur de plage temporelle configuré
-- [ ] (Bonus) Import/export de saved objects réalisé
+- [ ] Data View `products` créée avec champ date (`indexed_at` ou `created_at`)
+- [ ] Filtres KQL testés dans Discover (catégorie, prix, texte)
+- [ ] Recherche Discover sauvegardée
+- [ ] Visualisation A : Donut "Répartition par catégorie" créée avec Lens
+- [ ] Visualisation B : Bar Chart "Prix moyen par catégorie" créée avec Lens
+- [ ] Visualisation C : Metric "Total produits" + "Prix moyen global" créée avec Lens
+- [ ] Visualisation D : Data Table "Top 10 produits les plus chers" créée avec Lens
+- [ ] Dashboard "Product Analytics" assemblé avec les 4 visualisations
+- [ ] Control Options List sur `category.keyword` ajouté et fonctionnel
+- [ ] (Bonus) Line Chart "Produits indexés par mois" créé et ajouté
+- [ ] (Bonus) Gauge ou Metric "% produits en stock" créé et ajouté
 
 ---
 
 ## Ressources
 
 - [Documentation OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/)
-- [Guide KQL (Kibana Query Language)](https://opensearch.org/docs/latest/dashboards/dql/)
-- [Types de visualisations](https://opensearch.org/docs/latest/dashboards/visualize/viz-index/)
+- [Guide KQL (Dashboards Query Language)](https://opensearch.org/docs/latest/dashboards/dql/)
+- [Lens — éditeur de visualisations](https://opensearch.org/docs/latest/dashboards/visualize/lens/)
+- [Controls dans les dashboards](https://opensearch.org/docs/latest/dashboards/controls/index/)
 
-*Passez au [TP13 — Reindex + ISM](../tp13-reindex-ism/README.md)*
+*Suite : [TP13 — ISM, Aliases & Snapshots](../tp13-reindex-ism/README.md)*

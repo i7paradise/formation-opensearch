@@ -1,0 +1,17 @@
+services:
+  data-prepper:
+    image: opensearchproject/data-prepper:latest
+    ports:
+      - "4900:4900"
+      - "2021:2021"
+    volumes:
+      - ./pipelines:/usr/share/data-prepper/pipelines
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx256m
+    networks:
+      - opensearch-net
+
+networks:
+  opensearch-net:
+    external: true
+    name: infrastructure_opensearch-net

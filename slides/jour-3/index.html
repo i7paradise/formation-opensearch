@@ -13,554 +13,2196 @@
 <div class="reveal">
 <div class="slides">
 
-<!-- SLIDE 1 : TITRE -->
+<!-- SLIDE 1 -->
 <section style="background:#2563eb;color:#fff;">
   <h1 style="font-size:2em;color:#fff;">Formation OpenSearch 3.6</h1>
-  <h2 style="font-size:1.2em;color:#bfdbfe;font-weight:400;">Jour 3 — Cluster, Administration &amp; Sécurité</h2>
-  <aside class="notes">Bienvenue pour la dernière journée ! Aujourd'hui on passe en mode production. 3 nœuds, haute disponibilité, et sécurité RBAC. C'est le jour le plus exigeant — mais aussi le plus gratifiant. Timing : 1 min.</aside>
+  <h2 style="font-size:1.2em;color:#bfdbfe;font-weight:400;">Jour 3 — Dashboards, Outils &amp; Cycle de vie</h2>
+  <p style="margin-top:2em;color:#dbeafe;">9h00 – 17h00</p>
+  <aside class="notes">Hier vous avez sécurisé votre cluster. Aujourd'hui vous allez faire parler vos données. Deux datasets : products (Jour 2) pour les dashboards, et SpaceX API pour les pipelines d'ingestion. C'est la journée la plus visuelle et la plus opérationnelle de la formation. Timing : 1 min.</aside>
 </section>
 
-<!-- SLIDE 2 : RÉCAP JOUR 2 -->
+<!-- SLIDE 2 -->
 <section>
-  <h2>☀️ Récap Jour 2 — 6 questions</h2>
-  <ol style="font-size:0.85em;">
-    <li>Quelle est la différence entre un ingest pipeline et un analyseur ?</li>
-    <li>Quel est l'ordre de la chaîne d'analyse ?</li>
-    <li>À quoi sert l'<code>asciifolding</code> ?</li>
-    <li>Comment tester un pipeline sans indexer de documents ?</li>
-    <li>Quel type de champ pour l'autocomplétion ?</li>
-    <li>Quelle visualisation Dashboards pour des données géographiques ?</li>
+  <h2>Récap Jour 2 — 6 questions</h2>
+  <ol style="font-size:0.85em;line-height:2;">
+    <li>Différence DLS vs FLS ?</li>
+    <li>Pourquoi changer d'analyseur impose <code>_reindex</code> ?</li>
+    <li>Formule quorum pour N nœuds master-eligible ?</li>
+    <li>Que fait <code>_reindex?wait_for_completion=false</code> ?</li>
+    <li>Différence <code>hash(_id)</code> vs custom routing ?</li>
+    <li>À quoi sert <code>index.default_pipeline</code> ?</li>
   </ol>
-  <aside class="notes">Réponses : 1) Pipeline : à l'indexation sur le document entier. Analyseur : lors de l'indexation ET de la recherche, sur un champ text. 2) Char Filter → Tokenizer → Token Filters. 3) Convertit les accents en ASCII (é→e, ç→c). 4) API _simulate. 5) type: completion. 6) Coordinate Map. Timing : 15 min.</aside>
+  <aside class="notes">Réponses : 1) DLS = filtrage au niveau des documents (certains docs invisibles), FLS = filtrage au niveau des champs (certains champs masqués dans un doc visible. 2) L'index inversé existant est déjà tokenisé selon l'ancien analyseur — il faut recréer l'index et réindexer tous les documents. 3) floor(N/2) + 1. Ex : 3 nœuds → quorum 2. 4) Lance la tâche en arrière-plan et retourne un task_id ; on peut suivre avec GET /_tasks/{id}. 5) hash(_id) distribue aléatoirement, custom routing force un shard cible — utile pour colocaliser des documents liés. 6) Applique automatiquement ce pipeline à chaque document indexé dans cet index. Timing : 10 min.</aside>
 </section>
 
-<!-- SLIDE 3 : PLAN DU JOUR 3 -->
+<!-- SLIDE 3 -->
 <section>
   <h2>Plan du Jour 3</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.82em;">
     <div style="background:#f8fafc;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
-      <strong>Matin</strong><br>
-      📖 Ch.6 : Configuration du Cluster<br>
-      🔧 TP6 : Cluster multi-nœuds<br>
-      📖 Ch.7 : Administration
+      <strong>Matin</strong><br><br>
+      📊 OpenSearch Dashboards complet<br>
+      &nbsp;&nbsp;→ <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a>, Lens, TSVB, Maps, Alerting<br>
+      🔧 TP12 — Dashboard Product Analytics<br><br>
+      📡 Data Prepper + SpaceX API<br>
+      🔧 TP14 — Ingestion SpaceX
     </div>
-    <div style="background:#f8fafc;border-left:4px solid #9333ea;padding:1em;border-radius:4px;">
-      <strong>Après-midi</strong><br>
-      📖 Ch.8 : Sécurité<br>
-      🔧 TP7 : Sécurisation<br>
-      🎯 Récap global + QCM<br>
-      🎉 Clôture
+    <div style="background:#f8fafc;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
+      <strong>Après-midi</strong><br><br>
+      🔄 Logstash TP Docker<br>
+      🔧 TP15 — Ingestion Logstash<br>
+      ♻️ ISM + Snapshots<br>
+      🔧 TP13 — Cycle de vie<br>
+      🤖 Anomaly Detection<br>
+      🔧 TP16 — Détection anomalies<br>
+      🏭 Prod Readiness<br>
+      🟥 [OPTIONNEL] Parent-Child
     </div>
   </div>
-  <aside class="notes">Timing : 2 min. Transition : "On commence par le cluster. Comment passer d'un seul nœud à un cluster haute disponibilité ?"</aside>
+  <aside class="notes">Donnez le plan global. Insistez sur le fil rouge : les données SpaceX vont traverser Data Prepper ET Logstash — on compare les deux approches sur le même dataset. Timing : 2 min.</aside>
 </section>
 
-<!-- SLIDE 4 : CH6 OPENER -->
+<!-- SLIDE 4 -->
 <section style="background:#2563eb;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 6</h2>
-  <h3 style="color:#bfdbfe;font-weight:400;">Configuration du Cluster</h3>
-  <p style="color:#dbeafe;font-style:italic;">"Et si votre serveur tombait en pleine vente flash ?"</p>
-  <p style="color:#93c5fd;font-size:0.85em;">Single point of failure → Cluster haute disponibilité</p>
-  <aside class="notes">Posez le problème : un seul nœud = si le serveur meurt, 0 disponibilité. Avec 3 nœuds + replicas, on peut perdre 1 nœud sans interruption. Timing : 30 secondes.</aside>
+  <h2 style="color:#fff;">OpenSearch Dashboards</h2>
+  <h3 style="color:#bfdbfe;font-weight:400;">Visualiser pour comprendre</h3>
+  <p style="color:#dbeafe;margin-top:1.5em;font-style:italic;">"Les données sans visualisation, c'est un livre sans images."</p>
+  <p style="color:#93c5fd;font-size:0.85em;margin-top:1em;">Discover · Visualize · Dashboard · Maps · Alerting</p>
+  <aside class="notes">Un slide d'introduction de section. Laissez la citation faire son effet. Timing : 1 min.</aside>
 </section>
 
-<!-- SLIDE 5 : RÔLES DES NŒUDS -->
+<!-- SLIDE 5 -->
 <section>
-  <h2>Rôles des nœuds</h2>
-  <div style="font-size:0.82em;">
-    <table>
-      <thead><tr><th>Rôle</th><th>Responsabilité</th><th>Recommandation</th></tr></thead>
+  <h2>Vue d'ensemble des outils Dashboards</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
+    <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+      <strong style="color:#2563eb;">Menu principal</strong>
+      <ul style="margin-top:0.5em;list-style:none;padding:0;">
+        <li>🔍 Discover</li>
+        <li>📊 Visualize</li>
+        <li>🗂️ Dashboard</li>
+        <li>⚙️ Dev Tools</li>
+      </ul>
+    </div>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+      <strong style="color:#16a34a;">Plugins additionnels</strong>
+      <ul style="margin-top:0.5em;list-style:none;padding:0;">
+        <li>🔔 Alerting</li>
+        <li>🤖 Anomaly Detection</li>
+        <li>📡 Observability</li>
+        <li>🛡️ Security Analytics</li>
+        <li>📓 Notebooks</li>
+        <li>🗺️ Maps</li>
+        <li>📄 Reporting</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">Faites un tour rapide de l'interface. Montrez le menu latéral gauche dans Dashboards si vous avez un accès live. Chaque plugin est un espace distinct. Timing : 3 min.</aside>
+</section>
+
+<!-- SLIDE 6 -->
+<section>
+  <h2>Index Patterns &amp; Data Views</h2>
+  <div style="font-size:0.85em;">
+    <p style="background:#eff6ff;border-left:4px solid #2563eb;padding:0.8em;border-radius:4px;">
+      <strong>Chemin :</strong> Stack Management → Data Views → Create data view
+    </p>
+    <table style="font-size:0.9em;margin-top:1em;">
+      <thead><tr><th>Paramètre</th><th>Valeur exemple</th><th>Effet</th></tr></thead>
       <tbody>
-        <tr><td><strong>master</strong></td><td>Gestion cluster state, élection</td><td>Dédié si &gt; 5 nœuds</td></tr>
-        <tr><td><strong>data</strong></td><td>Stockage, indexation, recherche</td><td>Le plus nombreux</td></tr>
-        <tr><td><strong>ingest</strong></td><td>Exécution des pipelines</td><td>Optionnel dédié</td></tr>
-        <tr><td><strong>coordinating</strong></td><td>Routing des requêtes</td><td>Tous les nœuds par défaut</td></tr>
+        <tr><td>Pattern</td><td><code>products</code></td><td>Cible l'index products</td></tr>
+        <tr><td>Pattern wildcard</td><td><code>spacex-*</code></td><td>Tous les index SpaceX</td></tr>
+        <tr><td>Time field</td><td><code>indexed_at</code></td><td>Active le sélecteur dates</td></tr>
+        <tr><td>Champs manquants</td><td><em>italic</em></td><td>Non mappés → ignorés dans aggs</td></tr>
       </tbody>
     </table>
-    <pre style="font-size:0.8em;margin-top:0.8em;"><code class="language-yaml"># opensearch.yml — rôles d'un nœud
-node.roles: [master, data, ingest]</code></pre>
+    <div style="background:#fef9c3;border-left:4px solid #ca8a04;padding:0.8em;margin-top:1em;border-radius:4px;font-size:0.9em;">
+      ⚠️ Les champs non mappés apparaissent en italique dans Discover — ils ne peuvent pas être utilisés dans des agrégations.
+    </div>
   </div>
-  <aside class="notes">
-    En petits clusters (3 nœuds de formation), chaque nœud joue tous les rôles. En production avec &gt; 5 nœuds, on dédie des nœuds master (3 au minimum) pour éviter qu'un nœud master surchargé cause des problèmes de cluster state. Timing : 8 min.
-  </aside>
+  <aside class="notes">Un Data View (anciennement Index Pattern) est la liaison entre Dashboards et vos données OpenSearch. Sans Data View, aucune visualisation n'est possible. Créez-en un pour 'products' et un pour 'spacex-*' dès le début du TP. Timing : 4 min.</aside>
 </section>
 
-<!-- SLIDE 6 : DISCOVERY ET QUORUM -->
+<!-- SLIDE 7 -->
 <section>
-  <h2>Discovery &amp; Quorum — Éviter le split-brain</h2>
-  <pre style="font-size:0.65em;"><code class="language-yaml"># opensearch.yml
-cluster.initial_master_nodes:
-  - "opensearch-node1"
-  - "opensearch-node2"
-  - "opensearch-node3"
+  <h2>Discover — explorer et filtrer</h2>
+  <div style="display:flex;gap:1.5em;align-items:flex-start;font-size:0.82em;">
+    <div style="flex:0 0 auto;">
+      <p style="font-weight:600;color:#2563eb;margin-bottom:0.5em;">Zones de l'interface :</p>
+      <ul style="line-height:1.7;margin:0;list-style:none;padding:0;">
+        <li><strong>(A)</strong> Menu application — créer / sauvegarder des filtres</li>
+        <li><strong>(B)</strong> Sélecteur de champs — colonnes affichées</li>
+        <li><strong>(C)</strong> Filtre temporel — plage relative ou absolue</li>
+        <li><strong>(D)</strong> Barre de recherche — requête <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> / Lucene</li>
+        <li><strong>(E)</strong> Outil de filtres — raccourcis fréquents</li>
+        <li><strong>(F)</strong> Plage de dates — échelle de la timeline</li>
+        <li><strong>(G)</strong> Histogramme — documents par intervalle</li>
+        <li><strong>(H)</strong> Tableau de résultats — expandable, JSON view</li>
+      </ul>
+    </div>
+    <div style="flex:1 1 auto;text-align:center;">
+      <img src="https://docs.opensearch.org/latest/images/dashboards/discover-app-panel-callouts.png"
+           alt="Discover interface callouts"
+           style="max-width:100%;max-height:420px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);" />
+    </div>
+  </div>
+  <div style="background:#eff6ff;padding:0.7em;border-radius:4px;margin-top:0.8em;font-size:0.82em;">
+    💡 <strong>Tips :</strong> clic sur une valeur → filtre +/- instantané · Export CSV depuis le menu Reporting
+  </div>
+  <aside class="notes">Montrez en live si possible : ouvrez Discover, sélectionnez le Data View products, tapez une requête DQL simple, cliquez sur un champ pour l'ajouter en colonne. Les apprenants répliqueront dans TP12. Timing : 5 min.</aside>
+</section>
 
-discovery.seed_hosts:
-  - "opensearch-node1:9300"
-  - "opensearch-node2:9300"
-  - "opensearch-node3:9300"</code></pre>
-  <div style="font-size:0.8em;margin-top:0.8em;">
-    <p><strong>Quorum</strong> = ⌊N/2⌋ + 1</p>
+<!-- SLIDE 8 -->
+<section>
+  <h2><a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> — Dashboards Query Language (basics)</h2>
+  <pre><code class="language-json">// Égalité sur keyword
+category.keyword: "Electronics"
+
+// Plage numérique
+price >= 100 and stock > 0
+
+// Wildcard (attention aux perfs)
+name: *running*
+
+// Négation
+not in_stock: false
+
+// Combinaisons
+(category.keyword: "Books" or category.keyword: "Music") and price < 50</code></pre>
+  <div style="font-size:0.8em;background:#f8fafc;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+    <strong><a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> vs Lucene :</strong> DQL = syntaxe lisible, pas de scoring, autocomplétion dans Dashboards. Lucene = requête full-text avec scoring, opérateurs booléens (+/-).
+  </div>
+  <aside class="notes">DQL est le langage par défaut dans Discover et les vizzes. Il est plus simple que Lucene : pas de scoring, pas de guillemets obligatoires pour les mots simples. Le toggle 'DQL/Lucene' se trouve à gauche de la barre de recherche. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 9 -->
+<section>
+  <h2><a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> avancé — nested, ranges, wildcards</h2>
+  <pre><code class="language-json">// Champ imbriqué (nested ou objet)
+attributes.color: "red"
+
+// Plage de valeurs
+price >= 50 and price <= 200
+
+// Wildcard milieu de chaîne
+name: *pro*
+
+// Wildcard début de chaîne (plus lent)
+name: *book
+
+// Filtre sur date
+indexed_at >= "2024-01-01" and indexed_at <= "2024-12-31"</code></pre>
+  <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.8em;border-radius:4px;font-size:0.82em;margin-top:0.8em;">
+    ⚠️ Wildcard en début/milieu de chaîne est lent sur haute cardinalité. Pour regex complexes → utilisez Lucene Query String en passant le toggle DQL → Lucene.
+  </div>
+  <aside class="notes">Les wildcards leading (commençant par *) sont les plus coûteux car OpenSearch doit scanner tous les termes de l'index inversé. En production, évitez-les sur des champs à forte cardinalité comme les IDs ou les descriptions. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 10 -->
+<section>
+  <h2>Agrégations dans les visualisations</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;margin-bottom:1em;">
+    <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+      <strong style="color:#2563eb;">Métriques (Y-axis)</strong>
+      <ul style="margin-top:0.5em;">
+        <li>Count</li>
+        <li>Avg</li>
+        <li>Max / Min</li>
+        <li>Sum</li>
+        <li>Unique Count (cardinality)</li>
+      </ul>
+    </div>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+      <strong style="color:#16a34a;">Buckets (X-axis)</strong>
+      <ul style="margin-top:0.5em;">
+        <li>Terms</li>
+        <li>Date Histogram</li>
+        <li>Range</li>
+        <li>Histogram</li>
+        <li>Filters</li>
+      </ul>
+    </div>
+  </div>
+  <table style="font-size:0.75em;">
+    <thead><tr><th>Viz</th><th>Métrique typique</th><th>Bucket typique</th></tr></thead>
+    <tbody>
+      <tr><td>Bar chart</td><td>Count / Avg</td><td>Terms</td></tr>
+      <tr><td>Pie chart</td><td>Count</td><td>Terms (5)</td></tr>
+      <tr><td>Line / Area</td><td>Count / Sum</td><td>Date Histogram</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">Règle d'or : chaque visualisation = 1 métrique (ce qu'on mesure) + 1 ou plusieurs buckets (comment on segmente). Les métriques répondent à "combien ?" et les buckets répondent à "par quoi ?". Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 11 -->
+<section>
+  <h2>Terms → Pie chart &amp; Bar chart</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#2563eb;">Lens — drag &amp; drop :</p>
+    <pre><code class="language-json">// Equivalent DSL derrière le viz
+{
+  "aggs": {
+    "par_categorie": {
+      "terms": {
+        "field": "category.keyword",
+        "size": 5,
+        "order": { "_count": "desc" }
+      }
+    }
+  }
+}</code></pre>
+    <div style="background:#eff6ff;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      <strong>Dans Lens :</strong> glissez <code>category.keyword</code> dans "Slice by" → choisissez Pie. Size=5 = Top 5 catégories par count.
+    </div>
+    <div style="background:#dcfce7;padding:0.6em;border-radius:4px;margin-top:0.6em;font-size:0.9em;">
+      💡 Cas d'usage : "Répartition des produits par catégorie"
+    </div>
+  </div>
+  <aside class="notes">Le type Terms est le plus utilisé dans les dashboards produit. Il répond à "qui est en tête ?" ou "quelle est la distribution ?". Taille 5-10 max pour la lisibilité. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 12 -->
+<section>
+  <h2>Avg / Max / Sum → Metric &amp; Gauge &amp; Bar</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;margin-bottom:1em;">
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong>Avg price</strong><br>→ Metric KPI<br><code style="font-size:0.8em;">average(price)</code>
+      </div>
+      <div style="background:#fef3c7;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong>Max price</strong><br>→ Gauge<br><code style="font-size:0.8em;">max(price)</code>
+      </div>
+      <div style="background:#f0fdf4;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong>Sum stock</strong><br>→ Bar / catégorie<br><code style="font-size:0.8em;">sum(stock)</code>
+      </div>
+    </div>
+    <p style="font-weight:600;color:#2563eb;">Formule Lens avancée :</p>
+    <pre><code class="language-json">// % du prix moyen par rapport au max
+average(price) / max(price) * 100</code></pre>
+    <div style="background:#dcfce7;padding:0.6em;border-radius:4px;font-size:0.9em;">
+      💡 Cas d'usage : "Prix moyen par catégorie" — Bar chart avec Terms bucket sur category.keyword
+    </div>
+  </div>
+  <aside class="notes">Les métriques simples (Metric, Gauge, Goal) sont parfaites pour les KPIs en haut d'un dashboard. Les formules Lens permettent de combiner plusieurs métriques sans écrire de DSL. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 13 -->
+<section>
+  <h2>Date Histogram → Line chart &amp; Area</h2>
+  <pre><code class="language-json">// DSL équivalent
+{
+  "aggs": {
+    "par_mois": {
+      "date_histogram": {
+        "field": "indexed_at",
+        "calendar_interval": "month",
+        "min_doc_count": 0
+      }
+    }
+  }
+}</code></pre>
+  <div style="font-size:0.85em;margin-top:1em;">
+    <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+      <strong>Astuce Lens :</strong> ajoutez une 2ème couche avec <code>category.keyword</code> en "Break down by" → Area chart empilé par catégorie.<br>
+      <code>min_doc_count: 0</code> → affiche les mois vides (évite les gaps dans la courbe).
+    </div>
+    <div style="background:#dcfce7;padding:0.6em;border-radius:4px;margin-top:0.6em;font-size:0.9em;">
+      💡 Cas d'usage : "Volume d'indexation dans le temps"
+    </div>
+  </div>
+  <aside class="notes">Le Date Histogram est incontournable pour les données temporelles. L'intervalle calendar vs fixed : calendar tient compte des mois de longueur variable (28/29/30/31 jours), fixed utilise une durée fixe (7d = toujours 7 jours). Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 14 -->
+<section>
+  <h2>Visualize Library — tour complet</h2>
+  <div style="font-size:0.78em;">
     <table>
+      <thead><tr><th>Catégorie</th><th>Types disponibles</th><th>Usage principal</th></tr></thead>
       <tbody>
-        <tr><td>3 nœuds master-eligible</td><td>Quorum = 2 — perd 1 nœud ✅</td></tr>
-        <tr><td>2 nœuds master-eligible</td><td>Quorum = 2 — perd 0 nœud ❌ (split-brain !)</td></tr>
-        <tr><td>5 nœuds master-eligible</td><td>Quorum = 3 — perd 2 nœuds ✅</td></tr>
+        <tr><td><strong>Comparaison</strong></td><td>Vertical Bar, Horizontal Bar</td><td>Comparer des valeurs entre catégories</td></tr>
+        <tr><td><strong>Évolution</strong></td><td>Line, Area</td><td>Tendances temporelles</td></tr>
+        <tr><td><strong>Proportion</strong></td><td>Pie, Donut, Treemap, Waffle</td><td>Parts relatives d'un tout</td></tr>
+        <tr><td><strong>Valeur</strong></td><td>Metric, Gauge, Goal</td><td>KPI, indicateurs</td></tr>
+        <tr><td><strong>Tableau</strong></td><td>Data Table</td><td>Top N, détail</td></tr>
+        <tr><td><strong>Distribution</strong></td><td>Heatmap, Tag Cloud</td><td>Densité, fréquence</td></tr>
+        <tr><td><strong>Spéciaux</strong></td><td>Lens, TSVB, Vega, Maps</td><td>Besoins avancés</td></tr>
       </tbody>
     </table>
-    <p style="color:#ea580c;font-weight:600;">⚠️ JAMAIS 2 nœuds master-eligible — risque de split-brain !</p>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.7em;border-radius:4px;margin-top:0.8em;">
+      💡 Règle : choisissez le type selon la question, pas selon l'esthétique.
+    </div>
   </div>
-  <aside class="notes">
-    Le split-brain : si le réseau se partitionne en 2 groupes de 1 nœud chacun (avec 2 nœuds master-eligible), les deux groupes pensent être le master. On se retrouve avec 2 clusters qui divergent. Avec 3 nœuds, même si 1 est isolé, les 2 autres forment un quorum et continuent. cluster.initial_master_nodes n'est utilisé qu'AU PREMIER DÉMARRAGE du cluster — à retirer ensuite ! Timing : 10 min.
-  </aside>
+  <aside class="notes">Faites le tour rapide. La règle du "choose for the question" est importante : un pie avec 15 catégories est illisible — utilisez plutôt une Data Table ou limitez à Top 5. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 7 : SHARDS ET ROUTING -->
+<!-- SLIDE 15 -->
 <section>
-  <h2>Shards — Stratégie de sizing</h2>
-  <div style="font-size:0.82em;">
+  <h2>Lens — créer des visualisations drag &amp; drop</h2>
+  <div style="font-size:0.85em;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;">
       <div>
-        <p><strong>Primary Shards</strong> ⚠️</p>
-        <ul>
-          <li>Fixés à la création (immuable !)</li>
-          <li>Règle : 10–50 GB par shard</li>
-          <li>Formule : total_size / 30 GB</li>
-          <li>Trop de petits shards = overhead</li>
-        </ul>
+        <p style="font-weight:600;color:#2563eb;">Workflow Lens :</p>
+        <ol style="line-height:1.8;">
+          <li>Panneau gauche → champs disponibles</li>
+          <li>Glisser vers zone X / Y / Color / Size</li>
+          <li>Lens suggère automatiquement le meilleur viz</li>
+          <li>Changer le type en 1 clic (barre → ligne → donut)</li>
+          <li>Ajouter une 2ème couche (multi-series)</li>
+        </ol>
       </div>
       <div>
-        <p><strong>Replica Shards</strong> 🔄</p>
-        <ul>
-          <li>Modifiables à tout moment</li>
-          <li>1 replica minimum en prod</li>
-          <li>Augmente la disponibilité et les lectures</li>
-          <li>Replica ≠ backup (suppression = sur toutes)</li>
+        <p style="font-weight:600;color:#7c3aed;">Formules avancées :</p>
+        <pre style="font-size:0.75em;"><code class="language-json">// % du total
+count() / overall_sum(count()) * 100
+
+// Ratio de deux métriques
+sum(revenue) / count()
+
+// Moving average
+moving_average(count(), window: 7)</code></pre>
+      </div>
+    </div>
+    <div style="background:#dcfce7;padding:0.7em;border-radius:4px;margin-top:0.8em;font-size:0.9em;">
+      ✅ Mode recommandé pour les apprenants — plus intuitif que l'ancien mode Aggregation.
+    </div>
+  </div>
+  <aside class="notes">Lens remplace progressivement l'ancien éditeur d'agrégations. Il est plus rapide, plus intuitif, et les formules permettent des calculs complexes sans écrire de DSL. Encouragez les apprenants à l'utiliser dans TP12. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 16 -->
+<section>
+  <h2>TSVB — séries temporelles avancées</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#2563eb;">Time Series Visual Builder — capacités :</p>
+    <ul style="line-height:1.9;">
+      <li><strong>Math entre séries :</strong> <code>series_a / series_b * 100</code> → taux de conversion</li>
+      <li><strong>Décalage temporel :</strong> <code>Offset: 1w</code> → comparer cette semaine vs la semaine précédente</li>
+      <li><strong>Annotations :</strong> marquer des événements sur la timeline (releases, incidents)</li>
+      <li><strong>Moving average / Percentile</strong> — built-in, sans formule</li>
+    </ul>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      <strong>Cas d'usage :</strong> rates (req/s), ratios (succès/total), comparaisons temporelles. TSVB excelle là où Lens atteint ses limites.
+    </div>
+  </div>
+  <aside class="notes">TSVB est puissant mais plus complexe que Lens. À utiliser quand on a besoin de comparer deux séries, de calculer des taux, ou d'ajouter des annotations d'événements sur une courbe temporelle. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 17 -->
+<section>
+  <h2>Canvas &amp; Notebooks</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
+    <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+      <p style="font-weight:600;color:#2563eb;">Canvas</p>
+      <ul style="line-height:1.7;">
+        <li>Layout pixel-perfect avec CSS</li>
+        <li>Idéal pour écrans TV / NOC</li>
+        <li>Fond personnalisé, images, logos</li>
+        <li>Expressions Canvas pour les données</li>
+        <li>Exportable en PDF haute qualité</li>
+      </ul>
+    </div>
+    <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
+      <p style="font-weight:600;color:#7c3aed;">Notebooks (Jupyter-inspired)</p>
+      <ul style="line-height:1.7;">
+        <li>Markdown + requêtes DSL + vizzes</li>
+        <li>Document narratif reproductible</li>
+        <li>Partager des analyses avec contexte</li>
+        <li>Idéal pour rapports d'investigation</li>
+        <li>Exportable en PDF / HTML</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">Canvas est le "PowerPoint" d'OpenSearch — très visuel mais plus complexe à maintenir. Les Notebooks sont parfaits pour les analyses ponctuelles où on veut documenter le raisonnement en même temps que les données. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 18 -->
+<section>
+  <h2>Maps — géovisualisation</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#2563eb;">Types de couches (layers) :</p>
+    <ul style="line-height:1.9;">
+      <li><strong>Documents layer :</strong> points <code>geo_point</code> sur la carte</li>
+      <li><strong>Clusters layer :</strong> aggrégation géographique (geo_tile_grid)</li>
+      <li><strong>Choropleth :</strong> coloration de régions selon une valeur</li>
+      <li><strong>EMS Boundaries :</strong> frontières pays/régions depuis Elastic Maps Service</li>
+    </ul>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      ⚠️ Prérequis : champ mappé <code>type: "geo_point"</code> dans le mapping.<br>
+      Le filtrage géographique est interactif : dessinez une zone → filtre toutes les vizzes du dashboard.
+    </div>
+    <div style="background:#dcfce7;padding:0.6em;border-radius:4px;margin-top:0.6em;font-size:0.9em;">
+      💡 Cas d'usage : emplacements d'entrepôts, chaleur des ventes par région, sites de lancement SpaceX
+    </div>
+  </div>
+  <aside class="notes">Maps est particulièrement utile pour les données logistiques, météorologiques ou IoT. Pour les données SpaceX, les launchpads ont des coordonnées GPS — on pourrait les afficher sur une carte. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 19 -->
+<section>
+  <h2>Alerting — moniteurs et actions</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#2563eb;">Flux d'alerte :</p>
+    <div style="display:flex;align-items:center;gap:0.5em;margin-bottom:1em;font-size:0.9em;">
+      <div style="background:#eff6ff;padding:0.6em 1em;border-radius:4px;border:2px solid #2563eb;">Monitor<br><small>(requête périodique)</small></div>
+      <span>→</span>
+      <div style="background:#fef3c7;padding:0.6em 1em;border-radius:4px;border:2px solid #d97706;">Condition<br><small>(seuil)</small></div>
+      <span>→</span>
+      <div style="background:#fce7f3;padding:0.6em 1em;border-radius:4px;border:2px solid #db2777;">Action<br><small>(notification)</small></div>
+    </div>
+    <table style="font-size:0.85em;">
+      <thead><tr><th>Type de monitor</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Per query</td><td>Agrégation globale (ex: avg price)</td></tr>
+        <tr><td>Per bucket</td><td>Par groupe (ex: par catégorie)</td></tr>
+        <tr><td>Per cluster metrics</td><td>CPU, disk, JVM du cluster</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:0.8em;font-size:0.9em;"><strong>Actions :</strong> Webhook · Email · Slack · AWS SNS · PagerDuty · Jira</p>
+    <div style="background:#dcfce7;padding:0.6em;border-radius:4px;margin-top:0.6em;font-size:0.9em;">
+      💡 Exemple : alerte si <code>avg(price)</code> chute de plus de 20% en 1h
+    </div>
+  </div>
+  <aside class="notes">Alerting est le système de surveillance natif d'OpenSearch. Les webhooks permettent de s'intégrer avec n'importe quel système externe. On verra l'intégration avec Anomaly Detection plus tard dans la journée. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 20 -->
+<section>
+  <h2>Construire et partager un dashboard</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:1em;">
+      <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+        <strong>Composants :</strong>
+        <ul style="line-height:1.7;margin-top:0.4em;">
+          <li>Visualisations sauvegardées</li>
+          <li>Panneau Markdown (texte, titre)</li>
+          <li>Controls : Options List (dropdown)</li>
+          <li>Controls : Range Slider (numérique)</li>
+        </ul>
+      </div>
+      <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+        <strong>Interaction :</strong>
+        <ul style="line-height:1.7;margin-top:0.4em;">
+          <li>Clic valeur → filtre toutes les vizzes</li>
+          <li>Drill-down vers une URL externe</li>
+          <li>Time range global partagé</li>
+          <li>Refresh automatique configurable</li>
         </ul>
       </div>
     </div>
-    <pre style="font-size:0.8em;margin-top:0.5em;"><code class="language-bash"># Routing : hash(_id) % number_of_primary_shards
-# Routing personnalisé
-PUT /products/_doc/1?routing=category_electronics
-{ "name": "iPhone", "category": "Électronique" }</code></pre>
+    <p style="font-weight:600;color:#2563eb;">Partager :</p>
+    <ul style="line-height:1.7;">
+      <li><strong>URL directe</strong> avec filtres encodés</li>
+      <li><strong>Iframe embed</strong> dans une appli web</li>
+      <li><strong>PDF/PNG export</strong> via Reporting plugin</li>
+      <li><strong>Saved Objects</strong> : JSON import/export pour versionner</li>
+    </ul>
   </div>
-  <aside class="notes">
-    Le fait que primary shards soit immuable est la source de NOMBREUSES erreurs de débutants. Si on crée un index avec 1 shard et qu'il grossit à 500 GB, il faut absolument reindexer. Règle de formation : "Planifiez en pensant à la taille dans 2 ans." Timing : 8 min.
-  </aside>
+  <aside class="notes">Un dashboard bien construit est une interface de dialogue entre les données et les décideurs. Les Controls (dropdown + slider) permettent aux utilisateurs de filtrer sans toucher à DQL. Le partage par URL est très pratique pour collaborer. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 8 : ALIASES ET TEMPLATES -->
+<!-- SLIDE 21 -->
 <section>
-  <h2>Aliases &amp; Index Templates</h2>
-  <pre style="font-size:0.6em;"><code class="language-json">// Basculement sans downtime (atomique)
-POST /_aliases
-{
-  "actions": [
-    { "remove": { "index": "products-v1", "alias": "products" } },
-    { "add":    { "index": "products-v2", "alias": "products" } }
-  ]
+  <h2>TP12 — Dashboard "Product Analytics"</h2>
+  <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:1em;border-radius:4px;font-size:0.85em;">
+    <p><strong>📁 labs/tp12-dashboards/README.md</strong> — Durée : 40 min</p>
+    <p style="font-weight:600;margin-top:0.8em;">Étapes :</p>
+    <ol style="line-height:1.8;">
+      <li>Créer le Data View <code>products</code></li>
+      <li>Discover + <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> : filtrer électronique prix &gt; 50</li>
+      <li>Lens Donut : répartition par catégorie (Top 5)</li>
+      <li>Lens Bar : prix moyen par catégorie</li>
+      <li>Metric : nombre total + prix moyen global</li>
+      <li>Data Table : top 10 produits les plus chers</li>
+      <li>Assembler le dashboard + Controls (catégorie)</li>
+    </ol>
+    <p style="margin-top:0.8em;color:#166534;"><strong>Bonus :</strong> Line chart indexation par mois + Gauge % produits en stock</p>
+  </div>
+  <aside class="notes">C'est le TP le plus long du matin — 40 min. Circulez dans la salle. Les blocages fréquents : Data View mal configuré (time field manquant), champ keyword vs text pour Terms agg, formuler les formules Lens. Timing : 40 min TP.</aside>
+</section>
+
+<!-- SLIDE 22 -->
+<section style="background:#ea580c;color:#fff;">
+  <h2 style="color:#fff;">Écosystème collecteurs</h2>
+  <h3 style="color:#fed7aa;font-weight:400;">Les données viennent de partout</h3>
+  <p style="color:#ffedd5;margin-top:1.5em;font-style:italic;">"OpenSearch est le moteur. Logstash, Data Prepper et Fluent Bit sont les tuyaux."</p>
+  <aside class="notes">Transition après le TP12. Maintenant qu'on sait visualiser, il faut savoir comment faire arriver les données dans OpenSearch depuis le monde réel. Timing : 1 min.</aside>
+</section>
+
+<!-- SLIDE 23 -->
+<section>
+  <h2>Vue d'ensemble des collecteurs</h2>
+  <div style="font-size:0.85em;">
+    <ul style="list-style:none;padding:0;line-height:2.2;">
+      <li style="background:#eff6ff;padding:0.6em;border-radius:4px;margin-bottom:0.4em;">
+        <strong style="color:#2563eb;">Logstash</strong> — ETL mature, 200+ plugins, JVM, DSL config (Ruby). Migration de données, transformations complexes.
+      </li>
+      <li style="background:#fff7ed;padding:0.6em;border-radius:4px;margin-bottom:0.4em;">
+        <strong style="color:#ea580c;">Data Prepper</strong> — OpenSearch-native, YAML, OpenTelemetry, container-first. Observabilité moderne.
+      </li>
+      <li style="background:#f0fdf4;padding:0.6em;border-radius:4px;margin-bottom:0.4em;">
+        <strong style="color:#16a34a;">Fluent Bit</strong> — &lt;450KB, C, zéro dépendance, DaemonSet Kubernetes. Edge et conteneurs.
+      </li>
+      <li style="background:#faf5ff;padding:0.6em;border-radius:4px;">
+        <strong style="color:#7c3aed;">Beats</strong> — Filebeat/Metricbeat/Packetbeat, agents légers Go. Collecte ciblée par protocole.
+      </li>
+    </ul>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.6em;border-radius:4px;margin-top:0.8em;">
+      💡 Pas de silver bullet — choisissez selon votre contexte d'infrastructure.
+    </div>
+  </div>
+  <aside class="notes">Les 4 grandes familles de collecteurs. En pratique dans les grandes organisations, on en voit souvent 2 ou 3 coexister : Fluent Bit pour les logs K8s, Logstash pour les migrations, Data Prepper pour l'observabilité OTEL. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 24 -->
+<section>
+  <h2>Comparatif collecteurs</h2>
+  <div style="font-size:0.75em;">
+    <table>
+      <thead><tr><th>Critère</th><th style="color:#2563eb;">Logstash</th><th style="color:#ea580c;">Data Prepper</th><th style="color:#16a34a;">Fluent Bit</th></tr></thead>
+      <tbody>
+        <tr><td>Maturité</td><td style="background:#dcfce7;">Très mature (2009)</td><td style="background:#fef3c7;">Récent (2021)</td><td style="background:#dcfce7;">Mature (2014)</td></tr>
+        <tr><td>Nb plugins</td><td style="background:#dcfce7;">200+</td><td style="background:#fef3c7;">~30</td><td style="background:#dcfce7;">80+</td></tr>
+        <tr><td>Config</td><td>DSL Ruby</td><td>YAML</td><td>TOML/YAML</td></tr>
+        <tr><td>Cas d'usage</td><td>Migrations ETL</td><td>Observabilité OTEL</td><td>Edge / K8s</td></tr>
+        <tr><td>Perf / RAM</td><td style="background:#fee2e2;">JVM, 1-4GB</td><td style="background:#fef3c7;">JVM, 512MB+</td><td style="background:#dcfce7;">&lt;450KB, C</td></tr>
+        <tr><td>Déploiement</td><td>VM / Container</td><td>Container-first</td><td>DaemonSet K8s</td></tr>
+        <tr><td>OpenTelemetry</td><td style="background:#fef3c7;">Plugin externe</td><td style="background:#dcfce7;">Natif</td><td style="background:#fef3c7;">Via plugin</td></tr>
+      </tbody>
+    </table>
+    <div style="background:#eff6ff;padding:0.6em;border-radius:4px;margin-top:0.8em;">
+      <strong>Conclusion :</strong> Logstash = migrations · Data Prepper = observabilité OTEL · Fluent Bit = edge/K8s
+    </div>
+  </div>
+  <aside class="notes">Ce tableau comparatif est à garder comme référence. En interview ou en architecture review, être capable de justifier ce choix est une compétence clé. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 25 -->
+<section>
+  <h2>Data Prepper — architecture</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:flex;align-items:center;gap:0.8em;margin-bottom:1em;font-size:0.9em;">
+      <div style="background:#fff7ed;padding:0.8em 1.2em;border-radius:4px;border:2px solid #ea580c;text-align:center;">
+        <strong>Source</strong><br><small>http / otel / file / s3</small>
+      </div>
+      <span style="font-size:1.5em;">→</span>
+      <div style="background:#fff7ed;padding:0.8em 1.2em;border-radius:4px;border:2px solid #ea580c;text-align:center;">
+        <strong>Buffer</strong><br><small>in-memory / on-disk</small>
+      </div>
+      <span style="font-size:1.5em;">→</span>
+      <div style="background:#fff7ed;padding:0.8em 1.2em;border-radius:4px;border:2px solid #ea580c;text-align:center;">
+        <strong>Processors</strong><br><small>grok · date · mutate</small>
+      </div>
+      <span style="font-size:1.5em;">→</span>
+      <div style="background:#fff7ed;padding:0.8em 1.2em;border-radius:4px;border:2px solid #ea580c;text-align:center;">
+        <strong>Sink</strong><br><small>opensearch / stdout</small>
+      </div>
+    </div>
+    <p style="font-weight:600;color:#ea580c;">Un pipeline = un fichier YAML</p>
+    <table style="font-size:0.85em;margin-top:0.5em;">
+      <thead><tr><th>Data Prepper</th><th>Logstash équivalent</th></tr></thead>
+      <tbody>
+        <tr><td>source</td><td>input { }</td></tr>
+        <tr><td>processor</td><td>filter { }</td></tr>
+        <tr><td>sink</td><td>output { }</td></tr>
+        <tr><td>buffer</td><td>queue (PQ)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">Data Prepper adopte une architecture similaire à Logstash mais en YAML. Le buffer joue le rôle de queue intermédiaire entre la source et le processor — en cas de pic de charge, les messages s'accumulent sans perte. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 26 -->
+<section>
+  <h2>Data Prepper — installation Docker</h2>
+  <pre><code class="language-bash"># Lancer Data Prepper avec Docker
+docker run -d \
+  --name data-prepper \
+  -p 4900:4900 \
+  -p 2021:2021 \
+  -v $(pwd)/pipelines:/usr/share/data-prepper/pipelines \
+  -v $(pwd)/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml \
+  opensearchproject/data-prepper:latest
+
+# Vérifier le démarrage
+docker logs data-prepper -f
+
+# Port 4900 = management API (health, metrics, list)
+# Port 2021 = HTTP source (endpoint d'ingestion)</code></pre>
+  <div style="font-size:0.82em;background:#fff7ed;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+    <strong>data-prepper-config.yaml minimal :</strong>
+    <pre style="font-size:0.9em;margin:0.4em 0 0;"><code class="language-yaml">ssl: false</code></pre>
+  </div>
+  <aside class="notes">Dans le TP, Data Prepper sera dans le docker-compose avec le reste de la stack. Les ports importants : 4900 pour la gestion (health check, métriques Prometheus, liste des pipelines), 2021 pour recevoir des données via HTTP POST. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 27 -->
+<section>
+  <h2>Data Prepper — structure du pipeline YAML</h2>
+  <pre><code class="language-yaml">spacex-pipeline:                    # Nom du pipeline
+  source:
+    http:                           # Source : HTTP POST sur port 2021
+      port: 2021
+      path: /log/ingest
+
+  buffer:
+    bounded_blocking:               # Buffer in-memory avec limite
+      buffer_size: 1024
+      batch_size: 256
+
+  processor:                        # Chaîne de transformations
+    - date:
+        from_time_received: true
+        destination: "@timestamp"
+    - mutate_event:
+        add_entries:
+          - key: source
+            value: spacex-api
+
+  sink:                             # Destination
+    - opensearch:
+        hosts: ["https://opensearch-node1:9200"]
+        index: spacex-launches
+        username: admin
+        password: "${OS_PASSWORD}"
+        insecure: true</code></pre>
+  <aside class="notes">Lisez le YAML ligne par ligne avec les apprenants. Insistez sur la structure hiérarchique : pipeline-name → sections source/buffer/processor/sink. La variable ${OS_PASSWORD} est injectée via les variables d'environnement Docker. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 28 -->
+<section>
+  <h2>Data Prepper — Sources disponibles</h2>
+  <div style="font-size:0.85em;">
+    <table>
+      <thead><tr><th>Source</th><th>Description</th><th>Port défaut</th></tr></thead>
+      <tbody>
+        <tr><td><strong>http</strong></td><td>Webhook — JSON POST REST</td><td>2021</td></tr>
+        <tr><td><strong>otel_logs_source</strong></td><td>Logs OpenTelemetry (OTLP)</td><td>21892</td></tr>
+        <tr><td><strong>otel_trace_source</strong></td><td>Traces distribuées OTEL</td><td>21890</td></tr>
+        <tr><td><strong>otel_metrics_source</strong></td><td>Métriques OTEL</td><td>21891</td></tr>
+        <tr><td><strong>file</strong></td><td>Fichier JSON / NDJSON local</td><td>—</td></tr>
+        <tr><td><strong>s3</strong></td><td>Objets S3 (SQS notification)</td><td>—</td></tr>
+        <tr><td><strong>kafka</strong></td><td>Topic Kafka consumer</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div style="background:#fff7ed;border-left:4px solid #ea580c;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      💡 Pour l'API SpaceX : source <strong>http</strong> (on POST les données) ou source <strong>file</strong> (fichier NDJSON téléchargé).
+    </div>
+  </div>
+  <aside class="notes">La source http est la plus simple à tester : n'importe quel curl peut envoyer des données. Les sources OTEL sont conçues pour les agents d'instrumentation Java/Python/Go compatibles OpenTelemetry. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 29 -->
+<section>
+  <h2>Data Prepper — Processors</h2>
+  <div style="font-size:0.85em;">
+    <table style="font-size:0.85em;">
+      <thead><tr><th>Processor</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>grok</code></td><td>Parser des logs non structurés avec patterns nommés</td></tr>
+        <tr><td><code>date</code></td><td>Parser un champ date → <code>@timestamp</code></td></tr>
+        <tr><td><code>drop_events</code></td><td>Filtrer / supprimer des événements selon condition</td></tr>
+        <tr><td><code>obfuscate</code></td><td>RGPD — masquer des champs (email, IP, nom)</td></tr>
+        <tr><td><code>mutate_event</code></td><td>Renommer / supprimer / ajouter des champs</td></tr>
+        <tr><td><code>string_converter</code></td><td>Convertir une chaîne en minuscules / majuscules</td></tr>
+        <tr><td><code>parse_json</code></td><td>Parser un champ JSON string en objet</td></tr>
+      </tbody>
+    </table>
+    <p style="font-weight:600;color:#ea580c;margin-top:1em;">Exemple SpaceX :</p>
+    <pre style="font-size:0.8em;"><code class="language-yaml">processor:
+  - date:
+      match:
+        - key: date_utc
+          patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSZ"]
+      destination: "@timestamp"
+  - mutate_event:
+      add_entries:
+        - key: source
+          value: spacex-api</code></pre>
+  </div>
+  <aside class="notes">Le processor date est crucial pour que le champ @timestamp soit correctement parsé — sans ça, les visualisations temporelles ne fonctionnent pas. Le processor obfuscate est votre allié RGPD. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 30 -->
+<section>
+  <h2>Data Prepper — Sink OpenSearch</h2>
+  <pre><code class="language-yaml">sink:
+  - opensearch:
+      hosts: ["https://opensearch-node1:9200"]
+
+      # Index avec date dynamique
+      index: "spacex-launches-%{yyyy.MM.dd}"
+
+      # Authentification
+      username: admin
+      password: "${OS_PASSWORD}"
+
+      # TLS auto-signé (dev uniquement)
+      insecure: true
+
+      # Idempotence : utiliser l'ID SpaceX comme _id
+      document_id: "%{id}"
+
+      # Taille du batch bulk
+      bulk_size: 100
+
+      # Créer l'index si absent
+      index_type: custom</code></pre>
+  <div style="font-size:0.82em;background:#fef3c7;border-left:4px solid #d97706;padding:0.7em;border-radius:4px;margin-top:0.8em;">
+    ⚠️ <code>insecure: true</code> = ignore le certificat TLS. À remplacer par <code>cert</code> en production.
+  </div>
+  <aside class="notes">Le document_id avec l'ID SpaceX garantit l'idempotence : indexer deux fois le même lancement ne crée pas de doublon. Le bulk_size de 100 est un bon compromis performance/mémoire pour de petits volumes. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 31 -->
+<section>
+  <h2>Config complète SpaceX API</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.72em;">
+    <div>
+      <p style="font-weight:600;color:#ea580c;margin-bottom:0.3em;">pipelines/spacex-pipeline.yaml</p>
+      <pre style="margin:0;"><code class="language-yaml">spacex-pipeline:
+  source:
+    http:
+      port: 2021
+      path: /log/ingest
+  processor:
+    - date:
+        match:
+          - key: date_utc
+            patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSZ"]
+        destination: "@timestamp"
+    - mutate_event:
+        add_entries:
+          - key: source
+            value: spacex-api
+  sink:
+    - opensearch:
+        hosts: ["https://opensearch-node1:9200"]
+        index: spacex-launches
+        username: admin
+        password: "${OS_PASSWORD}"
+        insecure: true
+        document_id: "%{id}"</code></pre>
+    </div>
+    <div>
+      <p style="font-weight:600;color:#ea580c;margin-bottom:0.3em;">Pousser les données depuis l'API SpaceX :</p>
+      <pre style="margin:0;"><code class="language-bash"># Récupérer + filtrer + envoyer
+curl -s https://api.spacexdata.com/v4/launches \
+  | jq '[.[] | {
+      id,
+      name,
+      date_utc,
+      success,
+      flight_number,
+      rocket,
+      launchpad,
+      details
+    }]' \
+  | curl -XPOST \
+      http://localhost:2021/log/ingest \
+      -H "Content-Type: application/json" \
+      -d @-
+
+# Vérifier l'ingestion
+curl -s http://localhost:9200/spacex-launches/_count \
+  | jq '.count'</code></pre>
+    </div>
+  </div>
+  <aside class="notes">La commande curl + jq est le pattern clé de ce TP. On récupère tous les lancements de l'API SpaceX (format tableau JSON), on filtre les champs utiles avec jq, puis on pipe directement vers l'endpoint HTTP de Data Prepper. Pas de Python3 nécessaire. Timing : 8 min.</aside>
+</section>
+
+<!-- SLIDE 32 -->
+<section>
+  <h2>Data Prepper — health &amp; monitoring</h2>
+  <pre><code class="language-bash"># Vérifier l'état de santé
+curl -s http://localhost:4900/health | jq '.'
+
+# Métriques au format Prometheus
+curl -s http://localhost:4900/metrics/prometheus
+
+# Lister les pipelines actifs
+curl -s http://localhost:4900/list | jq '.'
+
+# Suivre les logs en temps réel
+docker logs data-prepper -f --tail 50
+
+# Compter les documents indexés
+curl -s https://localhost:9200/spacex-launches/_count \
+  --insecure -u admin:${OS_PASSWORD} | jq '.count'</code></pre>
+  <div style="font-size:0.82em;background:#fee2e2;border-left:4px solid #dc2626;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+    <strong>Erreur fréquente :</strong> le sink refuse les connexions → vérifiez les credentials, le TLS (<code>insecure: true</code>) et que l'endpoint OpenSearch est accessible depuis le container Data Prepper.
+  </div>
+  <aside class="notes">L'API de management sur le port 4900 est très utile pour debugger. Les métriques Prometheus peuvent être scrappées par Prometheus/Grafana pour monitorer le débit d'ingestion. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 33 -->
+<section>
+  <h2>Data Prepper — cas d'usage observabilité</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#ea580c;">OpenTelemetry natif :</p>
+    <div style="display:flex;align-items:center;gap:0.6em;margin:0.8em 0;font-size:0.85em;">
+      <div style="background:#fff7ed;padding:0.6em;border-radius:4px;border:2px solid #ea580c;text-align:center;">Application<br><small>OTEL Agent</small></div>
+      <span>→</span>
+      <div style="background:#fff7ed;padding:0.6em;border-radius:4px;border:2px solid #ea580c;text-align:center;">Data Prepper<br><small>otel_*_source</small></div>
+      <span>→</span>
+      <div style="background:#fff7ed;padding:0.6em;border-radius:4px;border:2px solid #ea580c;text-align:center;">OpenSearch<br><small>traces / logs</small></div>
+      <span>→</span>
+      <div style="background:#fff7ed;padding:0.6em;border-radius:4px;border:2px solid #ea580c;text-align:center;">Dashboards<br><small>Observability</small></div>
+    </div>
+    <ul style="line-height:1.9;">
+      <li><strong>Service Map :</strong> graphe des dépendances généré automatiquement depuis les traces</li>
+      <li><strong>Trace Analytics :</strong> visualiser les spans d'une requête distribuée</li>
+      <li><strong>Correlation logs ↔ traces :</strong> via trace_id / span_id</li>
+      <li>Agents disponibles : Java, Python, Go, .NET, Node.js, Ruby</li>
+    </ul>
+  </div>
+  <aside class="notes">C'est le cas d'usage "killer" de Data Prepper. Une application instrumentée avec l'agent OTEL envoie automatiquement logs, traces et métriques vers Data Prepper qui les route vers OpenSearch. La Service Map se génère toute seule depuis les trace spans. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 34 -->
+<section>
+  <h2>Fluent Bit — collecte légère</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:1em;">
+      <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+        <strong style="color:#16a34a;">Stats clés</strong>
+        <ul style="margin-top:0.5em;line-height:1.7;">
+          <li>&lt;450KB binaire</li>
+          <li>Écrit en C, zéro dépendance</li>
+          <li>DaemonSet Kubernetes natif</li>
+          <li>~1MB RAM par instance</li>
+        </ul>
+      </div>
+      <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+        <strong style="color:#2563eb;">Inputs / Outputs clés</strong>
+        <ul style="margin-top:0.5em;line-height:1.7;">
+          <li><strong>Inputs :</strong> tail, systemd, cpu, mem, docker</li>
+          <li><strong>Outputs :</strong> opensearch, kafka, s3, forward, loki</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-weight:600;color:#16a34a;">Pattern K8s typique :</p>
+    <div style="display:flex;align-items:center;gap:0.6em;font-size:0.85em;">
+      <div style="background:#f0fdf4;padding:0.5em 0.8em;border-radius:4px;border:2px solid #16a34a;">Fluent Bit<br><small>DaemonSet (node)</small></div>
+      <span>→</span>
+      <div style="background:#fff7ed;padding:0.5em 0.8em;border-radius:4px;border:2px solid #ea580c;">Data Prepper<br><small>(enrichissement)</small></div>
+      <span>→</span>
+      <div style="background:#eff6ff;padding:0.5em 0.8em;border-radius:4px;border:2px solid #2563eb;">OpenSearch</div>
+    </div>
+  </div>
+  <aside class="notes">Fluent Bit est l'agent de collecte de logs standard de Kubernetes. Sa légèreté permet de le déployer sur tous les nœuds sans impact sur les performances. Il peut envoyer directement vers OpenSearch ou passer par Data Prepper pour enrichissement. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 35 -->
+<section>
+  <h2>OpenSearch Benchmark</h2>
+  <pre><code class="language-bash"># Installer OpenSearch Benchmark
+pip install opensearch-benchmark
+
+# Lancer un test avec le workload nyc_taxis
+opensearch-benchmark execute-test \
+  --workload nyc_taxis \
+  --target-host https://localhost:9200 \
+  --client-options "basic_auth_user:admin,basic_auth_password:${OS_PASSWORD},verify_certs:false" \
+  --pipeline benchmark-only
+
+# Workloads disponibles
+opensearch-benchmark list workloads</code></pre>
+  <div style="font-size:0.82em;margin-top:0.8em;">
+    <table style="font-size:0.9em;">
+      <thead><tr><th>Workload</th><th>Volume</th><th>Type de données</th></tr></thead>
+      <tbody>
+        <tr><td>nyc_taxis</td><td>1.3B docs</td><td>Courses de taxi NYC</td></tr>
+        <tr><td>geonames</td><td>11M docs</td><td>Noms géographiques</td></tr>
+        <tr><td>noaa</td><td>33M docs</td><td>Données météo NOAA</td></tr>
+        <tr><td>so</td><td>36M docs</td><td>Stack Overflow</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:0.8em;"><strong>Résultats :</strong> throughput (doc/s), latences p50/p99, error rate, index size</p>
+  </div>
+  <aside class="notes">OpenSearch Benchmark est l'outil officiel de benchmarking. Il est essentiel avant de passer en production : on valide que le cluster tient la charge attendue. Attention : nyc_taxis avec 1.3B docs prend des heures — utilisez geonames pour les tests rapides. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 36 -->
+<section>
+  <h2>Quiz collecteurs — 4 questions</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q1 — Logs K8s sur 50 nœuds ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ Fluent Bit en DaemonSet — léger, un agent par nœud</p>
+      </div>
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q2 — Migrer 500 Go Oracle vers OS ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ Logstash + input jdbc — 200+ plugins, ETL mature</p>
+      </div>
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q3 — App Go avec traces OTEL ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ Data Prepper + otel_trace_source — OTEL natif</p>
+      </div>
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q4 — Valider perf avant prod ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ OpenSearch Benchmark — workload nyc_taxis ou geonames</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Quiz rapide oral — posez les questions avant d'afficher les réponses. 3 min maximum. Vérifiez que tout le monde a compris les cas d'usage de chaque collecteur. Timing : 3 min.</aside>
+</section>
+
+<!-- SLIDE 37 -->
+<section>
+  <h2>Sources de données pour pratiquer</h2>
+  <div style="font-size:0.78em;">
+    <table>
+      <thead><tr><th>Dataset</th><th>URL</th><th>Format</th><th>Taille</th><th>Cas d'usage</th></tr></thead>
+      <tbody>
+        <tr><td><strong>SpaceX API</strong></td><td>api.spacexdata.com/v4/launches</td><td>JSON REST</td><td>~200 docs</td><td>Pipelines, dashboards</td></tr>
+        <tr><td><strong>NYC Taxi</strong></td><td>OSB workload</td><td>CSV</td><td>1.3B docs</td><td>Benchmark</td></tr>
+        <tr><td><strong>Olist E-commerce</strong></td><td>kaggle.com/olistbr</td><td>CSV</td><td>~100k docs</td><td>Analytics e-commerce</td></tr>
+        <tr><td><strong>GitHub Events</strong></td><td>gharchive.org</td><td>NDJSON.gz</td><td>~millions/j</td><td>Séries temporelles</td></tr>
+        <tr><td><strong>OpenFoodFacts</strong></td><td>world.openfoodfacts.org/data</td><td>JSON dump</td><td>~2M docs</td><td>Recherche full-text</td></tr>
+        <tr><td><strong>NOAA Weather</strong></td><td>OSB workload noaa</td><td>CSV</td><td>33M docs</td><td>Géo + temporel</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">Ces datasets sont tous publics et libres d'utilisation pour la formation. Recommandez SpaceX pour les TPs d'aujourd'hui (petit volume, API REST simple), et NYC Taxi ou NOAA pour les benchmarks de performance. Timing : 3 min.</aside>
+</section>
+
+<!-- SLIDE 38 -->
+<section>
+  <h2>TP14 — Ingestion SpaceX avec Data Prepper</h2>
+  <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:1em;border-radius:4px;font-size:0.85em;">
+    <p><strong>📁 labs/tp14-data-prepper/README.md</strong> — Durée : 25 min</p>
+    <p style="font-weight:600;margin-top:0.8em;">Étapes :</p>
+    <ol style="line-height:1.8;">
+      <li>Créer <code>spacex-pipeline.yaml</code> dans le dossier pipelines/</li>
+      <li><code>docker compose up data-prepper -d</code></li>
+      <li>Récupérer l'API SpaceX + filtrer avec jq</li>
+      <li>POST vers <code>http://localhost:2021/log/ingest</code></li>
+      <li><code>GET /spacex-launches/_count</code> → vérifier le nombre de docs</li>
+      <li>Vérifier la présence de <code>@timestamp</code> et <code>source: spacex-api</code></li>
+    </ol>
+    <p style="margin-top:0.8em;color:#166534;"><strong>Bonus :</strong> ajouter <code>drop_events</code> pour ne garder que les lancements <code>success: true</code></p>
+  </div>
+  <aside class="notes">TP 25 min — circulez dans la salle. Points de blocage fréquents : oubli du chemin /log/ingest dans le POST curl, mauvais format de date dans le processor date, connexion refusée car Data Prepper n'est pas encore démarré (attendre 10-15s après docker compose up). Timing : 25 min TP.</aside>
+</section>
+
+<!-- SLIDE 39 -->
+<section>
+  <h2>Quiz Matin — 4 questions</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q1 — Formule Lens % du total ?</p>
+        <pre style="font-size:0.8em;margin:0.4em 0;"><code>count() / overall_sum(count()) * 100</code></pre>
+      </div>
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q2 — <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> vs DSL filter ?</p>
+        <p style="color:#374151;margin-top:0.4em;font-size:0.9em;">DQL = lisible, interactif, pas de scoring.<br>DSL filter = query context avec scoring BM25, plus puissant.</p>
+      </div>
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q3 — Processor RGPD Data Prepper ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ <code>obfuscate</code> — masque les champs sensibles (email, IP, numéro de carte)</p>
+      </div>
+      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">Q4 — insecure: true dans le sink ?</p>
+        <p style="color:#374151;margin-top:0.4em;font-size:0.9em;">Ignore la vérification du certificat TLS auto-signé. À remplacer en prod par un vrai certificat CA.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Quiz de mi-journée. Posez oralement avant d'afficher les réponses. Si Q1 bloque, réexpliquez les formules Lens — c'est crucial pour le TP dashboard. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 40 -->
+<section>
+  <h2>Récap Matin — 5 points clés</h2>
+  <ol style="font-size:0.85em;line-height:2.2;">
+    <li>
+      <strong>Dashboards :</strong> Data View → Discover → Visualize (Lens) → Dashboard + Controls
+    </li>
+    <li>
+      <strong>Agrégations visuelles :</strong> Terms→Pie/Bar · Avg/Sum→Metric/Gauge · Date Histogram→Line/Area
+    </li>
+    <li>
+      <strong><a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> :</strong> syntaxe lisible, filtrage interactif, pas de scoring, toggle vers Lucene si besoin
+    </li>
+    <li>
+      <strong>Data Prepper :</strong> pipeline YAML, source HTTP, processors date+mutate+drop, sink OpenSearch
+    </li>
+    <li>
+      <strong>Collecteur selon usage :</strong> Fluent Bit (K8s) · Logstash (migrations) · Data Prepper (OTEL)
+    </li>
+  </ol>
+  <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:0.8em;border-radius:4px;margin-top:1em;font-size:0.85em;">
+    ☕ Pause déjeuner — 1h<br>
+    <strong>Cet après-midi :</strong> Logstash TP Docker → ISM + Snapshots → Anomaly Detection → Prod Readiness
+  </div>
+  <aside class="notes">Résumez le matin en 5 points. Laissez 30 secondes de silence pour que les apprenants notent. Annoncez la pause déjeuner et le programme de l'après-midi. Timing : 3 min.</aside>
+</section>
+
+
+<!-- SLIDE 41 -->
+<section style="background:#0d9488;color:#fff;">
+  <h2 style="color:#fff;">Logstash</h2>
+  <h3 style="color:#99f6e4;font-weight:400;">Pipeline ETL de référence</h3>
+  <p style="color:#ccfbf1;margin-top:1.5em;font-style:italic;">"Logstash existe depuis 2009. C'est le couteau suisse de l'ingestion de données."</p>
+  <p style="color:#5eead4;font-size:0.85em;margin-top:1em;">Input · Filter · Output · 200+ plugins</p>
+  <aside class="notes">Logstash est le collecteur historique de l'écosystème Elastic/OpenSearch. Sa maturité et son écosystème de plugins en font le choix naturel pour les migrations de données complexes et les transformations ETL. Timing : 1 min.</aside>
+</section>
+
+<!-- SLIDE 42 -->
+<section>
+  <h2>Architecture Logstash</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:flex;align-items:center;gap:0.6em;margin-bottom:1em;font-size:0.9em;">
+      <div style="background:#f0fdfa;padding:0.7em 1em;border-radius:4px;border:2px solid #0d9488;text-align:center;">Input<br><small>thread unique</small></div>
+      <span>→</span>
+      <div style="background:#f0fdfa;padding:0.7em 1em;border-radius:4px;border:2px solid #0d9488;text-align:center;">Queue<br><small>in-memory / PQ</small></div>
+      <span>→</span>
+      <div style="background:#f0fdfa;padding:0.7em 1em;border-radius:4px;border:2px solid #0d9488;text-align:center;">Workers × N<br><small>Filter + Output</small></div>
+    </div>
+    <ul style="line-height:1.9;">
+      <li><strong>Event-driven :</strong> chaque document = un objet Java Event</li>
+      <li><strong>Persistent Queue (PQ) :</strong> anti-perte sur disque en cas de crash</li>
+      <li><code>pipeline.workers</code> = nombre de CPU recommandé</li>
+      <li><strong>JVM heap :</strong> min 256m, recommandé 1-4GB en production</li>
+    </ul>
+    <pre style="font-size:0.8em;margin-top:0.8em;"><code class="language-yaml"># logstash.yml
+pipeline.workers: 4
+pipeline.batch.size: 125
+queue.type: persisted
+path.queue: /var/lib/logstash/queue</code></pre>
+  </div>
+  <aside class="notes">La Persistent Queue (PQ) est la fonctionnalité qui rend Logstash fiable en production : si Logstash crashe ou est redémarré, les événements en attente ne sont pas perdus. En dev, on utilise la queue in-memory (plus rapide). Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 43 -->
+<section>
+  <h2>Inputs — les sources Logstash</h2>
+  <div style="font-size:0.85em;">
+    <table>
+      <thead><tr><th>Input plugin</th><th>Description</th><th>Usage typique</th></tr></thead>
+      <tbody>
+        <tr><td><code>file</code></td><td>Lire un fichier (json_lines codec)</td><td>NDJSON local, logs</td></tr>
+        <tr><td><code>http</code></td><td>Serveur webhook HTTP</td><td>Webhooks entrants</td></tr>
+        <tr><td><code>jdbc</code></td><td>Requête SQL périodique</td><td>Migration Oracle/MySQL</td></tr>
+        <tr><td><code>kafka</code></td><td>Consumer topic Kafka</td><td>Streaming événements</td></tr>
+        <tr><td><code>beats</code></td><td>Réception Filebeat/Metricbeat</td><td>Agents légers</td></tr>
+        <tr><td><code>http_poller</code></td><td>Appel REST API périodique</td><td>APIs externes</td></tr>
+        <tr><td><code>stdin</code></td><td>Entrée standard</td><td>Tests rapides</td></tr>
+      </tbody>
+    </table>
+    <div style="background:#f0fdfa;border-left:4px solid #0d9488;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      💡 Pour le TP SpaceX : input <strong>file</strong> avec codec <code>json</code> sur un fichier NDJSON téléchargé.
+    </div>
+  </div>
+  <aside class="notes">Le plugin jdbc est l'un des plus utilisés en migration : il exécute une requête SQL toutes les X secondes/minutes et envoie les nouvelles lignes vers OpenSearch. Très puissant pour la synchronisation base relationnelle → OpenSearch. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 44 -->
+<section>
+  <h2>Filters — transformer les données</h2>
+  <div style="font-size:0.83em;">
+    <table style="font-size:0.9em;">
+      <thead><tr><th>Filter</th><th>Usage</th><th>Exemple</th></tr></thead>
+      <tbody>
+        <tr><td><code>grok</code></td><td>Parser des logs non structurés</td><td>Logs Apache, nginx, syslog</td></tr>
+        <tr><td><code>mutate</code></td><td>Renommer, supprimer, ajouter, convertir</td><td><code>rename =&gt; { "ip" =&gt; "client_ip" }</code></td></tr>
+        <tr><td><code>date</code></td><td>Parser une date → <code>@timestamp</code></td><td><code>match =&gt; ["date_utc", "ISO8601"]</code></td></tr>
+        <tr><td><code>json</code></td><td>Parser un champ JSON string</td><td>Champ <code>message</code> = JSON</td></tr>
+        <tr><td><code>ruby</code></td><td>Code Ruby arbitraire</td><td>Calculs complexes</td></tr>
+      </tbody>
+    </table>
+    <p style="font-weight:600;color:#0d9488;margin-top:1em;">Exemple grok Apache :</p>
+    <pre style="font-size:0.75em;"><code class="language-ruby">filter {
+  grok {
+    match => {
+      "message" => "%{COMBINEDAPACHELOG}"
+    }
+  }
+  date {
+    match => ["timestamp", "dd/MMM/yyyy:HH:mm:ss Z"]
+    target => "@timestamp"
+  }
+}</code></pre>
+  </div>
+  <aside class="notes">Grok est le filter le plus puissant mais aussi le plus complexe. Il utilise des expressions régulières nommées pour extraire des champs depuis des logs non structurés. Le pattern COMBINEDAPACHELOG est intégré et couvre 99% des logs Apache/nginx. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 45 -->
+<section>
+  <h2>Output — opensearch plugin</h2>
+  <pre><code class="language-ruby">output {
+  opensearch {
+    hosts           => ["https://opensearch-node1:9200"]
+
+    # Index avec date dynamique
+    index           => "spacex-%{+YYYY.MM.dd}"
+
+    # Authentification
+    user            => "admin"
+    password        => "${OS_PASSWORD}"
+
+    # TLS auto-signé (dev)
+    ssl_certificate_verification => false
+
+    # Idempotence : ID document = ID SpaceX
+    document_id     => "%{[id]}"
+
+    # Action d'indexation
+    action          => "index"
+  }
+
+  # Debug : afficher en console aussi
+  # stdout { codec => rubydebug }
+}</code></pre>
+  <aside class="notes">Le plugin opensearch pour Logstash est maintenu par l'équipe OpenSearch — distinct du plugin elasticsearch. Le document_id garantit l'idempotence. En debug, décommentez le stdout rubydebug pour voir chaque event dans les logs Logstash. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 46 -->
+<section>
+  <h2>Grok patterns — parser des logs structurés</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#0d9488;">Patterns intégrés utiles :</p>
+    <ul style="line-height:1.8;margin-bottom:0.8em;">
+      <li><code>COMBINEDAPACHELOG</code> — logs Apache/nginx complets</li>
+      <li><code>COMMONAPACHELOG</code> — sans Referer/User-Agent</li>
+      <li><code>SYSLOG5424</code> — RFC 5424 syslog</li>
+      <li><code>TIMESTAMP_ISO8601</code> — dates ISO</li>
+      <li><code>IP</code>, <code>WORD</code>, <code>URI</code>, <code>NUMBER</code>, <code>GREEDYDATA</code></li>
+    </ul>
+    <p style="font-weight:600;color:#0d9488;">Pattern custom :</p>
+    <pre style="font-size:0.8em;"><code class="language-ruby">grok {
+  match => {
+    "message" => "(?&lt;launch_name&gt;[A-Z][^|]+)\|(?&lt;flight_number&gt;\d+)\|(?&lt;status&gt;success|failed)"
+  }
+}</code></pre>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.7em;border-radius:4px;margin-top:0.8em;">
+      🛠️ Testez vos patterns sur <strong>grokdebug.herokuapp.com</strong> avant de les déployer.
+    </div>
+  </div>
+  <aside class="notes">Les patterns Grok sont des expressions régulières nommées. GREEDYDATA = .* (capture tout). En pratique, utilisez les patterns intégrés quand c'est possible et ne créez des patterns custom que pour des formats maison. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 47 -->
+<section>
+  <h2>On_failure handler — gestion des erreurs</h2>
+  <div style="font-size:0.85em;">
+    <div style="background:#fee2e2;border-left:4px solid #dc2626;padding:0.8em;border-radius:4px;margin-bottom:1em;">
+      ⚠️ <strong>Sans on_failure :</strong> les événements en erreur de parsing sont rejetés silencieusement — vous perdez des données sans le savoir.
+    </div>
+    <pre style="font-size:0.78em;"><code class="language-ruby">filter {
+  grok {
+    match => { "message" => "%{COMBINEDAPACHELOG}" }
+    on_failure {
+      mutate {
+        add_field => { "parse_error" => "grok_failed" }
+        add_tag   => ["_grokparsefailure"]
+      }
+    }
+  }
+
+  # Router les erreurs vers un index dédié
+  if "_grokparsefailure" in [tags] {
+    mutate { add_field => { "[@metadata][index]" => "failed-ingestion" } }
+  }
 }
 
-// Index Template pour products-*
-PUT /_index_template/products-template
+output {
+  opensearch {
+    index => "%{[@metadata][index]:-spacex-launches}"
+  }
+}</code></pre>
+    <div style="background:#f0fdf4;padding:0.6em;border-radius:4px;margin-top:0.8em;font-size:0.9em;">
+      ✅ Essentiel en production — jamais de pipeline sans on_failure.
+    </div>
+  </div>
+  <aside class="notes">Le pattern d'index fallback avec `:-` est une syntaxe Ruby : si @metadata[index] est vide, utiliser spacex-launches. Routing des erreurs vers un index dédié permet de les analyser et corriger sans perdre les données. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 48 -->
+<section>
+  <h2>Config complète SpaceX JSON → OpenSearch</h2>
+  <pre style="font-size:0.65em;"><code class="language-ruby"># spacex.conf — pipeline Logstash complet
+
+input {
+  file {
+    path  => "/usr/share/logstash/data/launches.ndjson"
+    start_position => "beginning"
+    sincedb_path   => "/dev/null"   # Relire à chaque démarrage (dev)
+    codec => "json"
+  }
+}
+
+filter {
+  # Parser la date UTC SpaceX → @timestamp
+  date {
+    match   => ["date_utc", "ISO8601"]
+    target  => "@timestamp"
+    remove_field => ["date_utc"]
+  }
+
+  # Enrichir avec la source
+  mutate {
+    add_field => { "source_pipeline" => "logstash-spacex" }
+    # Convertir flight_number en entier
+    convert   => { "flight_number" => "integer" }
+    remove_field => ["@version", "host", "log", "event"]
+  }
+}
+
+output {
+  opensearch {
+    hosts    => ["https://opensearch-node1:9200"]
+    index    => "spacex-logstash"
+    user     => "admin"
+    password => "${OS_PASSWORD}"
+    ssl_certificate_verification => false
+    document_id => "%{[id]}"
+  }
+}</code></pre>
+  <aside class="notes">Config complète à donner aux apprenants comme point de départ pour TP15. Notez sincedb_path => /dev/null en dev : cela force Logstash à relire le fichier depuis le début à chaque démarrage. En production, laissez sincedb gérer l'offset. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 49 -->
+<section>
+  <h2>infrastructure/docker-compose.logstash.yml</h2>
+  <pre style="font-size:0.65em;"><code class="language-yaml">version: "3.8"
+services:
+  opensearch-node1:
+    image: opensearchproject/opensearch:3.6.0
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true      # Simplifie le TP
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    networks:
+      - logstash-net
+
+  logstash:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:8.9.0
+    environment:
+      - OS_PASSWORD=admin
+      - LS_JAVA_OPTS=-Xms256m -Xmx512m
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline    # spacex.conf
+      - ./logstash/data:/usr/share/logstash/data            # launches.ndjson
+    depends_on:
+      - opensearch-node1
+    networks:
+      - logstash-net
+
+networks:
+  logstash-net:
+    driver: bridge</code></pre>
+  <aside class="notes">DISABLE_SECURITY_PLUGIN=true simplifie considérablement le TP en évitant les problèmes TLS et credentials. En production, ne jamais désactiver la sécurité. Le volume pipeline/ mappe le dossier qui contient spacex.conf. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 50 -->
+<section>
+  <h2>Bonnes pratiques Logstash</h2>
+  <div style="font-size:0.85em;">
+    <ul style="list-style:none;padding:0;line-height:2.2;">
+      <li>✅ <strong>Testez avec stdin d'abord</strong> — copiez-collez un exemple pour valider la config</li>
+      <li>✅ <strong>on_failure sur chaque grok</strong> — jamais de perte silencieuse</li>
+      <li>✅ <strong>document_id pour l'idempotence</strong> — évite les doublons lors des retries</li>
+      <li>✅ <strong>Persistent Queue</strong> pour les volumes critiques — <code>queue.type: persisted</code></li>
+      <li>✅ <strong>pipeline.workers = nb CPU</strong> — parallélisme optimal des workers Filter+Output</li>
+      <li>✅ <strong>Credentials via env vars</strong> — <code>${OS_PASSWORD}</code> jamais en clair dans la config</li>
+    </ul>
+    <div style="background:#f0fdfa;border-left:4px solid #0d9488;padding:0.8em;border-radius:4px;margin-top:0.8em;">
+      💡 En production : activez le monitoring Logstash via X-Pack/Prometheus pour suivre le débit et les erreurs.
+    </div>
+  </div>
+  <aside class="notes">Ces 6 pratiques évitent 90% des problèmes en production avec Logstash. Insistez particulièrement sur on_failure (erreurs silencieuses = perte de données) et les credentials via env vars (sécurité). Timing : 3 min.</aside>
+</section>
+
+<!-- SLIDE 51 -->
+<section>
+  <h2>TP15 — Ingestion avec Logstash — SpaceX launches</h2>
+  <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:1em;border-radius:4px;font-size:0.82em;">
+    <p><strong>📁 labs/tp15-logstash/README.md</strong> — Durée : 35 min</p>
+    <p style="font-weight:600;margin-top:0.8em;">Étapes :</p>
+    <ol style="line-height:1.7;">
+      <li><code>docker compose -f infrastructure/docker-compose.logstash.yml up -d</code></li>
+      <li>Récupérer l'API SpaceX + convertir en NDJSON :<br>
+        <code style="font-size:0.85em;">curl -s https://api.spacexdata.com/v4/launches | jq -c '.[]' &gt; logstash/data/launches.ndjson</code></li>
+      <li>Créer <code>logstash/pipeline/spacex.conf</code></li>
+      <li><code>docker restart logstash</code></li>
+      <li><code>docker logs logstash -f</code> — attendre "Pipeline started"</li>
+      <li><code>GET /spacex-logstash/_count</code> — vérifier le nombre de docs</li>
+      <li>Comparer le mapping avec l'index TP14 Data Prepper</li>
+    </ol>
+    <p style="margin-top:0.8em;color:#166534;"><strong>Bonus :</strong> ajouter tag <code>failed_launch</code> si <code>success != true</code>, router vers index <code>spacex-failures</code></p>
+  </div>
+  <aside class="notes">TP 35 min. Les blocages fréquents : mauvais chemin de volume dans docker-compose (relatif vs absolu), codec json vs json_lines (json_lines pour NDJSON ligne par ligne), Logstash qui démarre avant OpenSearch (depends_on gère ça mais peut prendre 30s). Timing : 35 min TP.</aside>
+</section>
+
+<!-- SLIDE 52 -->
+<section style="background:#475569;color:#fff;">
+  <h2 style="color:#fff;">Cycle de vie</h2>
+  <h3 style="color:#cbd5e1;font-weight:400;">Vos index ne vivent pas éternellement</h3>
+  <p style="color:#e2e8f0;margin-top:1.5em;font-style:italic;">"Les logs d'hier sont chauds. Ceux d'il y a 6 mois sont froids. Ceux d'il y a 2 ans sont morts."</p>
+  <div style="display:flex;align-items:center;gap:0.8em;margin-top:2em;font-size:0.85em;">
+    <div style="background:#ef4444;color:#fff;padding:0.5em 1em;border-radius:4px;">🔥 HOT<br><small>7 jours</small></div>
+    <span style="color:#cbd5e1;">→</span>
+    <div style="background:#f97316;color:#fff;padding:0.5em 1em;border-radius:4px;">♨️ WARM<br><small>30 jours</small></div>
+    <span style="color:#cbd5e1;">→</span>
+    <div style="background:#3b82f6;color:#fff;padding:0.5em 1em;border-radius:4px;">❄️ COLD<br><small>90 jours</small></div>
+    <span style="color:#cbd5e1;">→</span>
+    <div style="background:#1f2937;color:#fff;padding:0.5em 1em;border-radius:4px;">🗑️ DELETE<br><small>après 90j</small></div>
+  </div>
+  <aside class="notes">Introduction de section. La gestion du cycle de vie est une des compétences les plus demandées en production OpenSearch. Sans ISM, les index grossissent indéfiniment jusqu'à remplir le disque. Timing : 1 min.</aside>
+</section>
+
+<!-- SLIDE 53 -->
+<section>
+  <h2>Aliases write/read + rollover</h2>
+  <div style="font-size:0.82em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7em;margin-bottom:1em;">
+      <div style="background:#eff6ff;padding:0.7em;border-radius:4px;border-left:4px solid #2563eb;">
+        <strong>Read alias</strong><br>Query transparente sur plusieurs index
+      </div>
+      <div style="background:#f0fdf4;padding:0.7em;border-radius:4px;border-left:4px solid #16a34a;">
+        <strong>Write alias</strong><br><code>is_write_index: true</code> — cible unique
+      </div>
+      <div style="background:#faf5ff;padding:0.7em;border-radius:4px;border-left:4px solid #7c3aed;">
+        <strong>Filtered alias</strong><br>DSL filter embarqué dans l'alias
+      </div>
+    </div>
+    <pre style="font-size:0.75em;"><code class="language-json">// Rollover : créer spacex-logs-000002 quand conditions atteintes
+POST /spacex-logs-current/_rollover
 {
-  "index_patterns": ["products-*"],
+  "conditions": {
+    "max_age":  "30d",
+    "max_docs": 1000000,
+    "max_size": "50gb"
+  }
+}
+
+// Résultat : spacex-logs-000002 créé, write alias basculé
+// GET /_cat/aliases?v pour vérifier</code></pre>
+  </div>
+  <aside class="notes">Le rollover est le mécanisme clé pour gérer les gros volumes de données temporelles. L'alias write pointe toujours sur l'index courant — les applications n'ont pas à connaître le nom exact de l'index courant. ISM peut déclencher le rollover automatiquement. Timing : 7 min.</aside>
+</section>
+
+<!-- SLIDE 54 -->
+<section>
+  <h2>Index Templates &amp; Component Templates</h2>
+  <div style="font-size:0.85em;">
+    <pre style="font-size:0.75em;"><code class="language-json">// 1. Component Template : mappings réutilisables
+PUT /_component_template/spacex-mappings
+{
   "template": {
-    "settings": { "number_of_replicas": 1, "number_of_shards": 2 },
     "mappings": {
       "properties": {
-        "price": { "type": "float" },
-        "category": { "type": "keyword" }
+        "@timestamp": { "type": "date" },
+        "flight_number": { "type": "integer" },
+        "success": { "type": "boolean" }
       }
-    },
-    "aliases": { "all-products": {} }
-  },
-  "priority": 10
+    }
+  }
+}
+
+// 2. Index Template : compose les component templates
+PUT /_index_template/spacex-template
+{
+  "index_patterns": ["spacex-*"],
+  "composed_of": ["spacex-mappings", "spacex-settings"],
+  "priority": 200,
+  "template": {
+    "settings": { "number_of_shards": 1 }
+  }
 }</code></pre>
-  <aside class="notes">
-    Les aliases sont l'outil le plus important pour les opérations sans downtime. L'opération `_aliases` avec plusieurs actions est ATOMIQUE — les clients voient soit v1 soit v2, jamais les deux ou aucun. Les Index Templates s'appliquent automatiquement aux nouveaux index qui matchent le pattern. Timing : 8 min.
-  </aside>
-</section>
-
-<!-- SLIDE 9 : DEMO LIVE CH6 -->
-<section style="background:#f8fafc;">
-  <h2>🖥️ Démo Live — Cluster 3 nœuds</h2>
-  <div style="font-size:0.85em;">
-    <ol>
-      <li>Passer à <code>docker compose -f docker-compose.cluster.yml up -d</code></li>
-      <li><code>GET /_cat/nodes?v</code> — voir 3 nœuds</li>
-      <li><code>GET /_cat/shards?v</code> — distribution des shards</li>
-      <li><code>GET /_cat/allocation?v</code> — espace utilisé par nœud</li>
-      <li><code>GET /_cluster/allocation/explain</code> — diagnostiquer shards non assignés</li>
-    </ol>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.7em;border-radius:4px;margin-top:0.8em;">
+      ✅ Template + ISM = zéro opération manuelle après le setup initial.
+    </div>
   </div>
-  <aside class="notes">Timing : 8 min. Le cluster 3 nœuds nécessite au moins 6 GB de RAM disponible. Vérifiez avant : docker stats.</aside>
+  <aside class="notes">Les Component Templates sont des blocs réutilisables (mappings, settings) qu'on compose dans plusieurs Index Templates. La priorité : si deux templates matchent le même index pattern, celui avec la priority la plus haute gagne. Timing : 5 min.</aside>
 </section>
 
-<!-- SLIDE 10 : TP6 -->
-<section style="background:#f8fafc;">
-  <h2>🔧 TP6 — Cluster Multi-nœuds</h2>
-  <p style="color:#2563eb;font-weight:600;">Durée : 60 minutes</p>
-  <ol style="font-size:0.82em;">
-    <li>Basculer vers <code>docker-compose.cluster.yml</code> (3 nœuds)</li>
-    <li>Vérifier la distribution des shards (<code>_cat/shards</code>, <code>_cat/allocation</code>)</li>
-    <li>Créer un index template pour <code>products-*</code></li>
-    <li>Configurer des aliases (<code>products-v1</code> → <code>products-v2</code> sans downtime)</li>
-    <li>Créer un snapshot (repository filesystem)</li>
-    <li>Configurer une politique ISM (hot → delete après 30 jours)</li>
-    <li>Monitorer avec <code>_nodes/stats</code>, <code>_cat/nodes</code></li>
-  </ol>
-  <div style="background:#eff6ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
-    <strong>⭐ Bonus :</strong> <code>docker stop opensearch-node2</code> → observer la récupération
-  </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp6-cluster/README.md</code></p>
-  <aside class="notes">Problème fréquent : node3 ne rejoint pas le cluster. Vérifier que les 3 nœuds sont dans initial_master_nodes et seed_hosts. Timing : 60 min.</aside>
-</section>
-
-<!-- SLIDE 11 : CH7 OPENER -->
-<section style="background:#2563eb;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 7</h2>
-  <h3 style="color:#bfdbfe;font-weight:400;">Administration du Cluster</h3>
-  <p style="color:#dbeafe;font-style:italic;">"Et si vous perdiez vos données ?"</p>
-  <aside class="notes">Transition. Timing : 30 secondes.</aside>
-</section>
-
-<!-- SLIDE 12 : SNAPSHOTS -->
-<section>
-  <h2>Snapshots — Sauvegardes incrémentielles</h2>
-  <pre style="font-size:0.6em;"><code class="language-bash"># 1. Créer un repository
-PUT /_snapshot/backup-fs
-{
-  "type": "fs",
-  "settings": { "location": "/mnt/snapshots" }
-}
-
-# 2. Prendre un snapshot
-PUT /_snapshot/backup-fs/snapshot-2026-05-06
-{
-  "indices": "products,stores",
-  "ignore_unavailable": true
-}
-
-# 3. Lister les snapshots
-GET /_snapshot/backup-fs/_all
-
-# 4. Restaurer
-POST /_snapshot/backup-fs/snapshot-2026-05-06/_restore
-{ "indices": "products", "rename_pattern": "(.*)", "rename_replacement": "$1-restored" }</code></pre>
-  <div style="font-size:0.75em;color:#475569;">Repositories : <strong>fs</strong> (local/NFS), <strong>S3</strong>, <strong>Azure Blob</strong>, <strong>GCS</strong></div>
-  <aside class="notes">
-    Les snapshots sont INCRÉMENTIELS : seuls les segments Lucene modifiés depuis le dernier snapshot sont copiés. Testez toujours la restauration en pré-prod ! Le repository doit être accessible par TOUS les nœuds. En prod : snapshot quotidien vers S3, rétention 30 jours. Timing : 10 min.
-  </aside>
-</section>
-
-<!-- SLIDE 13 : ISM -->
+<!-- SLIDE 55 -->
 <section>
   <h2>ISM — Index State Management</h2>
-  <pre style="font-size:0.58em;"><code class="language-json">PUT /_plugins/_ism/policies/logs-lifecycle
+  <div style="font-size:0.85em;">
+    <div style="background:#f8fafc;border-left:4px solid #475569;padding:1em;border-radius:4px;margin-bottom:1em;">
+      <strong>Définition :</strong> Plugin natif OpenSearch. Gestion déclarative du cycle de vie des index.<br>
+      <strong>Policy :</strong> states + transitions + actions. <strong>Polling :</strong> toutes les 5 minutes.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;margin-bottom:1em;">
+      <div>
+        <p style="font-weight:600;color:#475569;">API principales :</p>
+        <pre style="font-size:0.78em;"><code class="language-bash"># Lister les policies
+GET /_plugins/_ism/policies
+
+# Statut d'un index
+GET /_plugins/_ism/explain/spacex-logs-000001
+
+# Attacher manuellement
+POST /_plugins/_ism/add/spacex-logs-000001
+{ "policy_id": "spacex-lifecycle" }</code></pre>
+      </div>
+      <div>
+        <p style="font-weight:600;color:#475569;">Auto-attachement :</p>
+        <pre style="font-size:0.78em;"><code class="language-json">"ism_template": [{
+  "index_patterns": ["spacex-*"],
+  "priority": 100
+}]</code></pre>
+        <p style="font-size:0.85em;margin-top:0.5em;">Tous les nouveaux index <code>spacex-*</code> reçoivent automatiquement la policy.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">ISM remplace avantageusement les scripts cron de gestion manuelle des index. L'ism_template est la clé : on configure une fois, tous les futurs index sont gérés automatiquement. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 56 -->
+<section>
+  <h2>ISM — policy hot → warm → cold → delete</h2>
+  <pre style="font-size:0.6em;"><code class="language-json">PUT /_plugins/_ism/policies/spacex-lifecycle
 {
   "policy": {
-    "description": "Lifecycle logs : hot 30 jours puis suppression",
-    "default_state": "hot",
+    "description": "Cycle de vie SpaceX : 7j hot → 30j warm → 90j delete",
+    "ism_template": [{ "index_patterns": ["spacex-*"], "priority": 100 }],
     "states": [
       {
         "name": "hot",
         "actions": [],
-        "transitions": [{
-          "state_name": "delete",
-          "conditions": { "min_index_age": "30d" }
-        }]
+        "transitions": [{ "state_name": "warm", "conditions": { "min_index_age": "7d" } }]
+      },
+      {
+        "name": "warm",
+        "actions": [
+          { "read_only": {} },
+          { "force_merge": { "max_num_segments": 1 } }
+        ],
+        "transitions": [{ "state_name": "cold", "conditions": { "min_index_age": "30d" } }]
+      },
+      {
+        "name": "cold",
+        "actions": [{ "cold_migrate": { "timestamp_field": "@timestamp" } }],
+        "transitions": [{ "state_name": "delete", "conditions": { "min_index_age": "90d" } }]
       },
       {
         "name": "delete",
         "actions": [{ "delete": {} }],
         "transitions": []
       }
-    ],
-    "ism_template": [{
-      "index_patterns": ["logs-*"],
-      "priority": 100
-    }]
+    ]
   }
 }</code></pre>
-  <aside class="notes">
-    ISM est parfait pour les logs : les données récentes sont dans l'état "hot", après 30 jours elles sont supprimées automatiquement. Évite que les logs remplissent le disque. Rollover : lorsqu'un index atteint une taille (ex: 50GB) ou un âge, ISM crée automatiquement un nouvel index. Timing : 10 min.
-  </aside>
+  <aside class="notes">Lisez la policy état par état. HOT : aucune action, juste attendre. WARM : passer en lecture seule + force_merge pour réduire les segments (économise du CPU en lecture). COLD : migrer vers le stockage froid. DELETE : supprimer définitivement. Timing : 8 min.</aside>
 </section>
 
-<!-- SLIDE 14 : MONITORING -->
+<!-- SLIDE 57 -->
 <section>
-  <h2>Monitoring — Métriques clés</h2>
-  <div style="font-size:0.8em;">
-    <table>
-      <thead><tr><th>Métrique</th><th>API</th><th>Seuil d'alerte</th></tr></thead>
-      <tbody>
-        <tr><td>Cluster health</td><td><code>_cluster/health</code></td><td>rouge = urgence</td></tr>
-        <tr><td>JVM Heap</td><td><code>_nodes/stats</code></td><td>&gt; 75% = danger</td></tr>
-        <tr><td>CPU usage</td><td><code>_nodes/stats</code></td><td>&gt; 85% = action</td></tr>
-        <tr><td>Disk usage</td><td><code>_cat/allocation</code></td><td>&gt; 80% = warning</td></tr>
-        <tr><td>Shards non assignés</td><td><code>_cluster/health</code></td><td>&gt; 0 = investiguer</td></tr>
-      </tbody>
-    </table>
-    <pre style="font-size:0.75em;margin-top:0.5em;"><code class="language-bash"># Diagnostiquer un shard non assigné
-GET /_cluster/allocation/explain
-{
-  "index": "products", "shard": 0, "primary": true
-}</code></pre>
-  </div>
-  <aside class="notes">
-    _cluster/allocation/explain est l'outil le plus utile en cas de cluster rouge/jaune. Il dit exactement pourquoi un shard n'est pas assigné : disque plein, nœud absent, max_shards_per_node dépassé. Timing : 8 min.
-  </aside>
-</section>
-
-<!-- SLIDE 15 : CH8 OPENER -->
-<section style="background:#9333ea;color:#fff;">
-  <h2 style="color:#fff;">Chapitre 8</h2>
-  <h3 style="color:#e9d5ff;font-weight:400;">Sécurité dans OpenSearch</h3>
-  <p style="color:#f3e8ff;font-style:italic;">"Et si quelqu'un accédait à vos données sans autorisation ?"</p>
-  <aside class="notes">Le chapitre le plus "sérieux". Expliquez que la sécurité dans OpenSearch est native et gratuite — contrairement à Elasticsearch qui la vendait sous licence. Timing : 30 secondes.</aside>
-</section>
-
-<!-- SLIDE 16 : TLS / SSL -->
-<section>
-  <h2>TLS/SSL — Deux couches</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.82em;">
-    <div style="background:#faf5ff;border-left:4px solid #9333ea;padding:1em;border-radius:4px;">
-      <strong>🔒 Couche Transport (port 9300)</strong><br>
-      Entre nœuds du cluster<br>
-      Chiffre : réplication shards, cluster state<br>
-      Certificat : node certificate
-    </div>
-    <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
-      <strong>🌐 Couche REST (port 9200)</strong><br>
-      Entre clients et cluster<br>
-      Chiffre : toutes les requêtes API<br>
-      Certificat : HTTP certificate
-    </div>
-  </div>
-  <pre style="font-size:0.7em;margin-top:0.8em;"><code class="language-bash"># Avec TLS activé, utiliser -k ou spécifier le CA
-curl -k -u admin:Admin@1234! https://localhost:9200/_cluster/health</code></pre>
-  <aside class="notes">
-    Pour la formation, on utilise les demo certificates (déjà dans le conteneur OpenSearch). En PRODUCTION : n'utilisez jamais les demo certs — elles sont dans le repo GitHub, tout le monde connaît les clés privées ! Utilisez Let's Encrypt ou un CA interne. Timing : 8 min.
-  </aside>
-</section>
-
-<!-- SLIDE 17 : RBAC -->
-<section>
-  <h2>Authentification &amp; RBAC</h2>
-  <pre style="font-size:0.58em;"><code class="language-bash"># Créer un rôle products_reader
-PUT /_plugins/_security/api/roles/products_reader
-{
-  "cluster_permissions": ["cluster_monitor"],
-  "index_permissions": [{
-    "index_patterns": ["products-*"],
-    "allowed_actions": ["read", "indices:data/read/search", "indices:data/read/get"]
-  }]
-}
-
-# Créer un utilisateur analyst
-PUT /_plugins/_security/api/internalusers/analyst
-{
-  "password": "Analyst@1234!",
-  "backend_roles": [],
-  "attributes": { "department": "analytics" }
-}
-
-# Mapper l'utilisateur au rôle
-PUT /_plugins/_security/api/rolesmapping/products_reader
-{
-  "users": ["analyst"]
-}
-
-# Tester : analyst peut lire mais pas écrire
-curl -k -u analyst:Analyst@1234! https://localhost:9200/products/_search
-curl -k -u analyst:Analyst@1234! -X DELETE https://localhost:9200/products  # → 403</code></pre>
-  <aside class="notes">
-    Principes du RBAC : Roles + Permissions → Users. Les rôles built-in utiles : readall (lecture sur tous les index), kibana_user (accès Dashboards), all_access (administrateur). Principe du moindre privilège : donnez uniquement les permissions nécessaires. Timing : 10 min.
-  </aside>
-</section>
-
-<!-- SLIDE 18 : DLS ET FLS -->
-<section>
-  <h2>DLS &amp; FLS — Sécurité granulaire</h2>
-  <pre style="font-size:0.62em;"><code class="language-json">// DLS : analyst ne voit que la catégorie Électronique
-PUT /_plugins/_security/api/roles/analyst_electronics
-{
-  "index_permissions": [{
-    "index_patterns": ["products-*"],
-    "dls": "{ \"term\": { \"category\": \"Électronique\" } }",
-    "fls": ["~price", "~original_price"],
-    "allowed_actions": ["read"]
-  }]
-}
-// DLS = Document Level Security : filtre les documents visibles
-// FLS = Field Level Security : ~ préfixe = exclure ce champ</code></pre>
-  <div style="font-size:0.8em;margin-top:0.8em;background:#f8fafc;padding:0.8em;border-radius:4px;">
-    <strong>DLS</strong> : Ajoute un filtre de requête → l'utilisateur ne voit que ses documents<br>
-    <strong>FLS</strong> : Masque des champs dans la réponse → l'utilisateur ne voit pas certains champs
-  </div>
-  <aside class="notes">
-    DLS est parfait pour les données multi-tenant : chaque client ne voit que ses données. FLS pour la conformité RGPD : masquer les données personnelles selon le rôle. Attention : DLS a un coût de performance (filtre ajouté à chaque requête). Timing : 8 min.
-  </aside>
-</section>
-
-<!-- SLIDE 19 : AUDIT LOGGING -->
-<section>
-  <h2>Audit Logging — Traçabilité</h2>
-  <div style="font-size:0.82em;">
-    <p><strong>Catégories d'événements :</strong></p>
-    <table>
-      <tbody>
-        <tr><td><code>GRANTED_PRIVILEGES</code></td><td>Accès autorisé</td></tr>
-        <tr><td><code>FAILED_LOGIN</code></td><td>Authentification échouée</td></tr>
-        <tr><td><code>MISSING_PRIVILEGES</code></td><td>Permission refusée (403)</td></tr>
-        <tr><td><code>SSL_EXCEPTION</code></td><td>Problème TLS</td></tr>
-      </tbody>
-    </table>
-    <pre style="font-size:0.8em;margin-top:0.5em;"><code class="language-yaml"># opensearch.yml
-plugins.security.audit.type: internal_opensearch
-plugins.security.audit.config.enabled_rest_categories:
-  - FAILED_LOGIN
-  - MISSING_PRIVILEGES
-  - GRANTED_PRIVILEGES</code></pre>
-    <p style="color:#475569;font-size:0.8em;">Obligatoire pour la conformité RGPD, PCI-DSS, HIPAA</p>
-  </div>
-  <aside class="notes">L'audit logging enregistre qui a accédé à quoi et quand. Les logs d'audit sont stockés dans un index dédié (opensearch-security-auditlog-*). Timing : 5 min.</aside>
-</section>
-
-<!-- SLIDE 20 : DEMO LIVE CH8 -->
-<section style="background:#f8fafc;">
-  <h2>🖥️ Démo Live — Sécurité RBAC</h2>
+  <h2>Snapshots — principes et repositories</h2>
   <div style="font-size:0.85em;">
-    <ol>
-      <li>Se connecter en admin : <code>curl -k -u admin:Admin@1234! https://localhost:9200</code></li>
-      <li>Créer le rôle <code>products_reader</code> via REST API</li>
-      <li>Créer l'utilisateur <code>analyst</code></li>
-      <li>Mapper utilisateur → rôle</li>
-      <li>Tester lecture : <code>-u analyst:Analyst@1234!</code> → ✅</li>
-      <li>Tester suppression : → <code>403 Forbidden</code> ✅</li>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:1em;">
+      <div style="background:#f8fafc;border-left:4px solid #475569;padding:1em;border-radius:4px;">
+        <strong>Principes :</strong>
+        <ul style="line-height:1.8;margin-top:0.5em;">
+          <li>Copie incrémentale (seuls les deltas)</li>
+          <li>Cohérent même pendant les écritures</li>
+          <li>Restore partiel (index par index)</li>
+          <li>Rename à la restauration possible</li>
+        </ul>
+      </div>
+      <div style="background:#f8fafc;border-left:4px solid #475569;padding:1em;border-radius:4px;">
+        <strong>Repositories :</strong>
+        <ul style="line-height:1.8;margin-top:0.5em;">
+          <li><code>fs</code> — Système de fichiers (dev)</li>
+          <li><code>s3</code> — AWS S3 (prod recommandé)</li>
+          <li><code>azure</code> — Azure Blob Storage</li>
+          <li><code>gcs</code> — Google Cloud Storage</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
+      <div style="background:#dcfce7;padding:0.7em;border-radius:4px;">
+        <strong>RPO</strong> (Recovery Point Objective)<br>Quelle perte de données acceptable ? → fréquence snapshots
+      </div>
+      <div style="background:#fef3c7;padding:0.7em;border-radius:4px;">
+        <strong>RTO</strong> (Recovery Time Objective)<br>Combien de temps pour restaurer ? → taille snapshots + débit réseau
+      </div>
+    </div>
+    <div style="background:#fee2e2;border-left:4px solid #dc2626;padding:0.7em;border-radius:4px;margin-top:0.8em;font-size:0.9em;">
+      ⚠️ <strong>Toujours tester la restauration en staging !</strong> Un snapshot non testé = pas de backup.
+    </div>
+  </div>
+  <aside class="notes">Les snapshots sont incrémentaux : seul le premier snapshot est complet, les suivants ne stockent que les nouvelles données. RPO/RTO sont des métriques SRE importantes. En prod, snapshots quotidiens sur S3 avec retention 30 jours est un bon standard. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 58 -->
+<section>
+  <h2>Snapshot Lifecycle Management (SLM)</h2>
+  <pre style="font-size:0.68em;"><code class="language-json">// 1. Créer le repository filesystem (dev)
+PUT /_snapshot/fs-backup
+{
+  "type": "fs",
+  "settings": {
+    "location": "/mnt/snapshots",
+    "compress": true
+  }
+}
+
+// 2. Créer la policy SLM — snapshot quotidien à 1h du matin
+PUT /_plugins/_sm/policies/daily-backup
+{
+  "description": "Snapshot quotidien de tous les index",
+  "creation": {
+    "schedule": { "cron": { "expression": "0 1 * * *", "timezone": "Europe/Paris" } },
+    "config": {
+      "repository": "fs-backup",
+      "indices": ["spacex-*", "products"],
+      "include_global_state": false
+    }
+  },
+  "retention": {
+    "expire_after": "30d",
+    "max_count": 30,
+    "min_count": 5
+  }
+}
+
+// 3. Vérifier le statut
+GET /_plugins/_sm/policies/daily-backup/explain</code></pre>
+  <aside class="notes">SLM automatise entièrement la gestion des snapshots. La retention avec max_count:30 garantit qu'on ne gardera pas plus de 30 snapshots (évite de remplir le stockage). min_count:5 assure qu'on garde au minimum 5 snapshots même si ils sont vieux. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 59 -->
+<section>
+  <h2>Récap cycle de vie — scénario complet</h2>
+  <div style="font-size:0.82em;">
+    <div style="background:#f8fafc;border-left:4px solid #475569;padding:1em;border-radius:4px;margin-bottom:1em;">
+      <strong>Scénario spacex-* de bout en bout :</strong><br>
+      Index Template → ISM auto-attachée → Rollover → HOT 7j → WARM (read_only + force_merge) → 30j → DELETE 90j → SLM quotidien → snapshot fs
+    </div>
+    <pre style="font-size:0.8em;"><code class="language-bash"># Vue d'ensemble des index par date de création
+GET /_cat/indices?v&amp;s=creation.date:desc
+
+# Statut ISM de tous les index spacex
+GET /_plugins/_ism/explain/spacex-*
+
+# Derniers snapshots
+GET /_snapshot/fs-backup/_all?verbose=false
+
+# Forcer un rollover immédiat (test)
+POST /spacex-logs-current/_rollover</code></pre>
+    <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:0.7em;border-radius:4px;margin-top:0.8em;">
+      ✅ <strong>Objectif :</strong> zéro opération manuelle après le setup initial.
+    </div>
+  </div>
+  <aside class="notes">Ce slide synthétise tout le cycle de vie. Une fois que le template ISM, la policy et le SLM sont en place, le cluster se gère seul. C'est l'objectif d'une infrastructure mature : les opérations répétitives sont automatisées, les ops humains gèrent les exceptions. Timing : 7 min.</aside>
+</section>
+
+<!-- SLIDE 60 -->
+<section>
+  <h2>TP13 — Automatiser le cycle de vie — index SpaceX</h2>
+  <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:1em;border-radius:4px;font-size:0.82em;">
+    <p><strong>📁 labs/tp13-reindex-ism/README.md</strong> — Durée : 30 min</p>
+    <p style="font-weight:600;margin-top:0.8em;">Étapes :</p>
+    <ol style="line-height:1.7;">
+      <li>Créer spacex-template (1 shard, 1 replica, mapping @timestamp)</li>
+      <li>Créer <code>spacex-logs-000001</code> + alias <code>spacex-logs-current</code> (is_write_index: true)</li>
+      <li>Indexer 5 documents de test via l'alias</li>
+      <li>Rollover avec <code>max_docs: 3</code> → vérifier création spacex-logs-000002</li>
+      <li><code>GET /_cat/aliases?v</code> — vérifier le basculement du write alias</li>
+      <li>Créer ISM policy avec timing accéléré (min_index_age: 1m → delete)</li>
+      <li>Créer snapshot repository <code>fs-backup</code> + snapshot manuel</li>
+      <li>Restaurer l'index avec rename (<code>spacex-logs-restored</code>)</li>
     </ol>
+    <p style="margin-top:0.8em;color:#166534;"><strong>Bonus :</strong> SLM policy + GET explain</p>
   </div>
-  <aside class="notes">Montrez visuellement la différence entre les réponses de l'admin (toutes les permissions) et de l'analyst (lecture seulement). Timing : 8 min.</aside>
+  <aside class="notes">TP 30 min. Le timing accéléré de l'ISM (1min au lieu de 7j) permet de tester le cycle de vie sans attendre des jours. Rappel : ISM poll toutes les 5 min — en accéléré, l'état peut changer vite. Le snapshot repository fs nécessite que le chemin existe dans le container OpenSearch. Timing : 30 min TP.</aside>
 </section>
 
-<!-- SLIDE 21 : TP7 -->
-<section style="background:#f8fafc;">
-  <h2>🔧 TP7 — Sécurisation du Cluster</h2>
-  <p style="color:#9333ea;font-weight:600;">Durée : 45 minutes</p>
-  <ol style="font-size:0.82em;">
-    <li>Activer le plugin de sécurité (retirer <code>DISABLE_SECURITY_PLUGIN</code>)</li>
-    <li>Configurer TLS avec les certificats de démonstration</li>
-    <li>Se connecter en tant qu'<code>admin</code></li>
-    <li>Créer le rôle <code>products_reader</code> (lecture seule sur <code>products-*</code>)</li>
-    <li>Créer l'utilisateur <code>analyst</code>, mapper au rôle</li>
-    <li>Tester : analyst peut lire mais PAS écrire</li>
-    <li>Activer l'audit logging, vérifier les logs</li>
-  </ol>
-  <div style="background:#faf5ff;border-radius:4px;padding:0.5em;margin-top:0.5em;font-size:0.9em;">
-    <strong>⭐ Bonus :</strong> DLS → analyst ne voit que la catégorie <code>Électronique</code>
-  </div>
-  <p style="font-size:0.8em;color:#475569;">📁 <code>labs/tp7-securite/README.md</code></p>
-  <aside class="notes">Le TP le plus difficile. Problème fréquent : oublier -k pour ignorer la vérification du certificat auto-signé. Timing : 45 min.</aside>
+<!-- SLIDE 61 -->
+<section style="background:#7c3aed;color:#fff;">
+  <h2 style="color:#fff;">Anomaly Detection</h2>
+  <h3 style="color:#ddd6fe;font-weight:400;">Le ML sans data scientist</h3>
+  <p style="color:#ede9fe;margin-top:1.5em;font-style:italic;">"Et si votre cluster détectait lui-même les comportements anormaux dans vos données ?"</p>
+  <p style="color:#c4b5fd;font-size:0.85em;margin-top:1em;">Random Cut Forest · Anomaly Grade · Confidence · Real-time</p>
+  <aside class="notes">Introduction de section. Anomaly Detection est un des plugins les plus impressionnants d'OpenSearch. Il utilise Random Cut Forest, un algorithme ML non supervisé, pour détecter automatiquement les valeurs aberrantes sans avoir à définir des seuils manuellement. Timing : 1 min.</aside>
 </section>
 
-<!-- SLIDE 22 : RÉCAP GLOBAL — FIL ROUGE -->
+<!-- SLIDE 62 -->
+<section>
+  <h2>Random Cut Forest (RCF) — le modèle</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:1em;">
+      <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
+        <strong style="color:#7c3aed;">Principe :</strong>
+        <ul style="line-height:1.7;margin-top:0.5em;">
+          <li>Arbres aléatoires construits sur les données</li>
+          <li>Point anomal = modifie significativement la structure de l'arbre</li>
+          <li>Non supervisé : pas de labellisation requise</li>
+          <li>S'entraîne sur l'historique, surveille en temps réel</li>
+        </ul>
+      </div>
+      <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
+        <strong style="color:#7c3aed;">Métriques de sortie :</strong>
+        <ul style="line-height:1.7;margin-top:0.5em;">
+          <li><code>anomaly_grade</code> (0→1) : degré d'anomalie</li>
+          <li><code>confidence</code> (0→1) : confiance du modèle</li>
+          <li>Grade &gt; 0 : potentiellement anormal</li>
+          <li>Grade &gt; 0.7 + confidence &gt; 0.9 : alerte sérieuse</li>
+        </ul>
+      </div>
+    </div>
+    <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:0.8em;border-radius:4px;">
+      ✅ Avantage clé : pas besoin de définir un seuil manuellement — RCF apprend la "normalité" de vos données.
+    </div>
+  </div>
+  <aside class="notes">Random Cut Forest est un algorithme développé par Amazon Research. Contrairement à une alerte classique à seuil fixe (alert if value > X), RCF s'adapte aux patterns de vos données : saisonnalité, tendances, cycles hebdomadaires. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 63 -->
+<section>
+  <h2>Créer un détecteur dans Dashboards</h2>
+  <div style="font-size:0.85em;">
+    <p style="font-weight:600;color:#7c3aed;">Étapes dans l'interface :</p>
+    <ol style="line-height:2.1;">
+      <li><strong>Dashboards → Anomaly Detection → Create detector</strong></li>
+      <li>Nommer le détecteur + sélectionner index <code>spacex-launches</code></li>
+      <li>Champ à surveiller : <code>flight_number</code>, agrégation : <code>count()</code></li>
+      <li>Intervalle de détection : <code>1 month</code> (adapter à la granularité)</li>
+      <li>Shingle size : <code>8</code> (fenêtre glissante = 8 × intervalle)</li>
+      <li>Lancer l'analyse historique (entraîne le modèle sur le passé)</li>
+      <li>Activer la détection en temps réel</li>
+    </ol>
+    <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:0.7em;border-radius:4px;margin-top:0.8em;">
+      💡 Le shingle size contrôle la "mémoire" du modèle. Plus élevé = plus de contexte temporel, moins sensible aux pics ponctuels.
+    </div>
+  </div>
+  <aside class="notes">Montrez la création en live si possible. Le shingle size de 8 est la valeur par défaut recommandée. Pour des données mensuelles, ça représente 8 mois de contexte. L'analyse historique peut prendre quelques minutes selon le volume. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 64 -->
+<section>
+  <h2>Analyser les résultats</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:1em;">
+      <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
+        <strong style="color:#7c3aed;">Anomaly Explorer :</strong>
+        <ul style="line-height:1.7;margin-top:0.5em;">
+          <li>Heatmap par entité (si multi-category)</li>
+          <li>Timeline avec grade coloré</li>
+          <li>Zoom sur une anomalie précise</li>
+          <li>Exporter les résultats en CSV</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-weight:600;color:#7c3aed;">API résultats :</p>
+        <pre style="font-size:0.8em;"><code class="language-bash"># Résultats du détecteur
+GET /_plugins/_anomaly_detection/detectors/&lt;id&gt;/results/_search
+{
+  "query": {
+    "range": {
+      "anomaly_grade": { "gte": 0.7 }
+    }
+  }
+}</code></pre>
+      </div>
+    </div>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.8em;border-radius:4px;">
+      <strong>Réduire les faux positifs :</strong> ajuster le shingle_size, exclure des périodes connues (maintenance, pics saisonniers), ou augmenter le seuil de grade dans l'alerte.
+    </div>
+  </div>
+  <aside class="notes">Anomaly Explorer est l'interface principale pour analyser les résultats. Si vous avez trop de faux positifs, augmentez le shingle_size ou filtrez avec anomaly_grade > 0.7 ET confidence > 0.9. Les anomalies peuvent aussi être causées par un manque de données (index vide sur une période). Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 65 -->
+<section>
+  <h2>Intégration avec Alerting</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:flex;align-items:center;gap:0.5em;margin-bottom:1em;font-size:0.88em;">
+      <div style="background:#faf5ff;padding:0.6em;border-radius:4px;border:2px solid #7c3aed;text-align:center;">Détecteur RCF<br><small>(continu)</small></div>
+      <span>→</span>
+      <div style="background:#faf5ff;padding:0.6em;border-radius:4px;border:2px solid #7c3aed;text-align:center;">Anomaly event<br><small>(grade+confidence)</small></div>
+      <span>→</span>
+      <div style="background:#fef3c7;padding:0.6em;border-radius:4px;border:2px solid #d97706;text-align:center;">Monitor Alerting<br><small>(condition)</small></div>
+      <span>→</span>
+      <div style="background:#dcfce7;padding:0.6em;border-radius:4px;border:2px solid #16a34a;text-align:center;">Action<br><small>Slack/PD/email</small></div>
+    </div>
+    <pre style="font-size:0.78em;"><code class="language-json">// Condition du monitor anomalie
+{
+  "script": {
+    "source": "return ctx.results[0].aggregations.max_anomaly_grade.value >= 0.8 && ctx.results[0].aggregations.max_confidence.value >= 0.9"
+  }
+}
+
+// Payload Slack webhook
+{
+  "text": "🚨 Anomalie SpaceX détectée ! Grade: {{ctx.results[0].aggregations.max_anomaly_grade.value}}"
+}</code></pre>
+    <p style="font-size:0.85em;margin-top:0.7em;"><strong>Types :</strong> Anomaly detector monitor (natif) · Per query monitor sur l'index .opendistro-anomaly-results</p>
+  </div>
+  <aside class="notes">L'intégration Alerting + Anomaly Detection est puissante : au lieu de définir un seuil fixe, l'alerte se déclenche quand le modèle RCF détecte quelque chose d'inhabituel. PagerDuty est recommandé pour les alertes critiques en production. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 66 -->
+<section>
+  <h2>TP16 — Détecter des anomalies dans les lancements SpaceX</h2>
+  <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:1em;border-radius:4px;font-size:0.85em;">
+    <p><strong>📁 labs/tp16-anomaly/README.md</strong> — Durée : 20 min</p>
+    <p style="font-weight:600;margin-top:0.8em;">Étapes :</p>
+    <ol style="line-height:1.8;">
+      <li>Créer un détecteur sur <code>spacex-launches</code> (flight_number, count, 1 month)</li>
+      <li>Lancer l'analyse historique — attendre la fin</li>
+      <li>Explorer les anomalies dans Anomaly Explorer</li>
+      <li>Ajouter le widget anomalies au dashboard Product Analytics</li>
+    </ol>
+    <p style="margin-top:0.8em;color:#166534;"><strong>Bonus :</strong> Créer un monitor Alerting si anomaly_grade &gt; 0.8 → webhook. Si peu de données : injecter <code>bulk-anomalies.ndjson</code> fourni.</p>
+  </div>
+  <aside class="notes">TP 20 min. Si les apprenants n'ont pas assez de données dans spacex-launches (moins de 50 docs), le modèle RCF ne sera pas très précis. Fournissez un fichier bulk-anomalies.ndjson avec des données synthétiques incluant des pics artificiels. L'analyse historique peut prendre 1-2 minutes. Timing : 20 min TP.</aside>
+</section>
+
+<!-- SLIDE 67 -->
 <section style="background:#0f172a;color:#fff;">
-  <h2 style="color:#86efac;">🎯 Le Fil Rouge — 3 jours en un coup d'œil</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;font-size:0.78em;text-align:center;">
-    <div style="background:rgba(37,99,235,0.3);padding:1em;border-radius:8px;border:1px solid #2563eb;">
-      <strong style="color:#93c5fd;">Jour 1</strong><br>
-      Cluster local<br>
-      1000+ produits indexés<br>
-      Recherche DSL<br>
-      Agrégations
+  <h2 style="color:#fff;">Architecture de référence OpenSearch</h2>
+  <div style="font-size:0.72em;color:#e2e8f0;">
+    <div style="display:grid;grid-template-columns:1fr 0.2fr 1fr 0.2fr 1fr 0.2fr 1fr;gap:0.3em;align-items:center;margin:1.5em 0;">
+      <div style="background:#1e293b;border:1px solid #334155;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong style="color:#60a5fa;">SOURCES</strong><br><br>
+        Applications<br>Microservices<br>Bases SQL<br>Fichiers logs<br>APIs REST
+      </div>
+      <div style="text-align:center;color:#94a3b8;font-size:1.5em;">→</div>
+      <div style="background:#1e293b;border:1px solid #334155;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong style="color:#fb923c;">COLLECTEURS</strong><br><br>
+        Fluent Bit<br><small>(K8s logs)</small><br>
+        Logstash<br><small>(migrations)</small><br>
+        Data Prepper<br><small>(OTEL)</small>
+      </div>
+      <div style="text-align:center;color:#94a3b8;font-size:1.5em;">→</div>
+      <div style="background:#1e293b;border:1px solid #334155;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong style="color:#34d399;">CLUSTER</strong><br><br>
+        3× master-eligible<br>
+        N× data nodes<br>
+        2× coordinating<br>
+        ISM + Templates<br>
+        SLM → S3
+      </div>
+      <div style="text-align:center;color:#94a3b8;font-size:1.5em;">→</div>
+      <div style="background:#1e293b;border:1px solid #334155;padding:0.8em;border-radius:4px;text-align:center;">
+        <strong style="color:#a78bfa;">DASHBOARDS</strong><br><br>
+        Discover / <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a><br>
+        Lens / TSVB<br>
+        Maps<br>
+        Alerting<br>
+        Anomaly Detection
+      </div>
     </div>
-    <div style="background:rgba(22,163,74,0.3);padding:1em;border-radius:8px;border:1px solid #16a34a;">
-      <strong style="color:#86efac;">Jour 2</strong><br>
-      Analyseur français<br>
-      Autocomplétion<br>
-      Géolocalisation<br>
-      Dashboard e-commerce
-    </div>
-    <div style="background:rgba(147,51,234,0.3);padding:1em;border-radius:8px;border:1px solid #9333ea;">
-      <strong style="color:#e9d5ff;">Jour 3</strong><br>
-      Cluster 3 nœuds HA<br>
-      ISM + Snapshots<br>
-      RBAC + TLS<br>
-      DLS + Audit logs
+    <div style="background:#1e293b;border:1px solid #334155;padding:0.6em;border-radius:4px;text-align:center;margin-top:0.5em;">
+      <strong style="color:#fbbf24;">MONITORING</strong> — OpenSearch Benchmark · JVM heap alerts · Disk alerts · GET /_cluster/health
     </div>
   </div>
-  <p style="margin-top:1.5em;color:#86efac;font-size:0.9em;">De <code>GET /demo-products/_search</code> à un cluster de production sécurisé 🚀</p>
-  <aside class="notes">
-    Prenez le temps de célébrer le parcours accompli. "Regardez où vous étiez ce matin du jour 1, et où vous êtes maintenant." Ce récap donne de la fierté. Timing : 10 min.
-  </aside>
+  <aside class="notes">Ce slide résume toute la formation en une architecture. Les sources (à gauche) → collecteurs adaptés au contexte → cluster résilient → dashboards pour les utilisateurs. C'est l'architecture type qu'on retrouve dans les grandes entreprises. Timing : 7 min.</aside>
 </section>
 
-<!-- SLIDE 23 : POUR ALLER PLUS LOIN -->
+<!-- SLIDE 68 -->
+<section>
+  <h2>Checklist production — sécurité</h2>
+  <div style="font-size:0.85em;">
+    <ul style="list-style:none;padding:0;line-height:2.1;">
+      <li>✅ TLS transport (port 9300) + TLS REST (port 9200)</li>
+      <li>✅ Certificats démo remplacés par CA interne ou Let's Encrypt</li>
+      <li>✅ Mot de passe admin changé (exit la démo <code>admin:admin</code>)</li>
+      <li>✅ RBAC avec principe du moindre privilège</li>
+      <li>✅ DLS/FLS pour données PII et multi-tenant</li>
+      <li>✅ Audit logs activés (FAILED_LOGIN, MISSING_PRIVILEGES, INDEX_EVENT)</li>
+      <li>✅ Port 9200 derrière reverse proxy (nginx/traefik) — jamais exposé directement</li>
+      <li>✅ <code>cluster.initial_master_nodes</code> supprimé après bootstrap initial</li>
+    </ul>
+  </div>
+  <aside class="notes">Ces 8 points sont le minimum non négociable pour passer en production. Le plus souvent oublié en pratique : supprimer initial_master_nodes après bootstrap (risque de split-brain), et remplacer les certs de démo (ils sont publics sur GitHub). Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 69 -->
+<section>
+  <h2>Checklist production — performance &amp; fiabilité</h2>
+  <div style="font-size:0.85em;">
+    <ul style="list-style:none;padding:0;line-height:2.0;">
+      <li>✅ JVM heap = 50% RAM max, plafonné à 32 GB (compressed oops)</li>
+      <li>✅ Shard &lt; 50 GB, cible ~30 GB — éviter les shards trop gros ou trop petits</li>
+      <li>✅ Replicas ≥ 1 en production — tolérance à la panne d'un nœud</li>
+      <li>✅ ISM sur tous les index temporels — rollover + lifecycle automatiques</li>
+      <li>✅ Snapshot quotidien vers S3 via SLM — retention 30 jours</li>
+      <li>✅ Index Templates sur tous les patterns d'index</li>
+      <li>✅ Alerte JVM heap &gt; 75% (GC pressure)</li>
+      <li>✅ Alerte disk &gt; 80% (watermark low)</li>
+      <li>✅ <code>GET /_cluster/allocation/explain</code> pour diagnostiquer Yellow/Red</li>
+    </ul>
+  </div>
+  <aside class="notes">La règle des 32GB heap est liée aux "compressed object pointers" de la JVM — au-delà, les pointeurs passent de 32 à 64 bits, ce qui augmente la consommation mémoire. Le disk watermark low (80%) déclenche le refus de nouvelles allocations de shards. Timing : 4 min.</aside>
+</section>
+
+<!-- SLIDE 70 -->
+<section>
+  <h2>Quiz Après-midi — 4 questions</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
+      <div style="background:#f8fafc;padding:0.8em;border-radius:4px;border-left:4px solid #475569;">
+        <p style="font-weight:600;color:#475569;">Q1 — is_write_index: true ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ Marque l'unique cible d'écriture d'un alias — seul cet index reçoit les indexations via l'alias</p>
+      </div>
+      <div style="background:#f8fafc;padding:0.8em;border-radius:4px;border-left:4px solid #475569;">
+        <p style="font-weight:600;color:#475569;">Q2 — ISM archiver après 30 jours ?</p>
+        <pre style="font-size:0.8em;margin:0.4em 0;"><code>"conditions": {
+  "min_index_age": "30d"
+}</code></pre>
+      </div>
+      <div style="background:#f8fafc;padding:0.8em;border-radius:4px;border-left:4px solid #475569;">
+        <p style="font-weight:600;color:#475569;">Q3 — Algorithme Anomaly Detection ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ Random Cut Forest (RCF) — algorithme non supervisé, pas besoin de données labellisées</p>
+      </div>
+      <div style="background:#f8fafc;padding:0.8em;border-radius:4px;border-left:4px solid #475569;">
+        <p style="font-weight:600;color:#475569;">Q4 — Fichier pipelines Data Prepper ?</p>
+        <p style="color:#16a34a;margin-top:0.4em;">✅ <code>pipelines.yaml</code> (ou un fichier .yaml par pipeline dans le dossier pipelines/)</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Quiz de fin d'après-midi. 5 minutes maximum. Si Q2 bloque, réexpliquez la syntaxe ISM conditions — c'est un point souvent confondu avec la syntaxe SLM. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 71 -->
+<section>
+  <div style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:16px;right:-28px;background:#991b1b;color:#fff;padding:3px 36px;transform:rotate(45deg);font-size:0.65em;font-weight:700;letter-spacing:0.05em;">OPTIONNEL</div>
+    <div style="background:#991b1b;color:#fff;padding:2em;border-radius:4px;">
+      <h2 style="color:#fff;margin-top:0;">Parent-Child</h2>
+      <h3 style="color:#fca5a5;font-weight:400;">Quand la hiérarchie est inévitable</h3>
+      <div style="background:rgba(0,0,0,0.3);padding:1em;border-radius:4px;margin-top:1.5em;font-size:0.85em;">
+        <p style="font-weight:700;color:#fca5a5;">⚠️ AVERTISSEMENT</p>
+        <p><strong>Join fields are RAM-intensive and should be avoided when possible.</strong></p>
+      </div>
+      <div style="margin-top:1.5em;font-size:0.82em;color:#fecaca;">
+        <p><strong>Alternatives à considérer en priorité :</strong></p>
+        <ul>
+          <li>Dénormalisation — dupliquer les champs parent dans chaque enfant</li>
+          <li>Nested documents — pour les relations 1-N dans un même document</li>
+          <li>Join applicatif — plusieurs requêtes dans le code</li>
+        </ul>
+        <p style="margin-top:1em;font-size:0.85em;">
+          Docs : https://opensearch.org/docs/latest/field-types/supported-field-types/join/<br>
+          Référence : https://www.elastic.co/blog/managing-relations-inside-elasticsearch
+        </p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Section optionnelle — abordez-la uniquement si vous êtes en avance sur le planning et si des apprenants ont des besoins de modélisation hiérarchique. Durée estimée : 20-25 min. Timing : 2 min pour ce slide d'intro.</aside>
+</section>
+
+<!-- SLIDE 72 -->
+<section>
+  <div style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:16px;right:-28px;background:#991b1b;color:#fff;padding:3px 36px;transform:rotate(45deg);font-size:0.65em;font-weight:700;letter-spacing:0.05em;">OPTIONNEL</div>
+    <h2>join field type — modélisation</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.78em;">
+      <div>
+        <p style="font-weight:600;color:#991b1b;">Mapping :</p>
+        <pre style="font-size:0.85em;"><code class="language-json">PUT /spacex
+{
+  "mappings": {
+    "properties": {
+      "join_field": {
+        "type": "join",
+        "relations": {
+          "rocket": "launch"
+        }
+      },
+      "name": { "type": "keyword" }
+    }
+  }
+}</code></pre>
+      </div>
+      <div>
+        <p style="font-weight:600;color:#991b1b;">Comparaison approches :</p>
+        <table style="font-size:0.85em;">
+          <thead><tr><th>Approche</th><th>Avantage</th><th>Inconvénient</th></tr></thead>
+          <tbody>
+            <tr><td>Dénormalisation</td><td>Simple, rapide</td><td>Duplication données</td></tr>
+            <tr><td>Nested</td><td>Atomique</td><td>Update = réindexer tout</td></tr>
+            <tr><td>Join field</td><td>Indépendance</td><td>RAM + lent</td></tr>
+          </tbody>
+        </table>
+        <div style="background:#fee2e2;padding:0.6em;border-radius:4px;margin-top:0.6em;font-size:0.85em;">
+          ⚠️ L'enfant DOIT avoir le même routing que le parent.
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Le join field type crée une relation parent-enfant dans le même index OpenSearch. La contrainte de routing est critique : si l'enfant est sur un shard différent du parent, les requêtes has_child/has_parent retournent 0 résultat sans erreur. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 73 -->
+<section>
+  <div style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:16px;right:-28px;background:#991b1b;color:#fff;padding:3px 36px;transform:rotate(45deg);font-size:0.65em;font-weight:700;letter-spacing:0.05em;">OPTIONNEL</div>
+    <h2>Indexer des parents et des enfants</h2>
+    <pre style="font-size:0.72em;"><code class="language-json">// 1. Indexer le parent (rocket Falcon 9)
+PUT /spacex/_doc/falcon9?routing=falcon9
+{
+  "name": "Falcon 9",
+  "manufacturer": "SpaceX",
+  "join_field": {
+    "name": "rocket"
+  }
+}
+
+// 2. Indexer un enfant (lancement CRS-1)
+PUT /spacex/_doc/launch_crs1?routing=falcon9
+{
+  "name": "CRS-1",
+  "date_utc": "2012-10-08T00:35:00.000Z",
+  "success": true,
+  "join_field": {
+    "name": "launch",
+    "parent": "falcon9"
+  }
+}</code></pre>
+    <div style="background:#fee2e2;border-left:4px solid #dc2626;padding:0.8em;border-radius:4px;margin-top:0.8em;font-size:0.85em;">
+      ⚠️ <strong>Erreur fréquente :</strong> oublier <code>?routing=falcon9</code> sur l'enfant → mauvais shard → 0 résultats sans message d'erreur.
+    </div>
+  </div>
+  <aside class="notes">Le routing manuel est la contrainte la plus piégeuse du join field. En production, intégrez toujours la vérification du routing dans vos tests d'intégration. Le parent_id peut être n'importe quelle valeur unique — ici on utilise "falcon9" pour la clarté. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 74 -->
+<section>
+  <div style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:16px;right:-28px;background:#991b1b;color:#fff;padding:3px 36px;transform:rotate(45deg);font-size:0.65em;font-weight:700;letter-spacing:0.05em;">OPTIONNEL</div>
+    <h2>has_child / has_parent queries</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.78em;">
+      <div>
+        <p style="font-weight:600;color:#991b1b;">has_child — trouver fusées ayant des lancements réussis :</p>
+        <pre><code class="language-json">GET /spacex/_search
+{
+  "query": {
+    "has_child": {
+      "type": "launch",
+      "min_children": 5,
+      "score_mode": "avg",
+      "query": {
+        "term": {
+          "success": true
+        }
+      }
+    }
+  }
+}</code></pre>
+      </div>
+      <div>
+        <p style="font-weight:600;color:#991b1b;">has_parent — trouver lancements de fusées US :</p>
+        <pre><code class="language-json">GET /spacex/_search
+{
+  "query": {
+    "has_parent": {
+      "parent_type": "rocket",
+      "score": true,
+      "query": {
+        "term": {
+          "country": "US"
+        }
+      }
+    }
+  }
+}</code></pre>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">has_child et has_parent sont les deux requêtes clés du join field. has_child (depuis parent) : "donne-moi les parents qui ont des enfants correspondant à ce critère". has_parent (depuis enfant) : "donne-moi les enfants dont le parent correspond". min_children et score_mode permettent d'affiner la pertinence. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 75 -->
+<section>
+  <div style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:16px;right:-28px;background:#991b1b;color:#fff;padding:3px 36px;transform:rotate(45deg);font-size:0.65em;font-weight:700;letter-spacing:0.05em;">OPTIONNEL</div>
+    <h2>Quand utiliser — et quand éviter</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
+      <div style="background:#dcfce7;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+        <p style="font-weight:600;color:#166534;">✅ Utiliser quand :</p>
+        <ul style="line-height:1.8;margin-top:0.5em;">
+          <li>Relation many-to-many vraie</li>
+          <li>Cardinalité très déséquilibrée<br><small>(1 parent, 100k enfants)</small></li>
+          <li>Les enfants doivent être mis à jour indépendamment du parent</li>
+          <li>Le parent évolue séparément</li>
+        </ul>
+      </div>
+      <div style="background:#fee2e2;border-left:4px solid #dc2626;padding:1em;border-radius:4px;">
+        <p style="font-weight:600;color:#991b1b;">❌ Éviter quand :</p>
+        <ul style="line-height:1.8;margin-top:0.5em;">
+          <li>On peut dénormaliser facilement</li>
+          <li>Moins de 10 enfants par parent</li>
+          <li>Haute cardinalité + requêtes fréquentes</li>
+          <li>Performance critique</li>
+        </ul>
+      </div>
+    </div>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.7em;border-radius:4px;margin-top:0.8em;font-size:0.85em;">
+      <strong>Alternatives recommandées :</strong> Nested fields · Application-side join · Dénormalisation
+    </div>
+  </div>
+  <aside class="notes">La règle pratique : si vous pouvez dénormaliser sans duplication excessive, faites-le — c'est toujours plus rapide. Le join field est un dernier recours pour des cas vraiment hiérarchiques avec des mises à jour indépendantes. Timing : 5 min.</aside>
+</section>
+
+<!-- SLIDE 76 -->
+<section>
+  <h2>Récap Jour 3 — ce qu'on a accompli</h2>
+  <div style="font-size:0.85em;">
+    <ul style="list-style:none;padding:0;line-height:2.0;">
+      <li>✅ <strong>Dashboards :</strong> Discover, <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a>, Lens, TSVB, Canvas, Maps, Alerting</li>
+      <li>✅ <strong>Agrégations visuelles :</strong> Terms→Pie, Avg→Metric, Date Histogram→Line</li>
+      <li>✅ <strong>Data Prepper :</strong> pipeline YAML, SpaceX API via HTTP source</li>
+      <li>✅ <strong>Logstash :</strong> pipeline ETL Docker, input file, filter grok+mutate, output opensearch</li>
+      <li>✅ <strong>ISM :</strong> policy hot→warm→cold→delete, ism_template, rollover</li>
+      <li>✅ <strong>Snapshots + SLM :</strong> repository fs, snapshot manuel, lifecycle automatique</li>
+      <li>✅ <strong>Anomaly Detection :</strong> RCF, Anomaly Explorer, intégration Alerting</li>
+      <li>✅ <strong>[OPTIONNEL] Parent-Child :</strong> join field, has_child, has_parent</li>
+    </ul>
+  </div>
+  <aside class="notes">Récap rapide — demandez aux apprenants de confirmer chaque point en levant la main ou en acquiesçant. Si un point pose encore problème, adressez-le maintenant avant le quiz final. Timing : 3 min.</aside>
+</section>
+
+<!-- SLIDE 77 -->
+<section>
+  <h2>Fil rouge — 3 jours en un coup d'œil</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1em;font-size:0.82em;margin-bottom:1.5em;">
+    <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+      <p style="font-weight:700;color:#2563eb;margin:0 0 0.5em;">Jour 1</p>
+      <ul style="line-height:1.7;font-size:0.9em;">
+        <li>Cluster local</li>
+        <li>Indexation Bulk API</li>
+        <li>Search DSL (bool, range, match)</li>
+        <li>Agrégations (terms, date_hist)</li>
+        <li>Mapping &amp; types de champs</li>
+        <li>Geo queries</li>
+      </ul>
+    </div>
+    <div style="background:#f0fdfa;border-left:4px solid #0d9488;padding:1em;border-radius:4px;">
+      <p style="font-weight:700;color:#0d9488;margin:0 0 0.5em;">Jour 2</p>
+      <ul style="line-height:1.7;font-size:0.9em;">
+        <li>Sécurité AAA</li>
+        <li>DLS / FLS</li>
+        <li>Ingest Pipelines</li>
+        <li>Analyseurs &amp; Tokenizers</li>
+        <li>Architecture cluster &amp; nœuds</li>
+        <li>Sizing shards, _reindex, routage</li>
+      </ul>
+    </div>
+    <div style="background:#faf5ff;border-left:4px solid #7c3aed;padding:1em;border-radius:4px;">
+      <p style="font-weight:700;color:#7c3aed;margin:0 0 0.5em;">Jour 3</p>
+      <ul style="line-height:1.7;font-size:0.9em;">
+        <li>Dashboards + <a href="https://docs.opensearch.org/latest/dashboards/dql/" target="_blank">DQL</a> + Lens</li>
+        <li>Data Prepper</li>
+        <li>Logstash</li>
+        <li>ISM + Snapshots + SLM</li>
+        <li>Anomaly Detection (RCF)</li>
+        <li>Prod Readiness</li>
+      </ul>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:1em;font-size:0.85em;">
+    <span style="background:#eff6ff;padding:0.4em 0.8em;border-radius:999px;color:#2563eb;">débutant</span>
+    <span style="font-size:1.5em;color:#94a3b8;">→</span>
+    <span style="background:#faf5ff;padding:0.4em 0.8em;border-radius:999px;color:#7c3aed;">intermédiaire</span>
+    <span style="font-size:1.5em;color:#94a3b8;">→</span>
+    <span style="background:#0f172a;padding:0.4em 0.8em;border-radius:999px;color:#fff;">production-ready</span>
+  </div>
+  <aside class="notes">Ce slide résume les 3 jours. Utilisez-le pour montrer la progression pédagogique. Jour 1 = fondations techniques, Jour 2 = production et sécurité, Jour 3 = outils et automatisation. Timing : 3 min.</aside>
+</section>
+
+<!-- SLIDE 78 -->
 <section>
   <h2>Pour aller plus loin</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;font-size:0.82em;">
-    <div>
-      <p><strong>📚 Ressources officielles</strong></p>
-      <ul>
-        <li>opensearch.org/docs/latest/</li>
-        <li>forum.opensearch.org</li>
-        <li>opensearch.org/blog/</li>
-        <li>github.com/opensearch-project</li>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;font-size:0.85em;">
+    <div style="background:#f8fafc;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+      <p style="font-weight:600;color:#2563eb;">Sujets avancés à explorer :</p>
+      <ul style="line-height:1.9;">
+        <li><strong>ML Commons</strong> — modèles ML custom intégrés</li>
+        <li><strong>Neural Search</strong> — recherche vectorielle / sémantique</li>
+        <li><strong>Search Pipelines</strong> — post-processing des résultats</li>
+        <li><strong>Cross-cluster search</strong> — requêtes multi-cluster</li>
+        <li><strong>OpenSearch Serverless</strong> — AWS managed</li>
+        <li><strong>Observabilité OTEL</strong> — traces + logs + métriques</li>
       </ul>
     </div>
-    <div>
-      <p><strong>🏭 Checklist Production</strong></p>
-      <ul>
-        <li>≥ 3 nœuds master dédiés</li>
-        <li>TLS sur transport ET REST</li>
-        <li>Snapshots S3 quotidiens</li>
-        <li>Monitoring heap + disk</li>
-        <li>ISM pour les logs</li>
-        <li>Principle of least privilege</li>
+    <div style="background:#f8fafc;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+      <p style="font-weight:600;color:#16a34a;">Communauté &amp; ressources :</p>
+      <ul style="line-height:1.9;">
+        <li>🌐 forum.opensearch.org</li>
+        <li>🐙 github.com/opensearch-project</li>
+        <li>💬 opensearch.slack.com</li>
+        <li>📺 YouTube "OpenSearch" channel</li>
+        <li>📖 opensearch.org/docs/latest</li>
+        <li>📰 Blog officiel opensearch.org/blog</li>
       </ul>
     </div>
   </div>
-  <aside class="notes">Donnez les ressources et les conseils de production. Timing : 5 min.</aside>
+  <aside class="notes">Orientez les apprenants selon leurs besoins : si ML/IA → Neural Search + ML Commons. Si observabilité → Data Prepper + OTEL full stack. Si multi-cloud → Cross-cluster search + OpenSearch Serverless. La communauté Slack est très réactive pour les questions techniques. Timing : 3 min.</aside>
 </section>
 
-<!-- SLIDE 24 : QCM ET SATISFACTION -->
-<section style="background:#ea580c;color:#fff;">
-  <h2 style="color:#fff;">📝 QCM &amp; Questionnaire de Satisfaction</h2>
-  <p style="font-size:1.1em;color:#fed7aa;">Le quiz de validation est envoyé par Digiforma à <strong>16h00</strong></p>
-  <ul style="font-size:0.9em;color:#fff7ed;">
-    <li>20 questions couvrant les 3 jours</li>
-    <li>Durée recommandée : 20 minutes</li>
-    <li>Answers dans <code>quiz/quiz-final.md</code> (pour référence)</li>
-  </ul>
-  <p style="margin-top:1em;color:#fed7aa;">Puis : questionnaire de satisfaction Digiforma</p>
-  <p style="color:#fff7ed;font-size:0.9em;">Votre retour est précieux pour améliorer la formation !</p>
-  <aside class="notes">
-    À 16h00 exactement, envoyez le lien Digiforma. Donnez 20 min pour le quiz. Soyez disponible pour les questions mais ne donnez pas les réponses. Après le quiz, distribuez ou envoyez le questionnaire de satisfaction. Timing : 30 min.
-  </aside>
+<!-- SLIDE 79 -->
+<section>
+  <h2>QCM Final &amp; Questionnaire de satisfaction</h2>
+  <div style="font-size:0.85em;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1em;margin-bottom:1em;">
+      <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:1em;border-radius:4px;">
+        <p style="font-weight:600;color:#2563eb;">📝 QCM Final — 16h00</p>
+        <ul style="line-height:1.8;margin-top:0.5em;">
+          <li>20 questions</li>
+          <li>Couvre les 3 journées</li>
+          <li>Durée : 20 minutes</li>
+          <li>Réponses : <code>quiz/quiz-final.md</code></li>
+          <li>Format : QCM + questions courtes</li>
+        </ul>
+      </div>
+      <div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:1em;border-radius:4px;">
+        <p style="font-weight:600;color:#166534;">⭐ Questionnaire de satisfaction</p>
+        <ul style="line-height:1.8;margin-top:0.5em;">
+          <li>À remplir après le QCM</li>
+          <li>Contenu, rythme, formateur</li>
+          <li>Points à améliorer</li>
+          <li>Lien envoyé par email</li>
+          <li>Anonyme et confidentiel</li>
+        </ul>
+      </div>
+    </div>
+    <div style="background:#fef3c7;border-left:4px solid #d97706;padding:0.8em;border-radius:4px;font-size:0.9em;">
+      💡 Le QCM est un outil pédagogique, pas une évaluation sanctionnante. L'objectif est de consolider les apprentissages des 3 jours.
+    </div>
+  </div>
+  <aside class="notes">Donnez 20 min pour le QCM, puis 5 min pour le questionnaire de satisfaction. Passez dans la salle pendant le QCM mais ne répondez pas aux questions — les apprenants doivent chercher dans leurs notes. Corrigez collectivement après. Timing : 30 min (QCM + correction + satisfaction).</aside>
 </section>
 
-<!-- SLIDE 25 : MERCI -->
+<!-- SLIDE 80 -->
 <section style="background:#2563eb;color:#fff;">
-  <h2 style="color:#fff;">Merci pour ces 3 jours ! 🎉</h2>
-  <p style="color:#bfdbfe;font-size:1em;">Vous avez maintenant les bases pour déployer et administrer OpenSearch en production.</p>
-  <div style="margin-top:1.5em;font-size:0.85em;color:#dbeafe;">
-    <p>📧 Contact formateur : [nom.formateur@email.com]</p>
-    <p>📋 N'oubliez pas de signer la feuille de présence !</p>
-    <p>📜 Votre attestation de formation arrivera par Digiforma</p>
+  <h1 style="font-size:1.8em;color:#fff;">Merci !</h1>
+  <h2 style="font-size:1.1em;color:#bfdbfe;font-weight:400;margin-top:0.5em;">Maintenant, construisez !</h2>
+  <p style="color:#dbeafe;margin-top:2em;font-style:italic;font-size:1em;">
+    "Vous avez maintenant tous les outils pour faire d'OpenSearch votre superpouvoir."
+  </p>
+  <div style="margin-top:2em;font-size:0.85em;color:#bfdbfe;text-align:left;display:inline-block;">
+    <p>📧 Contact formateur : ismail.ferdous@mirakl.com</p>
+    <p>📋 Feuille de présence à signer avant de partir</p>
+    <p>📜 Attestation Digiforma sous 48h par email</p>
   </div>
-  <p style="margin-top:1.5em;color:#93c5fd;font-size:0.9em;">Bonne continuation avec OpenSearch ! 🚀</p>
-  <aside class="notes">
-    Clôture chaleureuse. Serrez des mains (si présentiel). Restez disponible encore 15-30 min pour les questions individuelles. Timing : 10 min pour la clôture + Q&A final.
-  </aside>
+  <aside class="notes">Slide de clôture. Remerciez les apprenants pour leur engagement. Rappelez la feuille de présence — indispensable pour déclencher l'attestation Digiforma. Proposez de rester 15-30 min pour les questions individuelles. Timing : 2 min.</aside>
 </section>
 
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
 <script>
-  Reveal.initialize({ hash: true, slideNumber: 'c/t', progress: true, center: true, transition: 'slide', plugins: [RevealHighlight, RevealNotes] });
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  plugins: [RevealNotes, RevealHighlight],
+  transition: 'slide',
+  backgroundTransition: 'fade'
+});
 </script>
 </body>
 </html>

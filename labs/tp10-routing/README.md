@@ -1,4 +1,4 @@
-# TP9 — Routage : démonstration de l'importance de l'algorithme
+# TP10 — Routage : démonstration de l'importance de l'algorithme
 
 ## Informations générales
 
@@ -8,6 +8,12 @@
 | Difficulté | Intermédiaire                                        |
 | Prérequis  | TP7 terminé — cluster 3 nœuds en cours d'exécution   |
 | Objectif   | Comprendre l'algorithme de routing et son impact sur la distribution des données |
+
+> **Stack utilisée** : `docker-compose.cluster.yml` (cluster 3 nœuds, sans sécurité)
+> ```bash
+> docker compose -f infrastructure/docker-compose.cluster.yml up -d
+> ```
+> OpenSearch est accessible sur `http://localhost:9200` sans authentification.
 
 ## Objectif
 
@@ -35,8 +41,7 @@ PUT /routing-demo-auto
 ```bash
 for i in $(seq 1 300); do
   CATEGORY="cat$((RANDOM % 5 + 1))"
-  curl -s -X POST "https://localhost:9200/routing-demo-auto/_doc" \
-    -k -u admin:admin \
+  curl -s -X POST "http://localhost:9200/routing-demo-auto/_doc" \
     -H 'Content-Type: application/json' \
     -d "{\"id\": $i, \"category\": \"$CATEGORY\", \"value\": $RANDOM}" > /dev/null
 done
@@ -48,8 +53,7 @@ echo "300 documents indexés"
 ### 1.3 Observer la distribution des shards
 
 ```bash
-curl -s "https://localhost:9200/_cat/shards/routing-demo-auto?v&h=index,shard,prirep,docs,store,node" \
-  -k -u admin:admin
+curl -s "http://localhost:9200/_cat/shards/routing-demo-auto?v&h=index,shard,prirep,docs,store,node"
 ```
 
 **Observation attendue** : ~100 documents par shard primaire — distribution équitable grâce à l'algorithme de hash sur l'ID auto-généré.
@@ -70,25 +74,28 @@ PUT /routing-demo-forced
 ### 2.2 Indexer des documents avec routing par catégorie
 
 ```bash
-CATEGORIES=("Électronique" "Électronique" "Électronique" "Vêtements" "Livres")
+CATEGORIES=("electronique" "electronique" "electronique" "vetements" "livres")
 for i in $(seq 1 300); do
   CAT="${CATEGORIES[$((i % 5))]}"
-  curl -s -X POST "https://localhost:9200/routing-demo-forced/_doc?routing=$CAT" \
-    -k -u admin:admin \
+  curl -s -X POST "http://localhost:9200/routing-demo-forced/_doc?routing=$CAT" \
     -H 'Content-Type: application/json' \
     -d "{\"id\": $i, \"category\": \"$CAT\", \"value\": $RANDOM}" > /dev/null
 done
 echo "300 documents indexés avec routing forcé"
 ```
 
+> **Pourquoi des clés ASCII ?** Les caractères UTF-8 non encodés dans une URL (`?routing=Électronique`) peuvent être envoyés de manière inconsistante par curl, ce qui produit des hash différents pour le même routing key et disperse les docs sur plusieurs shards. Les clés ASCII simples garantissent un comportement déterministe.
+
 ### 2.3 Observer la distribution inégale
 
 ```bash
-curl -s "https://localhost:9200/_cat/shards/routing-demo-forced?v&h=index,shard,prirep,docs,store,node" \
-  -k -u admin:admin
+curl -s -X POST "http://localhost:9200/routing-demo-forced/_refresh"
+curl -s "http://localhost:9200/_cat/shards/routing-demo-forced?v&h=index,shard,prirep,docs,store,node"
 ```
 
-**Observation** : Certains shards contiennent beaucoup plus de documents que d'autres (shard "chaud" sur Électronique). C'est un **hotspot**.
+> Le `_refresh` est nécessaire avant de lire les stats : `_cat/shards` affiche les comptes Lucene des segments committés, pas ceux en mémoire. Sans refresh, un primary peut afficher 0 doc alors que sa replica en montre déjà 80.
+
+**Observation** : Certains shards contiennent beaucoup plus de documents que d'autres (shard "chaud" sur `electronique`). C'est un **hotspot**.
 
 ---
 
@@ -97,24 +104,22 @@ curl -s "https://localhost:9200/_cat/shards/routing-demo-forced?v&h=index,shard,
 ### 3.1 Sans routing (tous les shards interrogés)
 
 ```bash
-time curl -s -X GET "https://localhost:9200/routing-demo-forced/_search?explain=false" \
-  -k -u admin:admin \
+time curl -s -X GET "http://localhost:9200/routing-demo-forced/_search?explain=false" \
   -H 'Content-Type: application/json' \
-  -d '{ "query": { "term": { "category": "Électronique" } }, "size": 5 }' \
-  | jq -r '"Total: \(.hits.total.value) | Shards interrogés: \(._shards.total)"' 2>/dev/null
+  -d '{ "query": { "term": { "category": "electronique" } }, "size": 5 }' \
+  | jq -r '"Total: \(.hits.total.value) | Shards interrogés: \(._shards.total)"'
 ```
 
 ### 3.2 Avec routing (shard ciblé uniquement)
 
 ```bash
-time curl -s -X GET "https://localhost:9200/routing-demo-forced/_search?routing=Électronique" \
-  -k -u admin:admin \
+time curl -s -X GET "http://localhost:9200/routing-demo-forced/_search?routing=electronique" \
   -H 'Content-Type: application/json' \
-  -d '{ "query": { "term": { "category": "Électronique" } }, "size": 5 }' \
-  | jq -r '"Total: \(.hits.total.value) | Shards interrogés: \(._shards.total)"' 2>/dev/null
+  -d '{ "query": { "term": { "category": "electronique" } }, "size": 5 }' \
+  | jq -r '"Total: \(.hits.total.value) | Shards interrogés: \(._shards.total)"'
 ```
 
-**Observation** : Avec `?routing=Électronique`, seul 1 shard est interrogé au lieu de 3. Les résultats sont identiques mais la requête est plus ciblée.
+**Observation** : Avec `?routing=electronique`, seul 1 shard est interrogé au lieu de 3. Les résultats sont identiques mais la requête est plus ciblée.
 
 ---
 
