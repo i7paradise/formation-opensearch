@@ -60,16 +60,6 @@ services:
       - "9600:9600"
     volumes:
       - opensearch-node1-data:/usr/share/opensearch/data
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
-        ]
-      interval: 15s
-      timeout: 10s
-      retries: 15
-      start_period: 60s
 
   # ---------------------------------------------------------------------------
   # Noeud 2 — Deuxième noeud du cluster
@@ -86,16 +76,6 @@ services:
       - "9201:9200"
     volumes:
       - opensearch-node2-data:/usr/share/opensearch/data
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
-        ]
-      interval: 15s
-      timeout: 10s
-      retries: 15
-      start_period: 60s
 
   # ---------------------------------------------------------------------------
   # Noeud 3 — Troisième noeud du cluster
@@ -112,16 +92,6 @@ services:
       - "9202:9200"
     volumes:
       - opensearch-node3-data:/usr/share/opensearch/data
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s http://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
-        ]
-      interval: 15s
-      timeout: 10s
-      retries: 15
-      start_period: 60s
 
   # ---------------------------------------------------------------------------
   # OpenSearch Dashboards — Pointe vers les 3 noeuds du cluster
@@ -130,12 +100,9 @@ services:
     image: opensearchproject/opensearch-dashboards:3.6.0
     container_name: opensearch-dashboards-cluster
     depends_on:
-      opensearch-node1:
-        condition: service_healthy
-      opensearch-node2:
-        condition: service_healthy
-      opensearch-node3:
-        condition: service_healthy
+      - opensearch-node1
+      - opensearch-node2
+      - opensearch-node3
     environment:
       - OPENSEARCH_HOSTS=["http://opensearch-node1:9200","http://opensearch-node2:9200","http://opensearch-node3:9200"]
       - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
@@ -143,14 +110,4 @@ services:
       - "5601:5601"
     networks:
       - opensearch-cluster-net
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s http://localhost:5601/api/status | grep -q '\"state\":\"green\"' || exit 1",
-        ]
-      interval: 20s
-      timeout: 10s
-      retries: 10
-      start_period: 90s
     restart: unless-stopped

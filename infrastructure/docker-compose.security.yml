@@ -1,0 +1,70 @@
+# =============================================================================
+# Docker Compose — Noeud unique OpenSearch avec sécurité activée (TP5)
+#
+# Ports identiques au docker-compose.yml → arrêter l'autre stack avant :
+#   docker compose -f docker-compose.yml down
+#   docker compose -f docker-compose.security.yml up -d
+#
+# Connexion admin :
+#   curl -k -u admin:Formation@OpenSearch2024! https://localhost:9200/...
+#
+# Volume séparé (opensearch-security-data) — les données du stack principal
+# ne sont pas partagées.
+# =============================================================================
+
+networks:
+  opensearch-security-net:
+    driver: bridge
+
+volumes:
+  opensearch-security-data:
+    driver: local
+
+services:
+  # ---------------------------------------------------------------------------
+  # Noeud OpenSearch — sécurité activée, certificats demo auto-générés
+  # ---------------------------------------------------------------------------
+  opensearch-security:
+    image: opensearchproject/opensearch:3.6.0
+    container_name: opensearch-security
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      # Mot de passe admin initial — requis par le plugin sécurité
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Formation@OpenSearch2024!
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-security-data:/usr/share/opensearch/data
+    networks:
+      - opensearch-security-net
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # OpenSearch Dashboards — connexion HTTPS avec credentials admin
+  # ---------------------------------------------------------------------------
+  opensearch-dashboards-security:
+    image: opensearchproject/opensearch-dashboards:3.6.0
+    container_name: opensearch-dashboards-security
+    depends_on:
+      - opensearch-security
+    environment:
+      - OPENSEARCH_HOSTS=["https://opensearch-security:9200"]
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=Formation@OpenSearch2024!
+      # Désactiver la vérification du certificat auto-signé
+      - OPENSEARCH_SSL_VERIFICATIONMODE=none
+    ports:
+      - "5601:5601"
+    networks:
+      - opensearch-security-net
+    restart: unless-stopped

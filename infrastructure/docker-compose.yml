@@ -1,5 +1,3 @@
-version: "3.8"
-
 # =============================================================================
 # Docker Compose — Noeud unique OpenSearch (Jours 1 & 2)
 # Image : opensearchproject/opensearch:3.6.0
@@ -31,6 +29,8 @@ services:
       - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
       # Mot de passe administrateur initial — utilisé par le plugin sécurité
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Formation@OpenSearch2024!
+      # Désactivation du plugin de sécurité pour simplifier les TPs
+      - DISABLE_SECURITY_PLUGIN=true
     ulimits:
       # Nécessaire pour le verrouillage mémoire
       memlock:
@@ -50,17 +50,6 @@ services:
       - opensearch-data:/usr/share/opensearch/data
     networks:
       - opensearch-net
-    healthcheck:
-      # Vérifie l'état du cluster toutes les 10s, timeout 5s, 12 essais max
-      test:
-        [
-          "CMD-SHELL",
-          "curl -sk -u admin:Formation@OpenSearch2024! https://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"' || exit 1",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 30s
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
@@ -70,26 +59,15 @@ services:
     image: opensearchproject/opensearch-dashboards:3.6.0
     container_name: opensearch-dashboards
     depends_on:
-      opensearch:
-        condition: service_healthy
+      - opensearch
     environment:
-      # URL du noeud OpenSearch (HTTPS avec le plugin sécurité activé)
-      - OPENSEARCH_HOSTS=["https://opensearch:9200"]
-      - OPENSEARCH_USERNAME=admin
-      - OPENSEARCH_PASSWORD=Formation@OpenSearch2024!
+      # URL du noeud OpenSearch
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      # Désactivation de la sécurité côté Dashboards
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
     ports:
       # Interface web Dashboards
       - "5601:5601"
     networks:
       - opensearch-net
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s http://localhost:5601/api/status | grep -q '\"state\":\"green\"' || exit 1",
-        ]
-      interval: 15s
-      timeout: 10s
-      retries: 8
-      start_period: 60s
     restart: unless-stopped
