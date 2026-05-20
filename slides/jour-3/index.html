@@ -559,7 +559,7 @@ moving_average(count(), window: 7)</code></pre>
   <h2>Comparatif collecteurs</h2>
   <div style="font-size:0.75em;">
     <table>
-      <thead><tr><th>Critère</th><th style="color:#2563eb;">Logstash</th><th style="color:#ea580c;">Data Prepper</th><th style="color:#16a34a;">Fluent Bit</th></tr></thead>
+      <thead><tr><th>Critère</th><th style="color:#fff;">Logstash</th><th style="color:#fff;">Data Prepper</th><th style="color:#fff;">Fluent Bit</th></tr></thead>
       <tbody>
         <tr><td>Maturité</td><td style="background:#dcfce7;">Très mature (2009)</td><td style="background:#fef3c7;">Récent (2021)</td><td style="background:#dcfce7;">Mature (2014)</td></tr>
         <tr><td>Nb plugins</td><td style="background:#dcfce7;">200+</td><td style="background:#fef3c7;">~30</td><td style="background:#dcfce7;">80+</td></tr>
@@ -652,10 +652,12 @@ docker logs data-prepper -f
 
   processor:                        # Chaîne de transformations
     - date:
-        from_time_received: true
         destination: "@timestamp"
-    - mutate_event:
-        add_entries:
+        match:
+          - key: date_utc
+            patterns: ["ISO8601"]
+    - add_entries:
+        entries:
           - key: source
             value: spacex-api
 
@@ -703,24 +705,29 @@ docker logs data-prepper -f
         <tr><td><code>date</code></td><td>Parser un champ date → <code>@timestamp</code></td></tr>
         <tr><td><code>drop_events</code></td><td>Filtrer / supprimer des événements selon condition</td></tr>
         <tr><td><code>obfuscate</code></td><td>RGPD — masquer des champs (email, IP, nom)</td></tr>
-        <tr><td><code>mutate_event</code></td><td>Renommer / supprimer / ajouter des champs</td></tr>
+        <tr><td><code>add_entries</code></td><td>Ajouter des champs à l'événement</td></tr>
         <tr><td><code>string_converter</code></td><td>Convertir une chaîne en minuscules / majuscules</td></tr>
         <tr><td><code>parse_json</code></td><td>Parser un champ JSON string en objet</td></tr>
       </tbody>
     </table>
-    <p style="font-weight:600;color:#ea580c;margin-top:1em;">Exemple SpaceX :</p>
-    <pre style="font-size:0.8em;"><code class="language-yaml">processor:
-  - date:
-      match:
-        - key: date_utc
-          patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSZ"]
-      destination: "@timestamp"
-  - mutate_event:
-      add_entries:
-        - key: source
-          value: spacex-api</code></pre>
   </div>
   <aside class="notes">Le processor date est crucial pour que le champ @timestamp soit correctement parsé — sans ça, les visualisations temporelles ne fonctionnent pas. Le processor obfuscate est votre allié RGPD. Timing : 6 min.</aside>
+</section>
+
+<!-- SLIDE 29b -->
+<section>
+  <h2>Data Prepper — Processors — Exemple SpaceX</h2>
+  <pre><code class="language-yaml">processor:
+  - date:
+      destination: "@timestamp"
+      match:
+        - key: date_utc
+          patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSXXX", "ISO8601"]
+  - add_entries:
+      entries:
+        - key: source
+          value: spacex-api</code></pre>
+  <aside class="notes">Exemple concret utilisé dans le TP14. Le processor date parse le champ date_utc vers @timestamp. Le processor add_entries ajoute un champ source pour identifier l'origine des données.</aside>
 </section>
 
 <!-- SLIDE 30 -->
@@ -767,12 +774,12 @@ docker logs data-prepper -f
       path: /log/ingest
   processor:
     - date:
+        destination: "@timestamp"
         match:
           - key: date_utc
-            patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSZ"]
-        destination: "@timestamp"
-    - mutate_event:
-        add_entries:
+            patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSXXX", "ISO8601"]
+    - add_entries:
+        entries:
           - key: source
             value: spacex-api
   sink:
@@ -921,32 +928,6 @@ opensearch-benchmark list workloads</code></pre>
     <p style="margin-top:0.8em;"><strong>Résultats :</strong> throughput (doc/s), latences p50/p99, error rate, index size</p>
   </div>
   <aside class="notes">OpenSearch Benchmark est l'outil officiel de benchmarking. Il est essentiel avant de passer en production : on valide que le cluster tient la charge attendue. Attention : nyc_taxis avec 1.3B docs prend des heures — utilisez geonames pour les tests rapides. Timing : 4 min.</aside>
-</section>
-
-<!-- SLIDE 36 -->
-<section>
-  <h2>Quiz collecteurs — 4 questions</h2>
-  <div style="font-size:0.85em;">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8em;">
-      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
-        <p style="font-weight:600;color:#2563eb;">Q1 — Logs K8s sur 50 nœuds ?</p>
-        <p style="color:#16a34a;margin-top:0.4em;">✅ Fluent Bit en DaemonSet — léger, un agent par nœud</p>
-      </div>
-      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
-        <p style="font-weight:600;color:#2563eb;">Q2 — Migrer 500 Go Oracle vers OS ?</p>
-        <p style="color:#16a34a;margin-top:0.4em;">✅ Logstash + input jdbc — 200+ plugins, ETL mature</p>
-      </div>
-      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
-        <p style="font-weight:600;color:#2563eb;">Q3 — App Go avec traces OTEL ?</p>
-        <p style="color:#16a34a;margin-top:0.4em;">✅ Data Prepper + otel_trace_source — OTEL natif</p>
-      </div>
-      <div style="background:#eff6ff;padding:0.8em;border-radius:4px;">
-        <p style="font-weight:600;color:#2563eb;">Q4 — Valider perf avant prod ?</p>
-        <p style="color:#16a34a;margin-top:0.4em;">✅ OpenSearch Benchmark — workload nyc_taxis ou geonames</p>
-      </div>
-    </div>
-  </div>
-  <aside class="notes">Quiz rapide oral — posez les questions avant d'afficher les réponses. 3 min maximum. Vérifiez que tout le monde a compris les cas d'usage de chaque collecteur. Timing : 3 min.</aside>
 </section>
 
 <!-- SLIDE 37 -->

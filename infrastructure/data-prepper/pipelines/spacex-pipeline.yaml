@@ -1,0 +1,23 @@
+spacex-pipeline:
+  source:
+    http:
+      port: 2021
+  buffer:
+    bounded_blocking:
+      buffer_size: 1024
+      batch_size: 256
+  processor:
+    - date:
+        from_time_received: true
+        destination: "@timestamp"
+    - add_entries:
+        entries:
+          - key: source
+            value: "spacex-api"
+          - key: ingested_by
+            value: "data-prepper"
+  sink:
+    - opensearch:
+        hosts: ["http://opensearch-node1:9200"]
+        index: "spacex-launches"
+        bulk_size: 100

@@ -1,0 +1,86 @@
+# =============================================================================
+# Docker Compose — Data Prepper + OpenSearch (TP14)
+# Démarrage : docker compose -f docker-compose.data-prepper.yml up -d
+# Arrêt     : docker compose -f docker-compose.data-prepper.yml down
+#
+# Avant d'ingérer des données, créez le pipeline :
+#   data-prepper/pipelines/spacex-pipeline.yaml
+# Le sink doit utiliser http (sécurité désactivée) :
+#   hosts: ["http://opensearch-node1:9200"]
+# =============================================================================
+
+networks:
+  data-prepper-net:
+    driver: bridge
+
+volumes:
+  opensearch-data-prepper:
+    driver: local
+
+services:
+  # ---------------------------------------------------------------------------
+  # Noeud OpenSearch unique
+  # ---------------------------------------------------------------------------
+  opensearch-node1:
+    image: opensearchproject/opensearch:3.6.0
+    container_name: opensearch-node1
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Formation@OpenSearch2024!
+      - DISABLE_SECURITY_PLUGIN=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-data-prepper:/usr/share/opensearch/data
+    networks:
+      - data-prepper-net
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # OpenSearch Dashboards — Interface graphique
+  # ---------------------------------------------------------------------------
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.6.0
+    container_name: opensearch-dashboards-dp
+    depends_on:
+      - opensearch-node1
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch-node1:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    ports:
+      - "5601:5601"
+    networks:
+      - data-prepper-net
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Data Prepper — Pipeline d'ingestion
+  # Port 2021 : source HTTP (réception des données)
+  # Port 4900 : management (health check, métriques)
+  # ---------------------------------------------------------------------------
+  data-prepper:
+    image: opensearchproject/data-prepper:2
+    container_name: data-prepper
+    depends_on:
+      - opensearch-node1
+    volumes:
+      # Pipelines créés dans le TP14 (ex: spacex-pipeline.yaml)
+      - ./data-prepper/pipelines:/usr/share/data-prepper/pipelines
+      # Config management : désactivation SSL pour simplifier le TP
+      - ./data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml
+    ports:
+      - "2021:2021"
+      - "4900:4900"
+    networks:
+      - data-prepper-net
+    restart: unless-stopped

@@ -31,30 +31,24 @@ spacex-pipeline:
       batch_size: 256
   processor:
     - date:
-        from_time_received: false
         destination: "@timestamp"
         match:
           - key: "date_utc"
-            patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSXXX", "yyyy-MM-dd'T'HH:mm:ssXXX", "ISO8601"]
-    - mutate:
+            patterns: ["yyyy-MM-dd'T'HH:mm:ss.SSSXXX", "ISO8601"]
+    - add_entries:
         entries:
           - key: source
             value: "spacex-api"
-            add_to_existing_only: false
           - key: ingested_by
             value: "data-prepper"
-            add_to_existing_only: false
   sink:
     - opensearch:
-        hosts: ["https://opensearch-node1:9200"]
+        hosts: ["http://opensearch-node1:9200"]
         index: "spacex-launches"
-        username: "admin"
-        password: "Admin@1234!"
-        insecure: true
         bulk_size: 100
 ```
 
-> Le processor `date` convertit `date_utc` en `@timestamp`. Le processor `mutate` ajoute les champs `source` et `ingested_by`.
+> Le processor `date` convertit `date_utc` en `@timestamp`. Le processor `add_entries` ajoute les champs `source` et `ingested_by`.
 
 ---
 
@@ -69,15 +63,15 @@ docker compose -f docker-compose.data-prepper.yml up -d
 ### 2.2 Vérifier que Data Prepper est sain
 
 ```bash
-curl http://localhost:4900/health
+curl http://localhost:4900/list
 ```
 
 Réponse attendue :
 ```json
-{"status":"ok"}
+{"pipelines":[{"name":"spacex-pipeline"}]}
 ```
 
-> Attendez 10 à 15 secondes après le démarrage si le health check échoue.
+> Attendez 10 à 15 secondes après le démarrage si la commande échoue.
 
 ---
 
