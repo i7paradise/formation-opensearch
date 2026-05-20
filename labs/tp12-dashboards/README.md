@@ -10,7 +10,7 @@
 
 ## Objectif
 
-Construire un dashboard analytique complet "Product Analytics" dans OpenSearch Dashboards en utilisant Lens pour toutes les visualisations. Vous allez créer la Data View, explorer les données avec Discover et KQL, puis assembler le dashboard final avec un control interactif.
+Construire un dashboard analytique complet "Product Analytics" dans OpenSearch Dashboards en utilisant Lens pour toutes les visualisations. Vous allez créer la Data View, explorer les données avec Discover et DQL, puis assembler le dashboard final avec un control interactif.
 
 ---
 
@@ -43,7 +43,7 @@ Après la création, parcourez la liste des champs :
 
 ---
 
-## Exercice 2 — Explorer les données avec Discover + KQL
+## Exercice 2 — Explorer les données avec Discover + DQL
 
 ### 2.1 Ouvrir Discover
 
@@ -51,7 +51,7 @@ Après la création, parcourez la liste des champs :
 2. Sélectionnez la Data View `products` (menu déroulant en haut à gauche)
 3. Ajustez la plage temporelle — essayez **Last 1 year** ou **Last 5 years**
 
-### 2.2 Appliquer des filtres KQL
+### 2.2 Appliquer des filtres DQL
 
 Dans la barre de recherche en haut de Discover, testez les filtres suivants :
 
@@ -190,7 +190,7 @@ Testez le Control "Filtrer par catégorie" — toutes les visualisations doivent
 2. Métrique : expression `Filters`
    - Filtre A : `stock_quantity > 0` (label : `En stock`)
    - Divisé par Count total pour obtenir un pourcentage
-3. Sinon : utilisez une métrique `Count` avec filtre KQL `stock_quantity > 0` et comparez manuellement
+3. Sinon : utilisez une métrique `Count` avec filtre DQL `stock_quantity > 0` et comparez manuellement
 4. Titre : `Produits en stock`
 
 ---
@@ -198,7 +198,7 @@ Testez le Control "Filtrer par catégorie" — toutes les visualisations doivent
 ## Vérification finale
 
 - [ ] Data View `products` créée avec champ date (`indexed_at` ou `created_at`)
-- [ ] Filtres KQL testés dans Discover (catégorie, prix, texte)
+- [ ] Filtres DQL testés dans Discover (catégorie, prix, texte)
 - [ ] Recherche Discover sauvegardée
 - [ ] Visualisation A : Donut "Répartition par catégorie" créée avec Lens
 - [ ] Visualisation B : Bar Chart "Prix moyen par catégorie" créée avec Lens
@@ -214,7 +214,7 @@ Testez le Control "Filtrer par catégorie" — toutes les visualisations doivent
 ## Ressources
 
 - [Documentation OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/)
-- [Guide KQL (Dashboards Query Language)](https://opensearch.org/docs/latest/dashboards/dql/)
+- [Guide DQL (Dashboards Query Language)](https://opensearch.org/docs/latest/dashboards/dql/)
 - [Lens — éditeur de visualisations](https://opensearch.org/docs/latest/dashboards/visualize/lens/)
 - [Controls dans les dashboards](https://opensearch.org/docs/latest/dashboards/controls/index/)
 

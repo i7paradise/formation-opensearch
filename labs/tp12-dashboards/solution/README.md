@@ -27,7 +27,7 @@ La réponse doit montrer un mapping avec `created_at` de type `date`, `category`
 
 ## Exercice 2 — Exploration avec Discover
 
-### Filtre KQL recommandé
+### Filtre DQL recommandé
 
 ```
 category: "Électronique" AND price > 500
@@ -338,6 +338,6 @@ curl -X POST "http://localhost:5601/api/saved_objects/_import?overwrite=true" \
 
 3. **Filtres globaux vs locaux** : Les filtres dans la barre du haut s'appliquent à toutes les visualisations du dashboard. Les filtres dans une visualisation individuelle ne s'appliquent qu'à elle.
 
-4. **KQL vs DQL** : KQL (Kibana Query Language) est disponible dans OpenSearch Dashboards. C'est un langage simple pour filtrer les documents sans écrire de Query DSL complet.
+4. **DQL (Dashboards Query Language)** : DQL est le langage de requête natif d'OpenSearch Dashboards. C'est un langage simple pour filtrer les documents sans écrire de Query DSL complet.
 
 5. **Sélection du champ de date** : Le champ `created_at` doit être de type `date` dans le mapping pour fonctionner comme time field dans Dashboards.
