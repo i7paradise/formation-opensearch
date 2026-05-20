@@ -12,6 +12,8 @@ networks:
 volumes:
   opensearch-data:
     driver: local
+  opensearch-snapshots:
+    driver: local
 
 services:
   # ---------------------------------------------------------------------------
@@ -31,6 +33,8 @@ services:
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Formation@OpenSearch2024!
       # Désactivation du plugin de sécurité pour simplifier les TPs
       - DISABLE_SECURITY_PLUGIN=true
+      # Répertoire autorisé pour les snapshots filesystem (TP13)
+      - path.repo=/usr/share/opensearch/snapshots
     ulimits:
       # Nécessaire pour le verrouillage mémoire
       memlock:
@@ -48,6 +52,8 @@ services:
     volumes:
       # Volume persistant pour les données OpenSearch
       - opensearch-data:/usr/share/opensearch/data
+      # Volume pour les snapshots filesystem (TP13)
+      - opensearch-snapshots:/usr/share/opensearch/snapshots
     networks:
       - opensearch-net
     restart: unless-stopped
