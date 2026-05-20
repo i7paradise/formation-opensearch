@@ -19,5 +19,5 @@ spacex-pipeline:
   sink:
     - opensearch:
         hosts: ["http://opensearch-node1:9200"]
-        index: "spacex-launches"
+        index: "spacex-launches-1"
         bulk_size: 100
